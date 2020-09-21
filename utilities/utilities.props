@@ -22,7 +22,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <OutDir>$(SolutionDir)\utilities\bin\$(Configuration)\</OutDir>
-    <IncludePath>$(GLUI_INCLUDE_DIR);$(IncludePath)</IncludePath>
+    <IncludePath>$(IntelSWTools)\mkl\include;$(Glui)\include;$(SolutionDir)libraries\include;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(IntelSWTools)\mkl\bin;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>

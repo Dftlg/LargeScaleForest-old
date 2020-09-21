@@ -76,13 +76,12 @@ using namespace std;
 #endif
 
 
-#include "../../RenderingProcess/Shader.h"
-#include "../../RenderingProcess/Sence.h"
-#include "../../RenderingProcess/Mesh.h"
+#include "Shader.h"
+#include "Sence.h"
+#include "Mesh.h"
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <GLFW/glfw3.h>
-#include "../../VegaFemFactory/ModelDeformationTransform.h"
 
 #include "getopts.h"
 #include "initGraphics.h"
@@ -378,46 +377,47 @@ void displayFunction(void)
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
   glStencilFunc(GL_ALWAYS, 0, ~(0u));
-  // render embedded triangle mesh 内部三角网格
+  // render embedded triangle mesh 绘制每一帧的obj模型
   if (renderSecondaryDeformableObject)
     secondaryDeformableObjectRenderingMesh->Render();
 
   glStencilFunc(GL_ALWAYS, 1, ~(0u));
 
   // render the main deformable object (surface of volumetric mesh)
-  //if (renderDeformableObject)
-  //{
-  //  if (renderSecondaryDeformableObject)
-  //  {
-  //    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  //    glEnable(GL_BLEND);
+  if (renderDeformableObject)
+  {
+    if (renderSecondaryDeformableObject)
+    {
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glEnable(GL_BLEND);
 
-  //    glEnable(GL_POLYGON_OFFSET_FILL);
-  //    glPolygonOffset(1.0, 1.0);
-  //    glDrawBuffer(GL_NONE);
-  //    deformableObjectRenderingMesh->Render();
-  //    glDisable(GL_POLYGON_OFFSET_FILL);
-  //    glDrawBuffer(GL_BACK);
-  //    glEnable(GL_LIGHTING);
-  //  }
+      glEnable(GL_POLYGON_OFFSET_FILL);
+      glPolygonOffset(1.0, 1.0);
+      glDrawBuffer(GL_NONE);
+      deformableObjectRenderingMesh->Render();
+      glDisable(GL_POLYGON_OFFSET_FILL);
+      glDrawBuffer(GL_BACK);
+      glEnable(GL_LIGHTING);
+    }
 
-  //  glColor3f(0.0, 0.0, 0.0);
-  //  deformableObjectRenderingMesh->Render();
+	//外部包围网格
+   glColor3f(0.0, 0.0, 0.0);
+   deformableObjectRenderingMesh->Render();
 
-  //  if (renderVertices)
-  //  {
-  //    glDisable(GL_LIGHTING);
-  //    glColor3f(0.5,0,0);
-  //    glPointSize(8.0);
-  //    deformableObjectRenderingMesh->RenderVertices();
-  //    glEnable(GL_LIGHTING);
-  //  }
+    if (renderVertices)
+    {
+      glDisable(GL_LIGHTING);
+      glColor3f(0.5,0,0);
+      glPointSize(8.0);
+      deformableObjectRenderingMesh->RenderVertices();
+      glEnable(GL_LIGHTING);
+    }
 
-  //  if (renderSecondaryDeformableObject)
-  //  {
-  //    glDisable(GL_BLEND);
-  //  }
-  //}
+    if (renderSecondaryDeformableObject)
+    {
+      glDisable(GL_BLEND);
+    }
+  }
 
   // render any extra scene geometry
   glStencilFunc(GL_ALWAYS, 0, ~(0u));
@@ -582,7 +582,7 @@ void idleFunction(void)
 		//计算外力
        /* camera->CameraVector2WorldVector_OrientationOnly3D(
             forceX, forceY, 0, externalForce);*/
-		camera->setWorldCoorinateSystemForce(500, 0, 30, externalForce);
+		camera->setWorldCoorinateSystemForce(500, 0, 0, externalForce);
 		std::copy(externalForce, externalForce + 3, vForce);
 
         for(int j=0; j<3; j++)
@@ -688,31 +688,30 @@ void idleFunction(void)
         explosionCounter.StartCounter();
         break;
       }
-
-	  //if (strcmp(outputFilename, "__none") != 0)
-	  //{
-		 // char s[4096];
-			//  //写入可查看的位移文件
-		 // //sprintf(s, "%s.u.%04d.txt", "P", subTimestepCounter);
-			//  FILE * file = fopen(outputFilename, "a");
-			//  //printf("Saving deformation to %s.\n", s);
-			//  if (!file)
-			//  {
-			//	  printf("Can't open output file: %s.\n", s);
-			//  }
-			//  else
-			//  {
-			//	  sprintf(s, "Position%04d", subTimestepCounter);
-			//	  fprintf(file, "%s \n", s);
-			//	  fprintf(file, "%s \n", n);
-			//	  for (int i = 0; i < 3 * n; i++)
-			//	  {
-			//		  fprintf(file, "%.10lf ", integratorBase->Getq()[i]);
-			//	  }
-			//	  fprintf(file, "\n");
-			//  }
-			//  fclose(file);
-	  //}
+	  //保存位移文件
+	  if (strcmp(outputFilename, "__none") != 0)
+	  {
+		  char s[4096];
+			  //写入可查看的位移文件
+		  //sprintf(s, "%s.u.%04d.txt", "P", subTimestepCounter);
+			  FILE * file = fopen(outputFilename, "a");
+			  //printf("Saving deformation to %s.\n", s);
+			  if (!file)
+			  {
+				  printf("Can't open output file: %s.\n", s);
+			  }
+			  else
+			  {
+				  sprintf(s, "Position%04d", subTimestepCounter);
+				  fprintf(file, "%s \n", s);
+				  for (int i = 0; i < 3 * n; i++)
+				  {
+					  fprintf(file, "%.10lf ", integratorBase->Getq()[i]);
+				  }
+				  fprintf(file, "\n");
+			  }
+			  fclose(file);
+	  }
 
       // update UI performance indicators
 	  /*if (pulledVertex != -1)
@@ -731,10 +730,11 @@ void idleFunction(void)
 
       subTimestepCounter++;
     }
-	if (subTimestepCounter > 60)
+	if (subTimestepCounter > 80)
 	{
 		exit(1);
 	}
+	//用于判断文件力的数量
     //timestepCounter++;
 
     totalDynamicsCounter.StopCounter();
@@ -776,14 +776,10 @@ void idleFunction(void)
     secondaryDeformableObjectRenderingMesh->SetVertexDeformations(uSecondary);
 
 	//////////////////////
-	/*ObjMesh * mesh = secondaryDeformableObjectRenderingMesh->GetMesh();
-	double * restPosition = secondaryDeformableObjectRenderingMesh->GetVertexRestPositions();*/
-	CModelDeformationTransform deformationsave;
-	deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
-
-
+	//ObjMesh * mesh = secondaryDeformableObjectRenderingMesh->GetMesh();
+	//double * restPosition = secondaryDeformableObjectRenderingMesh->GetVertexRestPositions();
 	//mesh->saveToAscii("D:/GraduationProject/Vega/models/8.10/position/1.obj",1);
-	//CSence sence(mesh, restPosition,true, outputFilename, subTimestepCounter);
+	//CSence sence(mesh, restPosition);
 	//std::vector<std::vector<glm::vec3>> data = sence.getGroupDeformationData();
 	//if (strcmp(outputFilename, "__none") != 0)
 	//{
@@ -800,20 +796,15 @@ void idleFunction(void)
 	//	{
 	//		sprintf(s, "Position%04d", subTimestepCounter);
 	//		fprintf(file, "%s \n", s);
-	//		sprintf(s, "%d", data.size());
-	//		fprintf(file, "%s \n", s);
 	//		for (auto i = 0; i < data.size(); i++)
 	//		{
 	//			sprintf(s, "group%04d", i);
-	//			fprintf(file, "%s \n", s);
-	//			sprintf(s, "%d", data[i].size());
 	//			fprintf(file, "%s \n", s);
 	//			for (auto j = 0; j < data[i].size(); j++)
 	//			{
 	//				std::vector<glm::vec3> tempdata=data[i];
 	//				fprintf(file, "%.10lf %.10lf %10.lf ", tempdata[j].x,tempdata[j].y,tempdata[j].z);
 	//			}
-	//			fprintf(file, "%s \n", s);
 	//		}
 	//		fprintf(file, "\n");
 	//	}

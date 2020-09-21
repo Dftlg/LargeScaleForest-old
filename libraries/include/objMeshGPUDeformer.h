@@ -48,8 +48,8 @@
   #include <OpenGL/glext.h>
 #endif
 
-#include <cg.h>
-#include <cgGL.h>
+#include <cg/cg.h>
+#include <cg/cgGL.h>
 
 #include "objMesh.h"
 #include "objMeshRender.h"

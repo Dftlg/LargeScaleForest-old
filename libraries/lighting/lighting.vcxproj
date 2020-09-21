@@ -70,6 +70,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\libraries\camera;$(SolutionDir)\libraries\configFile;$(SolutionDir)\libraries\minivector;$(SolutionDir)\libraries\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -96,8 +97,6 @@
     <Import Project="..\..\..\..\vc_packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets" Condition="Exists('..\..\..\..\vc_packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets')" />
     <Import Project="..\..\..\..\vc_packages\glew.redist.2.1.0\build\native\GLEW.redist.targets" Condition="Exists('..\..\..\..\vc_packages\glew.redist.2.1.0\build\native\GLEW.redist.targets')" />
     <Import Project="..\..\..\..\vc_packages\glew.1.9.0.1\build\native\glew.targets" Condition="Exists('..\..\..\..\vc_packages\glew.1.9.0.1\build\native\glew.targets')" />
-    <Import Project="..\..\..\..\vc_packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets" Condition="Exists('..\..\..\..\vc_packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets')" />
-    <Import Project="..\..\..\..\vc_packages\freeglut.2.8.1.15\build\native\freeglut.targets" Condition="Exists('..\..\..\..\vc_packages\freeglut.2.8.1.15\build\native\freeglut.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -105,7 +104,5 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\..\..\vc_packages\glew.redist.2.1.0\build\native\GLEW.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\vc_packages\glew.redist.2.1.0\build\native\GLEW.redist.targets'))" />
     <Error Condition="!Exists('..\..\..\..\vc_packages\glew.1.9.0.1\build\native\glew.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\vc_packages\glew.1.9.0.1\build\native\glew.targets'))" />
-    <Error Condition="!Exists('..\..\..\..\vc_packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\vc_packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets'))" />
-    <Error Condition="!Exists('..\..\..\..\vc_packages\freeglut.2.8.1.15\build\native\freeglut.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\vc_packages\freeglut.2.8.1.15\build\native\freeglut.targets'))" />
   </Target>
 </Project>

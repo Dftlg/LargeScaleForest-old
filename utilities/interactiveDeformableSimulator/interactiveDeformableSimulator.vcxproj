@@ -50,11 +50,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>D:\GraduationProject\Vega\libraries\glui\glui-2.35\src\msvc\lib\Debug;D:\GraduationProject\Vega\libraries\glui\glui-2.35\src\msvc\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)libraries\glui\glui-2.35\src\msvc\lib\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>D:\GraduationProject\Vega\libraries\glui\glui-2.35\src\msvc\x64\Debug;D:\GraduationProject\Vega\libraries\glui\glui-2.35\src\msvc\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)libraries\glui\glui-2.35\src\msvc\lib\Release;$(LibraryPath)</LibraryPath>
     <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -80,16 +80,16 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>GLUI_NO_LIB_PRAGMA;_DEBUG;_CONSOLE;NOMINMAX%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLUI_NO_LIB_PRAGMA;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\libraries\basicAlgorithms;$(SolutionDir)\libraries\camera;$(SolutionDir)\libraries\configFile;$(SolutionDir)\libraries\constrainedDOFs;$(SolutionDir)\libraries\corotationalLinearFEM;$(SolutionDir)\libraries\forceModel;$(SolutionDir)\libraries\getopts;$(SolutionDir)\libraries\graph;$(SolutionDir)\libraries\imageIO;$(SolutionDir)\libraries\integrator;$(SolutionDir)\libraries\integratorSparse;$(SolutionDir)\libraries\isotropicHyperelasticFEM;$(SolutionDir)\libraries\lighting;$(SolutionDir)\libraries\listIO;$(SolutionDir)\libraries\macros;$(SolutionDir)\libraries\massSpringSystem;$(SolutionDir)\libraries\matrix;$(SolutionDir)\libraries\matrixIO;$(SolutionDir)\libraries\minivector;$(SolutionDir)\libraries\objMesh;$(SolutionDir)\libraries\performanceCounter;$(SolutionDir)\libraries\polarDecomposition;$(SolutionDir)\libraries\sceneObject;$(SolutionDir)\libraries\sparseMatrix;$(SolutionDir)\libraries\sparseSolver;$(SolutionDir)\libraries\stencilForceModel;$(SolutionDir)\libraries\stvk;$(SolutionDir)\libraries\volumetricMesh;$(SolutionDir)\libraries\include%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>basicAlgorithms.lib;camera.lib;configFile.lib;constrainedDOFs.lib;corotationalLinearFEM.lib;forceModel.lib;getopts.lib;graph.lib;imageIO.lib;integrator.lib;integratorSparse.lib;isotropicHyperelasticFEM.lib;lighting.lib;listIO.lib;massSpringSystem.lib;matrixIO.lib;mesh.lib;minivector.lib;objMesh.lib;openGLHelper.lib;performanceCounter.lib;polarDecomposition.lib;sceneObject.lib;sparseMatrix.lib;sparseSolver.lib;stencilForceModel.lib;stvk.lib;volumetricMesh.lib;GLUI.lib;glui32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basicAlgorithms.lib;camera.lib;configFile.lib;constrainedDOFs.lib;corotationalLinearFEM.lib;forceModel.lib;getopts.lib;graph.lib;imageIO.lib;integrator.lib;integratorSparse.lib;isotropicHyperelasticFEM.lib;lighting.lib;listIO.lib;massSpringSystem.lib;matrixIO.lib;mesh.lib;minivector.lib;objMesh.lib;openGLHelper.lib;performanceCounter.lib;polarDecomposition.lib;sceneObject.lib;sparseMatrix.lib;sparseSolver.lib;stencilForceModel.lib;stvk.lib;volumetricMesh.lib;GLUI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -103,14 +103,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.vcxproj">
-      <Project>{dcf08742-1dd0-4a5b-80dc-9cfe26abc661}</Project>
+    <ProjectReference Include="..\..\VegaRendering\Common\Common.vcxproj">
+      <Project>{ffe4174e-9a25-4028-b22f-8d29a453ee6f}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\RenderingProcess\RenderingProcess.vcxproj">
-      <Project>{96eb22fd-5b97-444e-81ba-2b5a60f6e0fe}</Project>
+    <ProjectReference Include="..\..\VegaRendering\RenderingProcess\RenderingProcess.vcxproj">
+      <Project>{dbd25957-7e9f-40a3-ad16-17fc2dc796ef}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\VegaFemFactory\VegaFemFactory.vcxproj">
-      <Project>{49fc65aa-ecff-464e-9b3b-95c9d44ac3dd}</Project>
+    <ProjectReference Include="..\..\VegaRendering\VegaFemFactory\VegaFemFactory.vcxproj">
+      <Project>{4d8480d7-7834-40a2-97ea-e34a72da8a63}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
@@ -127,8 +127,6 @@
     <Import Project="..\..\..\..\vc_packages\glew.redist.2.1.0\build\native\GLEW.redist.targets" Condition="Exists('..\..\..\..\vc_packages\glew.redist.2.1.0\build\native\GLEW.redist.targets')" />
     <Import Project="..\..\..\..\vc_packages\glew.1.9.0.1\build\native\glew.targets" Condition="Exists('..\..\..\..\vc_packages\glew.1.9.0.1\build\native\glew.targets')" />
     <Import Project="..\..\..\..\vc_packages\glfw.3.3.2\build\native\glfw.targets" Condition="Exists('..\..\..\..\vc_packages\glfw.3.3.2\build\native\glfw.targets')" />
-    <Import Project="..\..\..\..\vc_packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets" Condition="Exists('..\..\..\..\vc_packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets')" />
-    <Import Project="..\..\..\..\vc_packages\freeglut.2.8.1.15\build\native\freeglut.targets" Condition="Exists('..\..\..\..\vc_packages\freeglut.2.8.1.15\build\native\freeglut.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -142,7 +140,5 @@
     <Error Condition="!Exists('..\..\..\..\vc_packages\glew.redist.2.1.0\build\native\GLEW.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\vc_packages\glew.redist.2.1.0\build\native\GLEW.redist.targets'))" />
     <Error Condition="!Exists('..\..\..\..\vc_packages\glew.1.9.0.1\build\native\glew.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\vc_packages\glew.1.9.0.1\build\native\glew.targets'))" />
     <Error Condition="!Exists('..\..\..\..\vc_packages\glfw.3.3.2\build\native\glfw.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\vc_packages\glfw.3.3.2\build\native\glfw.targets'))" />
-    <Error Condition="!Exists('..\..\..\..\vc_packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\vc_packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets'))" />
-    <Error Condition="!Exists('..\..\..\..\vc_packages\freeglut.2.8.1.15\build\native\freeglut.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\vc_packages\freeglut.2.8.1.15\build\native\freeglut.targets'))" />
   </Target>
 </Project>

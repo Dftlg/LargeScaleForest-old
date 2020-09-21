@@ -12,12 +12,18 @@
     </JPEG_LIBRARIES>
     <PNG_LIBRARIES>
     </PNG_LIBRARIES>
-    <GLEW_LIBRARIES></GLEW_LIBRARIES>
+    <GLEW_LIBRARIES>
+    </GLEW_LIBRARIES>
   </PropertyGroup>
-  <PropertyGroup />
+  <PropertyGroup>
+    <LibraryPath>$(IntelSWTools)\mkl\lib\intel64_win;$(IntelSWTools)\compiler\lib\intel64_win;$(Pre-built)\lib\x64;$(CGAL)\auxiliary\gmp\lib;$(Glui)\msvc\lib\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <Link />
     <Link />
+    <Link>
+      <AdditionalDependencies>mkl_intel_lp64.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5md.lib;pthreadVC2.lib;libgmp-10.lib;libmpfr-4.lib;GLUI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="GLUT_LIBRARIES">
