@@ -688,45 +688,6 @@ void idleFunction(void)
         explosionCounter.StartCounter();
         break;
       }
-	  //保存位移文件
-	  if (strcmp(outputFilename, "__none") != 0)
-	  {
-		  char s[4096];
-			  //写入可查看的位移文件
-		  //sprintf(s, "%s.u.%04d.txt", "P", subTimestepCounter);
-			  FILE * file = fopen(outputFilename, "a");
-			  //printf("Saving deformation to %s.\n", s);
-			  if (!file)
-			  {
-				  printf("Can't open output file: %s.\n", s);
-			  }
-			  else
-			  {
-				  sprintf(s, "Position%04d", subTimestepCounter);
-				  fprintf(file, "%s \n", s);
-				  for (int i = 0; i < 3 * n; i++)
-				  {
-					  fprintf(file, "%.10lf ", integratorBase->Getq()[i]);
-				  }
-				  fprintf(file, "\n");
-			  }
-			  fclose(file);
-	  }
-
-      // update UI performance indicators
-	  /*if (pulledVertex != -1)
-	  {
-		  if (strcmp(outputFilename, "__none") != 0)
-		  {
-			  char s[4096];
-			  sprintf(s, "%s.u.%04d", outputFilename, subTimestepCounter);
-			  printf("Saving deformation to %s.\n", s);
-			  WriteMatrixToDisk_(s, 3 * n, 1, integratorBase->Getq());
-			  sprintf(s, "%s.f.%04d", outputFilename, subTimestepCounter);
-			  printf("Saving forces to %s.\n", s);
-			  WriteMatrixToDisk_(s, 3 * n, 1, integratorBase->GetExternalForces());
-		  }
-	  }*/
 
       subTimestepCounter++;
     }
@@ -778,8 +739,13 @@ void idleFunction(void)
 	//////////////////////
 	//ObjMesh * mesh = secondaryDeformableObjectRenderingMesh->GetMesh();
 	//double * restPosition = secondaryDeformableObjectRenderingMesh->GetVertexRestPositions();
+	CModelDeformationTransform deformationsave;
+	deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
+
+
 	//mesh->saveToAscii("D:/GraduationProject/Vega/models/8.10/position/1.obj",1);
 	//CSence sence(mesh, restPosition);
+
 	//std::vector<std::vector<glm::vec3>> data = sence.getGroupDeformationData();
 	//if (strcmp(outputFilename, "__none") != 0)
 	//{

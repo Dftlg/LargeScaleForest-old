@@ -43,10 +43,6 @@ void CModelDeformationTransform::__VertexFaceRelated()
 //根据原始u来填充按面的顺序排序的顶点u
 void CModelDeformationTransform::ConvertVertex2mutileVerteices(Common::SFileData &vBaseFileDeformation)
 {
-
-	/*std::chrono::high_resolution_clock clock;
-	auto start = clock.now();*/
-
 	if (m_VerticesNumber != vBaseFileDeformation.BaseFileDeformations.size()) std::cout << "the DataSet not equal to baseFile" << std::endl;
 
 	//循环group
@@ -65,38 +61,6 @@ void CModelDeformationTransform::ConvertVertex2mutileVerteices(Common::SFileData
 		//将一帧中所有group对应的按照面排列的u进行存储
 		vBaseFileDeformation.FileDeformation.push_back(tempDataGroup);
 	}
-
-	//	std::vector<Common::SFileDataGroup> tempGroups;
-	//	for (int i = 0; i < m_BaseFileMesh->getNumGroups(); i++)
-	//	{
-	//		Common::SFileDataGroup tempDataGroup(i);
-	//		tempGroups.push_back(tempDataGroup);
-	//	}
-	//#pragma omp parallel for num_threads(6)// m_BaseFileMesh->getNumGroups())
-	//	for (int i = 0; i < m_BaseFileMesh->getNumGroups(); i++)
-	//	{
-	//		//Common::SFileDataGroup tempDataGroup(i);
-	//		for (unsigned int faceid = 0; faceid < m_Groups[i].FaceSize; faceid++)
-	//		{
-	//			for (unsigned int vertexindex=0; vertexindex < 3; vertexindex++)
-	//			{
-	//				/*tempDataGroup.PositionsDeformation.push_back(vBaseFileDeformation.BaseFileDeformations[m_Groups[i].Faces[faceid].VertexIndex[vertexindex]]);*/
-	//				tempGroups[i].PositionsDeformation.push_back(vBaseFileDeformation.BaseFileDeformations[m_Groups[i].Faces[faceid].VertexIndex[vertexindex]]);
-	//			}	
-	//		}
-	//		
-	//	/*	std::cout << "Finish Product MutileVertices In Group: " << i << std::endl;
-	//		std::cout << "this OpenMp threadId is : " << omp_get_thread_num() << std::endl;*/
-	//	}
-	//	for (int i = 0; i < m_BaseFileMesh->getNumGroups(); i++)
-	//	{
-	//		vBaseFileDeformation.FileDeformation.push_back(tempGroups[i]);
-	//	}
-
-		/*auto end = clock.now();
-
-		std::cout << "Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;*/
-		//vBaseFileDeformation.FileDeformation.push_back(tempGroups);
 }
 
 void CModelDeformationTransform::SaveDeformationVertexFromBaseModel(const double* u, const int vDeformationSize, std::string vSaveFileName, int vtimeStepCounter)
