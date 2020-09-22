@@ -76,6 +76,8 @@ public:
 
   virtual int DoTimestep(); 
 
+  virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex);
+
 protected:
   int symplectic;
   SparseMatrix * systemMatrix;

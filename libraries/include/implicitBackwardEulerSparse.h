@@ -38,6 +38,7 @@
 #define _IMPLICITBACKWARDEULERSPARSE_H_
 
 #include "implicitNewmarkSparse.h"
+#include<fstream>
 
 class ImplicitBackwardEulerSparse : public ImplicitNewmarkSparse
 {
@@ -49,6 +50,8 @@ public:
   ImplicitBackwardEulerSparse(int r, double timestep, SparseMatrix * massMatrix, ForceModel * forceModel, int numConstrainedDOFs=0, int * constrainedDOFs=NULL, double dampingMassCoef=0.0, double dampingStiffnessCoef=0.0, int maxIterations = 1, double epsilon = 1E-6, int numSolverThreads=0); 
 
   virtual ~ImplicitBackwardEulerSparse();
+
+  virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex);
 
   // sets q, and (optionally) qvel 
   // returns 0 

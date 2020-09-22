@@ -281,13 +281,17 @@ SparseMatrix::SparseMatrix(SparseMatrixOutline * sparseMatrixOutline)
 // construct matrix from the outline
 void SparseMatrix::InitFromOutline(SparseMatrixOutline * sparseMatrixOutline)
 {
+	//获取行数维度10884
   numRows = sparseMatrixOutline->GetNumRows();
   Allocate();
 
   for(int i=0; i<numRows; i++)
   {
+	  //获取当前某个顶点的某个维度所相关的维度长度 例如24，48，96等
     rowLength[i] = (int)(sparseMatrixOutline->columnEntries[i].size());
+	//创建当前相关维度的维度索引值 总共10884维度
     columnIndices[i] = (int*) malloc (sizeof(int) * rowLength[i]);
+	//创建当前相关维度的数据值 总共10884维度
     columnEntries[i] = (double*) malloc (sizeof(double) * rowLength[i]);
 
     map<int,double>::iterator pos;
@@ -295,13 +299,16 @@ void SparseMatrix::InitFromOutline(SparseMatrixOutline * sparseMatrixOutline)
     int prev = -1;
     for(pos = sparseMatrixOutline->columnEntries[i].begin(); pos != sparseMatrixOutline->columnEntries[i].end(); pos++)
     {
+		//为某一维度赋值相关维度的索引号
       columnIndices[i][j] = pos->first;
       if (columnIndices[i][j] <= prev)
         printf("Warning: entries not sorted in a row in a sparse matrix.\n");
       prev = columnIndices[i][j];
+	  //为某一维度赋值相关维度的数据
       columnEntries[i][j] = pos->second;
       j++;
     }
+	//columnIndices大小和columnEntries大小相同
   }
 }
 
@@ -1477,6 +1484,18 @@ int SparseMatrix::Save(const char * filename, int oneIndexed) const
     }
   }
   fclose(fout);
+
+  //std::ofstream connectionFile;
+  //connectionFile.open(filename, std::ios::in | std::ios::app);
+  //for (int i = 0; i < numRows; i++)
+  //{
+	 // for (int j = 0; j < rowLength[i]; j++)
+	 // {
+		//  int index = columnIndices[i][j];
+		//  double entry = columnEntries[i][j];
+		//  connectionFile << i << " " << index << " " << entry << "\n";
+	 // }
+  //}
 
   return 0;
 }

@@ -59,6 +59,7 @@ ImplicitNewmarkSparse::ImplicitNewmarkSparse(int r, double timestep, SparseMatri
   }
 
   rayleighDampingMatrix = new SparseMatrix(*tangentStiffnessMatrix);
+  temptangentStiffnessMatrix = new SparseMatrix(*tangentStiffnessMatrix);
 
   rayleighDampingMatrix->BuildSubMatrixIndices(*massMatrix);
   tangentStiffnessMatrix->BuildSubMatrixIndices(*massMatrix);

@@ -201,3 +201,7 @@ int EulerSparse::DoTimestep()
   return 0;
 }
 
+void EulerSparse::WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex)
+{
+
+}

@@ -203,5 +203,12 @@ namespace Common
 			ConnectedIndex = vConnectedIndex;
 		}
 	};
+	//struct SKVFFrames
+	//{
+	//	std::string FileName;
+	//	std::vector<double> Deformation;
+	//	std::vector<double> InternalForces;
+	//	std::vector<
+	//};
 
 }

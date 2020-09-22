@@ -106,10 +106,13 @@ public:
   // dynamic solver is default (i.e. useStaticSolver=false)
   virtual void UseStaticSolver(bool useStaticSolver);
 
+  //virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex)=0;
+
 protected:
   SparseMatrix * rayleighDampingMatrix;
   SparseMatrix * tangentStiffnessMatrix;
   SparseMatrix * systemMatrix;
+  SparseMatrix * temptangentStiffnessMatrix;
 
   double * bufferConstrained;
 

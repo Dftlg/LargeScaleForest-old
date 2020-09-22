@@ -99,3 +99,7 @@ void IntegratorBaseSparse::ClearTangentStiffnessMatrixOffset()
   tangentStiffnessMatrixOffset = NULL;
 }
 
+void IntegratorBaseSparse::WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex)
+{
+
+}

@@ -187,6 +187,7 @@ CorotationalLinearFEM::CorotationalLinearFEM(VolumetricMesh * volumetricMesh_) :
     {
       for(int i = 0; i < 4; i++)
         vtxIndex[i] = volumetricMesh->getVertexIndex(el, cubeRotationTetIndex[i]);
+	  //获取体素3，4，1，6号位置的节点索引值
     }
 
     /*
@@ -203,6 +204,7 @@ CorotationalLinearFEM::CorotationalLinearFEM(VolumetricMesh * volumetricMesh_) :
 
     // invert M and cache inverse (see [Mueller 2004])
     MInverse[el] = (double*) malloc (sizeof(double) * 16);
+	//求M的逆矩阵 M是每个体素的四个顶点的三维信息
     inverse4x4(M, MInverse[el]);
   }
 
@@ -503,12 +505,22 @@ void CorotationalLinearFEM::GetStiffnessMatrixTopology(VolumetricMesh * volumetr
   int numVertices = volumetricMesh->getNumVertices();
   //空矩阵3*所有顶点
   SparseMatrixOutline * emptyMatrix = new SparseMatrixOutline(3 * numVertices);
+  std::vector<int> sizematrix;
+  std::vector<int> sizematrixaf;
+  
+  for (int i = 0; i < 20; i++)
+  {
+	  sizematrix.push_back(emptyMatrix->GetRow(i).size());
+  }
+  
 
   int numElements = volumetricMesh->getNumElements();
   int numElementVertices = volumetricMesh->getNumElementVertices();
   vector<int> vtxIndex(numElementVertices);
   for (int el = 0; el < numElements; el++)
   {
+	  //选取一个体素
+	  //得到该体素的每一个节点的序列
     for(int vtx = 0; vtx < numElementVertices; vtx++)
       vtxIndex[vtx] = volumetricMesh->getVertexIndex(el, vtx);
 
@@ -518,8 +530,13 @@ void CorotationalLinearFEM::GetStiffnessMatrixTopology(VolumetricMesh * volumetr
         // add 3x3 block corresponding to pair of vertices (i,j)
         for(int k = 0; k < 3; k++)
           for(int l = 0; l < 3; l++)
+			  //3*顶点序列+i(0,2)表示该顶点的三个维度中一个值
             emptyMatrix->AddEntry(3 * vtxIndex[i] + k, 3 * vtxIndex[j] + l, 0.0);
       }
+  }
+  for (int i = 0; i < 20; i++)
+  {
+	  sizematrixaf.push_back(emptyMatrix->GetRow(i).size());
   }
 
   *stiffnessMatrixTopology = new SparseMatrix(emptyMatrix);

@@ -76,6 +76,8 @@ public:
   virtual double GetKineticEnergy();
   virtual double GetTotalMass();
 
+  virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex);
+
 protected:
   SparseMatrix * massMatrix; 
   ForceModel * forceModel;

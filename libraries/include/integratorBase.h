@@ -103,6 +103,7 @@ Both publications are available online at www.jernejbarbic.com .
 */
 
 #include <stdlib.h>
+#include<string>
 
 // This abstract class is derived into: IntegratorBaseDense (dense systems)
 // and ImplicitNewmarkSparse ((large) sparse systems).
@@ -188,6 +189,7 @@ public:
   // constrain the system to ||q||^2 < R2
   // useful to prevent large values from occuring
   virtual void ConstrainToSphere(double R2);
+  virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex) = 0;
 
 protected:
 

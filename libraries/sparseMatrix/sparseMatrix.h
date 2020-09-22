@@ -104,6 +104,7 @@
 #include <string.h>
 #include <vector>
 #include <map>
+#include<fstream>
 
 class SparseMatrix;
 

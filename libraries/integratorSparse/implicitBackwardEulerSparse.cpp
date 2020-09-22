@@ -82,6 +82,8 @@ int ImplicitBackwardEulerSparse::DoTimestep()
     counterForceAssemblyTime.StopCounter();
     forceAssemblyTime = counterForceAssemblyTime.GetElapsedTime();
 
+	temptangentStiffnessMatrix = tangentStiffnessMatrix;
+	//tangentStiffnessMatrix->Save("D:\\GraduationProject\\LargeScaleForest\\models\\8.10\\test\\K2.txt");
     //tangentStiffnessMatrix->Print();
     //tangentStiffnessMatrix->Save("K");
 
@@ -154,6 +156,8 @@ int ImplicitBackwardEulerSparse::DoTimestep()
       *tangentStiffnessMatrix *= timestep; // h^2 * K + h * (D_Rayleigh + D_externnal)
       tangentStiffnessMatrix->AddSubMatrix(1.0, *massMatrix); // h^2 * K + h * (D_Rayleigh + D_external) + M
 
+
+	  //tangentStiffnessMatrix->Save("D:\\GraduationProject\\LargeScaleForest\\models\\8.10\\test\\K3.txt");
       // add externalForces, internalForces
       for(int i=0; i<r; i++)
       {
@@ -217,7 +221,7 @@ int ImplicitBackwardEulerSparse::DoTimestep()
       break;
 
     systemMatrix->AssignSuperMatrix(*tangentStiffnessMatrix);
-
+	systemMatrix->Save("D:\\GraduationProject\\LargeScaleForest\\models\\8.10\\test\\K3.txt");
     // solve: systemMatrix * buffer = bufferConstrained
 
     PerformanceCounter counterSystemSolveTime;
@@ -317,4 +321,54 @@ int ImplicitBackwardEulerSparse::DoTimestep()
 
   return 0;
 }
+
+void ImplicitBackwardEulerSparse::WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex)
+{
+	const size_t last_slash_idx = vFilePath.rfind('.txt');
+	std::string FramesBlockFileName = vFilePath.substr(0, last_slash_idx - 3);
+	FramesBlockFileName = FramesBlockFileName + ".kvf";
+
+	std::ofstream connectionFile;
+	connectionFile.open(FramesBlockFileName, std::ios::in | std::ios::app);
+
+	if (connectionFile.is_open())
+	{
+		//输出帧号
+		connectionFile << vFrameIndex << std::endl;
+		connectionFile << "u" << std::endl;
+		for (int i = 0; i < r; i++)
+			connectionFile << q[i] << " ";
+		connectionFile << std::endl;
+		//输出内力
+		connectionFile << "internalForces" << std::endl;
+		for (int i = 0; i < r; i++)
+			connectionFile << internalForces[i] << " ";
+		connectionFile << std::endl;
+		connectionFile << "Kmatrix" << std::endl;
+		//输出刚度矩阵或者输出A矩阵
+		//int temRows = temptangentStiffnessMatrix->GetNumRows();
+
+		for (int i = 0; i < temptangentStiffnessMatrix->GetNumRows(); i++)
+		{
+			for (int j = 0; j < temptangentStiffnessMatrix->GetRowLength(i); j++)
+			{
+				//int temRowLength = temptangentStiffnessMatrix->GetRowLength(i);
+				int index = temptangentStiffnessMatrix->GetColumnIndex(i, j);
+				double entry = temptangentStiffnessMatrix->GetEntry(i, j);
+				//connectionFile << i << " " << index << " " << entry << "\n";
+				connectionFile << entry << " ";
+			}
+			connectionFile << "\n";
+		}
+			
+		//输出速度
+		connectionFile << "velocity" << std::endl;
+		for (int i = 0; i < r; i++)
+			connectionFile << qvel[i] << " ";
+		connectionFile << std::endl;
+	}
+	
+
+}
+
 

@@ -662,6 +662,8 @@ void idleFunction(void)
     {
 		//计算由力产生的结点位移形变
       int code = integratorBase->DoTimestep();
+	  integratorBase->WriteKRFextVMartixToFile(outputFilename, subTimestepCounter);
+
       printf("."); fflush(nullptr);
 
       double forceAssemblyLocalTime = integratorBaseSparse->GetForceAssemblyTime();
@@ -1455,8 +1457,10 @@ void initSimulation()
   printf("Loaded %d fixed vertices. They are:\n",numFixedVertices);
   ListIO::print(numFixedVertices,fixedVertices);
   // create 0-indexed fixed DOFs
+  //每个顶点三个方向的DOF
   int numFixedDOFs = 3 * numFixedVertices;
   int * fixedDOFs = (int*) malloc (sizeof(int) * numFixedDOFs);
+  //将固定的某个顶点的三维全部选取出来
   for(int i=0; i<numFixedVertices; i++)
   {
     fixedDOFs[3*i+0] = 3*fixedVertices[i]-3;
