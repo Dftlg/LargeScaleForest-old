@@ -47,7 +47,7 @@ int main()
 	CVegaFemFactory vFem("../../models/8.10/test", "../../models/8.10/1.obj");
 	std::vector<int> b{ 500, 500, 500 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 1;
+	int numbercounter = 5;
 	for (int i = 0; i < numbercounter; i++)
 	{
 		angle.push_back(std::make_pair(0, i * 30));
