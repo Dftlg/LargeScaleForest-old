@@ -798,6 +798,7 @@ void SparseMatrix::Print(int sparsePrint) const
 // if not found, returns -1
 int SparseMatrix::GetInverseIndex(int row, int jDense) const
 {
+	//此处实际计算时并未考虑到3个维度，只对一个维度进行了查找
   for(int j=0; j < rowLength[row]; j++)
     if (columnIndices[row][j] == jDense)
       return j;

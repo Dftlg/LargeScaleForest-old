@@ -1189,9 +1189,6 @@ void CorotationalLinearFEM::BuildRowColumnIndices(SparseMatrix * sparseMatrix)
     for(int i=0; i<numElementVertices; i++)
       for(int j=0; j<numElementVertices; j++)
         columnIndices[el][numElementVertices * i + j] = sparseMatrix->GetInverseIndex(3*rowIndices[el][i], 3*rowIndices[el][j]) / 3;
-	//columnIndices中存放如果体素内一个顶点与体素内其他顶点是否存在在SparseMatrix的columnIndices中如果存在返回其索引号。
-	//SparseMatrix中的columnIndices存储的为用i表示某一顶点的维度 j表示其中该顶点维度与其他顶点的维度相关的索引数据，其中j大小一般为24或者96或者48等
-	//在corotationLinearFem的columnIndices存放的为i表示某个体素，j属于64长度，每8个长度表示体素的一个顶点，其中的每个值表示为该顶点是否能在rowLength(24,96,48）长度中，找到相应的索引值
   }
 }
 

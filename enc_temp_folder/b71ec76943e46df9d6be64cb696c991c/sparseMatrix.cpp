@@ -287,7 +287,7 @@ void SparseMatrix::InitFromOutline(SparseMatrixOutline * sparseMatrixOutline)
 
   for(int i=0; i<numRows; i++)
   {
-	  //获取当前某个顶点的某个维度所相关的维度长度
+	  //获取当前某个顶点的某个维度所相关的维度长度 例如24，48，96等
     rowLength[i] = (int)(sparseMatrixOutline->columnEntries[i].size());
 	//创建当前相关维度的维度索引值 总共10884维度
     columnIndices[i] = (int*) malloc (sizeof(int) * rowLength[i]);
