@@ -4,6 +4,7 @@
 #include<glm/gtc/type_ptr.hpp>
 #include<glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
+#include <vector>
 #include "../RenderingProcess/Camera.h"
 #include "Shader.h"
 #include "Sence.h"
@@ -24,6 +25,8 @@ void scrollCallback(GLFWwindow* vWindow, double vXOffset, double vYOffset);
 void mouseCallback(GLFWwindow* vWindow, double vXPos, double vYPos);
 void framebufferSizeCallback(GLFWwindow* vWindow, int vWidth, int vHeight);
 void processInput(GLFWwindow* vWindow);
+unsigned int loadTexture(char const * path);
+unsigned int loadCubemap(std::vector<std::string> faces);
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -61,22 +64,133 @@ int main()
 	}
 
 	// glfw: initialize and configure
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 	// ------------------------------
 	GLFWwindow* Window = nullptr;
 	if (!initWindow(Window, SCR_WIDTH, SCR_HEIGHT))
 	{
 		return EXIT_FAILURE;
 	}
+	glfwMakeContextCurrent(Window);
+	glfwSetFramebufferSizeCallback(Window, framebufferSizeCallback);
+	glfwSetCursorPosCallback(Window, mouseCallback);
+	glfwSetScrollCallback(Window, scrollCallback);
+
+	// tell GLFW to capture our mouse
+	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// configure global opengl state
 	// -----------------------------
-	/*glEnable(GL_CULL_FACE);*/
 	glEnable(GL_DEPTH_TEST);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	// build and compile shaders
 	// -------------------------
 
-	CShader ourShader("../../VegaRendering/VegaInterpolationRendering/Tree.vert", "../../VegaRendering/VegaInterpolationRendering/Tree.frag");
+	CShader ourTreeShader("Tree.vert", "Tree.frag");
+	CShader ourPlaneShader("Plane.vert", "Plane.frag");
+	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
+
+	//plane vertices
+	float planeVertices[] = {
+		// positions          // texture Coords 
+		 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+		-5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
+		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+
+		 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+		 5.0f, -0.5f, -5.0f,  2.0f, 2.0f
+	};
+
+	//skybox vertices
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
+	// plane VAO
+	unsigned int planeVAO, planeVBO;
+	glGenVertexArrays(1, &planeVAO);
+	glGenBuffers(1, &planeVBO);
+	glBindVertexArray(planeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glBindVertexArray(0);
+	// plane load textures
+	unsigned int floorTexture = loadTexture("resources/textures/metal.png");
+	ourPlaneShader.use();
+	ourPlaneShader.setInt("texture1", 0);
+
+	// skybox VAO
+	unsigned int skyboxVAO, skyboxVBO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	std::vector<std::string> faces
+	{
+		"resources/textures/skybox/right.jpg",
+		"resources/textures/skybox/left.jpg",
+		"resources/textures/skybox/top.jpg",
+		"resources/textures/skybox/bottom.jpg",
+		"resources/textures/skybox/front.jpg",
+		"resources/textures/skybox/back.jpg"
+	};
+	// skybox load textures
+	unsigned int cubemapTexture = loadCubemap(faces);
+	ourSkyBoxShader.use();
+	ourSkyBoxShader.setInt("skybox", 0);
 
 	CSence ourModel("../../models/8.10/1.obj");
 
@@ -109,7 +223,7 @@ int main()
 	}
 	std::cout << deformU[numbercounter*frameNums*vertexNums - 1].x << " " << count << std::endl;
 
-	GLuint shader_index = glGetProgramResourceIndex(ourShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
+	GLuint shader_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
 	GLint SSBOBinding = 0, BlockDataSize = 0;
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding);
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize);
@@ -125,11 +239,14 @@ int main()
 	//点和SSBO的连接
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, SSBO);
 	//点和shader的连接
-	glShaderStorageBlockBinding(ourShader.getID(), shader_index, ssbo_binding_point_index);
+	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_index, ssbo_binding_point_index);
 
-	ourShader.use();
-	ourShader.setInt("frameNums", frameNums);
-	ourShader.setInt("vertexNums", vertexNums);
+	ourTreeShader.use();
+	ourTreeShader.setInt("frameNums", frameNums);
+	ourTreeShader.setInt("vertexNums", vertexNums);
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 projection;
+	glm::mat4 view;
 	//glm::mat4 model = glm::mat4(1.0f);
 	//model = glm::translate(model, glm::vec3(1.0f, -0.5f, 0.0f));// translate it down so it's at the center of the scene
 	//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
@@ -143,7 +260,6 @@ int main()
 		float currentFrame = glfwGetTime();
 		DeltaTime = (currentFrame - LastFrame);
 		LastFrame = currentFrame;
-		//std::cout<<i << "帧间隔时间" << DeltaTime << std::endl;
 
 		// input---
 		processInput(Window);
@@ -152,13 +268,24 @@ int main()
 		glClearColor(1.0f, 1.0f, 1.0f, 0.5f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		ourShader.use();
-	
-		glm::mat4 projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = Camera.getViewMatrix();
-		ourShader.setMat4("projection", projection);
-		ourShader.setMat4("view", view);	
-		ourShader.setInt("frameIndex", i);
+		//plane
+		ourPlaneShader.use();
+		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		view = Camera.getViewMatrix();
+		ourPlaneShader.setMat4("projection", projection);
+		ourPlaneShader.setMat4("view", view);
+		glBindVertexArray(planeVAO);
+		glBindTexture(GL_TEXTURE_2D, floorTexture);
+		ourPlaneShader.setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		//tree
+		ourTreeShader.use();
+		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		view = Camera.getViewMatrix();
+		ourTreeShader.setMat4("projection", projection);
+		ourTreeShader.setMat4("view", view);	
+		ourTreeShader.setInt("frameIndex", i);
 
 		if (i >= 60)
 		{
@@ -168,19 +295,38 @@ int main()
 		{
 
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(1.0f*j, -0.5f, 0.0f));// translate it down so it's at the center of the scene
+			model = glm::translate(model, glm::vec3(1.0f*j, -0.5f, -5.0f));// translate it down so it's at the center of the scene
 			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-			ourShader.setMat4("model", model);
-			ourShader.setInt("treeIndex", j);
-			ourModel.draw(ourShader);
+			ourTreeShader.setMat4("model", model);
+			ourTreeShader.setInt("treeIndex", j);
+			ourModel.draw(ourTreeShader);
 		}
 		//ourModel.draw(ourShader)
 		i++;
+
+		//skybox
+		glDepthFunc(GL_LEQUAL);
+		ourSkyBoxShader.use();
+		view = glm::mat4(glm::mat3(Camera.getViewMatrix()));
+		ourSkyBoxShader.setMat4("view", view);
+		ourSkyBoxShader.setMat4("projection", projection);
+		//
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS); // set depth function back to default
 
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 	}
 
+	glDeleteVertexArrays(1, &skyboxVAO);
+	glDeleteVertexArrays(1, &planeVAO);
+	glDeleteBuffers(1, &planeVBO);
+	glDeleteBuffers(1, &skyboxVBO);
+	glDeleteBuffers(1, &SSBO);
 	glfwTerminate();
 	return 0;
 }
@@ -272,4 +418,70 @@ void framebufferSizeCallback(GLFWwindow* vWindow, int vWidth, int vHeight)
 {
 	glViewport(0, 0, vWidth, vHeight);
 }
+// utility function for loading a 2D texture from file
+unsigned int loadTexture(char const * path)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
 
+	int width, height, nrComponents;
+	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+	if (data)
+	{
+		GLenum format;
+		if (nrComponents == 1)
+			format = GL_RED;
+		else if (nrComponents == 3)
+			format = GL_RGB;
+		else if (nrComponents == 4)
+			format = GL_RGBA;
+
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_image_free(data);
+	}
+	else
+	{
+		std::cout << "Texture failed to load at path: " << path << std::endl;
+		stbi_image_free(data);
+	}
+
+	return textureID;
+}
+
+unsigned int loadCubemap(std::vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}

@@ -14,7 +14,7 @@ enum ECamera_Movement
 class CCamera
 {
 public:
-	CCamera(glm::vec3 vPosition = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 vUp = glm::vec3(0.0f, 1.0f, 0.0f), float vYaw = -90.0f, float vPitch = -90.0f);
+	CCamera(glm::vec3 vPosition = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 vUp = glm::vec3(0.0f, 1.0f, 0.0f), float vYaw = -90.0f, float vPitch = 0.0f);
 	CCamera(float vPosX, float vPosY, float vPosZ, float vUpX, float vUpY, float vUpZ, float vYaw, float vPitch);
 
 	void processKeyboard(ECamera_Movement vDirection, float vDeltaTime);
