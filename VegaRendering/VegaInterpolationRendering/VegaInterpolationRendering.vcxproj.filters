@@ -23,5 +23,9 @@
     <None Include="packages.config" />
     <None Include="Tree.frag" />
     <None Include="Tree.vert" />
+    <None Include="Plane.vert" />
+    <None Include="Plane.frag" />
+    <None Include="skybox.vert" />
+    <None Include="skybox.frag" />
   </ItemGroup>
 </Project>
