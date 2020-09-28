@@ -77,6 +77,7 @@ public:
   virtual int DoTimestep(); 
 
   virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex);
+  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex);
 
 protected:
   int symplectic;

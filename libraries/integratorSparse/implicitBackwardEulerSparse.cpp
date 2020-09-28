@@ -149,16 +149,25 @@ int ImplicitBackwardEulerSparse::DoTimestep()
 
       //add mass matrix and damping matrix to tangentStiffnessMatrix
 	  //用来计算A这个System Matrix矩阵
-      *tangentStiffnessMatrix *= timestep; // h * K
-      *tangentStiffnessMatrix += *rayleighDampingMatrix; // h * K + D_Rayleigh
-      tangentStiffnessMatrix->AddSubMatrix(1.0, *dampingMatrix, 1); // at this point, tangentStiffnessMatrix = h * K + (D_Rayleigh + D_exteral)
-      tangentStiffnessMatrix->MultiplyVectorAdd(qvel, qresidual);//(h*K+D)v
+      *tangentStiffnessMatrix *= timestep; //K= t * K
+      *tangentStiffnessMatrix += *rayleighDampingMatrix; //K=K+D_RayLeigh= t * K + D_Rayleigh
+      tangentStiffnessMatrix->AddSubMatrix(1.0, *dampingMatrix, 1); // at this point, tangentStiffnessMatrix = t * K + (D_Rayleigh + D_exteral)
+
+	  // K=K+dampingMatrix=t*K+D_Rayleigh + D_dampMatrix=  t*k+C 
+
+	  //qresidual = K * v = (t*K + C)v  此时qresidual为(t*K+C)v
+      tangentStiffnessMatrix->MultiplyVectorAdd(qvel, qresidual);//(t*K+D)v  
+
+	  //K=t(t*K+C)
       *tangentStiffnessMatrix *= timestep; // h^2 * K + h * (D_Rayleigh + D_externnal)
+	  //K=t(t*K+C)+M=t^2K+tC+M  此时的tangentStiffnessMatrix为A矩阵
       tangentStiffnessMatrix->AddSubMatrix(1.0, *massMatrix); // h^2 * K + h * (D_Rayleigh + D_external) + M
 
 
 	  //tangentStiffnessMatrix->Save("D:\\GraduationProject\\LargeScaleForest\\models\\8.10\\test\\K3.txt");
       // add externalForces, internalForces
+	  // qresidual=qresidual + Fint-Fext= (t*K+C)v+Fint-Fext
+	  //qresidual=-t[(t*K+C)v+Fint-Fext]=t[-(t*K+C)v-Fint+Fext] 此时与隐式欧拉residual步骤相同
       for(int i=0; i<r; i++)
       {
         qresidual[i] += internalForces[i] - externalForces[i];
@@ -246,6 +255,7 @@ int ImplicitBackwardEulerSparse::DoTimestep()
 
     #ifdef PARDISO
       int info = pardisoSolver->FactorMatrix(systemMatrix);
+	  // A(\dot q)=residual
       if (info == 0)
         info = pardisoSolver->SolveLinearSystem(buffer, bufferConstrained);
       char solverString[16] = "PARDISO";
@@ -333,6 +343,13 @@ void ImplicitBackwardEulerSparse::WriteKRFextVMartixToFile(const std::string & v
 
 	if (connectionFile.is_open())
 	{
+		/*int * temp= temptangentStiffnessMatrix->GetRowLengths();
+		for (int i = 0; i < r; i++)
+		{
+			connectionFile << temp[i] << " " << std::endl;
+		}*/
+
+
 		//输出帧号
 		connectionFile << vFrameIndex << std::endl;
 		connectionFile << "u" << std::endl;
@@ -346,7 +363,7 @@ void ImplicitBackwardEulerSparse::WriteKRFextVMartixToFile(const std::string & v
 		connectionFile << std::endl;
 		connectionFile << "Kmatrix" << std::endl;
 		//输出刚度矩阵或者输出A矩阵
-		//int temRows = temptangentStiffnessMatrix->GetNumRows();
+		int temRows = temptangentStiffnessMatrix->GetNumRows();
 
 		for (int i = 0; i < temptangentStiffnessMatrix->GetNumRows(); i++)
 		{
@@ -371,4 +388,88 @@ void ImplicitBackwardEulerSparse::WriteKRFextVMartixToFile(const std::string & v
 
 }
 
+void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex)
+{
+	const size_t last_slash_idx = vFilePath.rfind('.txt');
+	std::string FramesBlockFileName = vFilePath.substr(0, last_slash_idx - 3);
+	FramesBlockFileName = FramesBlockFileName + ".spkvf";
+
+	std::ofstream connectionFile;
+	connectionFile.open(FramesBlockFileName, std::ios::in | std::ios::app);
+
+	int ElementNumber= forceModel->GetStencilForceModel()->GetNumStencilVertices(0);
+
+	if (connectionFile.is_open())
+	{
+		//输出帧号
+		connectionFile << vFrameIndex << std::endl;
+
+		connectionFile << "Kmatrix" << std::endl;
+		std::map<int, std::vector<double>> vertexPos;
+		std::map<int, std::vector<double>> vertexVel;
+		for (int i = 0; i < vElementIndex.size(); i++)
+		{
+			const int *vIndices=forceModel->GetStencilForceModel()->GetStencilVertexIndices(0,vElementIndex[i]);
+			for (int v = 0; v < ElementNumber; v++)
+			{
+				//存储当前ele的某个顶点内力值
+				if (vertexPos.count(vIndices[v]) == 0)
+				{
+					std::vector<double> tempForcesxyz;
+					tempForcesxyz.push_back(internalForces[vIndices[v] * 3]);
+					tempForcesxyz.push_back(internalForces[vIndices[v] * 3+1]);
+					tempForcesxyz.push_back(internalForces[vIndices[v] * 3+2]);
+					vertexPos.insert(std::make_pair(vIndices[v], tempForcesxyz));
+				}
+
+				if (vertexPos.count(vIndices[v]) == 0)
+				{
+					std::vector<double> tempVelsxyz;
+					tempVelsxyz.push_back(qvel[vIndices[v] * 3]);
+					tempVelsxyz.push_back(qvel[vIndices[v] * 3 + 1]);
+					tempVelsxyz.push_back(qvel[vIndices[v] * 3 + 2]);
+					vertexPos.insert(std::make_pair(vIndices[v], tempVelsxyz));
+				}
+
+				//存储当前ele的某个顶点相关的某一维度相关顶点维度的数据
+				for (int j = 0; j < 3; j++)
+				{
+					int RowLength= temptangentStiffnessMatrix->GetRowLength(vIndices[v] * 3+j);
+					connectionFile << RowLength << " ";
+					for (int k = 0; k < RowLength; k++)
+					{
+						double entry = temptangentStiffnessMatrix->GetEntry(vIndices[v] * 3 + j, k);
+						connectionFile << entry << " ";
+					}
+					connectionFile << std::endl;
+
+				}
+			
+			}
+		}
+		connectionFile << "internalForces" << std::endl;
+		for (auto it = vertexPos.begin(); it != vertexPos.end(); ++it)
+		{
+			connectionFile << (it)->first << " ";
+			for (int i = 0; i < 3; i++)
+				connectionFile << it->second[i]<<" ";
+			connectionFile << "\n";
+		}
+
+		connectionFile << "velocity" << std::endl;
+		for (auto it = vertexVel.begin(); it != vertexVel.end(); ++it)
+		{
+			connectionFile << (it)->first << " ";
+			for (int i = 0; i < 3; i++)
+				connectionFile << it->second[i] << " ";
+			connectionFile << "\n";
+		}
+
+		connectionFile << "all point deformation" << std::endl;
+		for (int i = 0; i < r; i++)
+			connectionFile << q[i] << " ";
+		connectionFile << std::endl;
+	}
+
+}
 

@@ -35,6 +35,7 @@
 
 #include "forceModel.h"
 #include "stencilForceModel.h"
+#include <iostream>
 
 #ifdef USE_TBB
   #include <tbb/tbb.h>

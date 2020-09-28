@@ -40,12 +40,18 @@ ForceModelAssembler::ForceModelAssembler(StencilForceModel *eleFM) : stencilForc
   r = stencilForceModel->Getn3();
   SparseMatrixOutline *smo = new SparseMatrixOutline(r);
   SparseMatrixOutline *smo1 = new SparseMatrixOutline(r / 3);
-
+  
+ // int t = stencilForceModel->GetNumStencilTypes();
+  //获取类型大小为1
   for (int eltype = 0; eltype < stencilForceModel->GetNumStencilTypes(); eltype++) 
   {
+	  //值为8
     int nelev = stencilForceModel->GetNumStencilVertices(eltype);
+	//int number = stencilForceModel->GetNumStencils(eltype);
+	//ele总共1678个体素
     for (int ele = 0; ele < stencilForceModel->GetNumStencils(eltype); ele++) 
     {
+		//获取体素ele的顶点索引
       const int *vertexIndices = stencilForceModel->GetStencilVertexIndices(eltype, ele);
 
       for (int vi = 0; vi < nelev; vi++) 
@@ -97,6 +103,7 @@ ForceModelAssembler::ForceModelAssembler(StencilForceModel *eleFM) : stencilForc
   for (int eltype = 0; eltype < stencilForceModel->GetNumStencilTypes(); eltype++) 
   {
     int nelev = stencilForceModel->GetNumStencilVertices(eltype);
+	//
     bufferExamplars[eltype].resize(nelev * 3 + nelev * nelev * 9);
   }
 
@@ -231,26 +238,33 @@ void ForceModelAssembler::GetEnergyAndForceAndMatrix(const double * u, double * 
   {
 	  //8
     int nelev = stencilForceModel->GetNumStencilVertices(eltype);
-	//543
+	//543 1678
     int nele = stencilForceModel->GetNumStencils(eltype);
 
     for (int ele = 0; ele < nele; ele++) 
     {
+	  //获取当前体素的内部内力以及内部局部刚度矩阵。
       double *fEle = bufferExamplars[eltype].data();
       double *KEle = bufferExamplars[eltype].data() + nelev * 3;
 
       double energyEle = 0;
 
+	  
+	  //fEle和Kele指向同一块内存，fEle比Kele多24位
+	  //其中包含660个，而Kele又576个
       stencilForceModel->GetStencilLocalEnergyAndForceAndMatrix(eltype, ele, u,
         (energy ? &energyEle : nullptr),
         (internalForces ? fEle : nullptr),
         (tangentStiffnessMatrix ? KEle : nullptr)
       );
 
+	  //当前体素的8个顶点
       const int *vIndices = stencilForceModel->GetStencilVertexIndices(eltype, ele);
 
+	  //更新当前八个顶点x,y,z轴的内力
       if (internalForces) 
       {
+		//fEle只取前24个数
         for (int v = 0; v < nelev; v++) 
         {
           internalForces[vIndices[v] * 3] += fEle[v * 3];
@@ -258,7 +272,7 @@ void ForceModelAssembler::GetEnergyAndForceAndMatrix(const double * u, double * 
           internalForces[vIndices[v] * 3 + 2] += fEle[v * 3 + 2];
         }
       }
-
+	  //更新当前
       if (tangentStiffnessMatrix) 
       {
         const int *vtxColIndices = inverseIndices[eltype].data() + ele * nelev * nelev;
@@ -281,6 +295,7 @@ void ForceModelAssembler::GetEnergyAndForceAndMatrix(const double * u, double * 
                 int local_row = 3 * va + i;
                 int local_col = 3 * vb + j;
 
+				//这里可以更新局部的刚度矩阵
                 tangentStiffnessMatrix->AddEntry(row, columnIndex, KEle[local_col * nelev * 3 + local_row]);
               } // i
             } // j
