@@ -230,7 +230,7 @@ int ImplicitBackwardEulerSparse::DoTimestep()
       break;
 
     systemMatrix->AssignSuperMatrix(*tangentStiffnessMatrix);
-	systemMatrix->Save("D:\\GraduationProject\\LargeScaleForest\\models\\8.10\\test\\K3.txt");
+	//systemMatrix->Save("D:\\GraduationProject\\LargeScaleForest\\models\\8.10\\test\\K3.txt");
     // solve: systemMatrix * buffer = bufferConstrained
 
     PerformanceCounter counterSystemSolveTime;
@@ -422,13 +422,13 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 					vertexPos.insert(std::make_pair(vIndices[v], tempForcesxyz));
 				}
 
-				if (vertexPos.count(vIndices[v]) == 0)
+				if (vertexVel.count(vIndices[v]) == 0)
 				{
 					std::vector<double> tempVelsxyz;
 					tempVelsxyz.push_back(qvel[vIndices[v] * 3]);
 					tempVelsxyz.push_back(qvel[vIndices[v] * 3 + 1]);
 					tempVelsxyz.push_back(qvel[vIndices[v] * 3 + 2]);
-					vertexPos.insert(std::make_pair(vIndices[v], tempVelsxyz));
+					vertexVel.insert(std::make_pair(vIndices[v], tempVelsxyz));
 				}
 
 				//存储当前ele的某个顶点相关的某一维度相关顶点维度的数据
@@ -465,10 +465,10 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 			connectionFile << "\n";
 		}
 
-		connectionFile << "all point deformation" << std::endl;
+		/*connectionFile << "all point deformation" << std::endl;
 		for (int i = 0; i < r; i++)
 			connectionFile << q[i] << " ";
-		connectionFile << std::endl;
+		connectionFile << std::endl;*/
 	}
 
 }

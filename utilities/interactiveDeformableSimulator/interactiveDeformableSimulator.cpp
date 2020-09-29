@@ -294,6 +294,10 @@ double * uSecondary = nullptr;
 double * uInitial = nullptr;
 double * velInitial = nullptr;
 
+double * deltau = nullptr;
+double * preu = nullptr;
+double * deltaSecondaryu = nullptr;
+
 double vForce[3];
 int constantpulledVertex = -1;
 
@@ -662,7 +666,9 @@ void idleFunction(void)
     {
 		//计算由力产生的结点位移形变
       int code = integratorBase->DoTimestep();
-	  integratorBase->WriteKRFextVMartixToFile(outputFilename, subTimestepCounter);
+	  std::vector<int> tempvec = { 0,4,1677 };
+	  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, tempvec);
+	  /*integratorBase->WriteKRFextVMartixToFile(outputFilename, subTimestepCounter);*/
 
       printf("."); fflush(nullptr);
 
@@ -693,7 +699,7 @@ void idleFunction(void)
 
       subTimestepCounter++;
     }
-	if (subTimestepCounter > 80)
+	if (subTimestepCounter > 30)
 	{
 		exit(1);
 	}
@@ -704,6 +710,22 @@ void idleFunction(void)
     printf("Total dynamics: %G\n", totalDynamicsCounter.GetElapsedTime());
 
     memcpy(u, integratorBase->Getq(), sizeof(double) * 3 * n);
+
+	if (subTimestepCounter == 1)
+	{
+		memcpy(deltau, integratorBase->Getq(), sizeof(double) * 3 * n);
+		memcpy(preu, integratorBase->Getq(), sizeof(double) * 3 * n);
+	}
+	else
+	{
+		for (int i = 0; i < 3*n; i++)
+		{
+			deltau[i] = u[i] - preu[i];
+			memcpy(preu, integratorBase->Getq(), sizeof(double) * 3 * n);
+		}
+	}
+
+	
 
     if (singleStepMode == 1)
       singleStepMode = 2;
@@ -734,16 +756,19 @@ void idleFunction(void)
   if (secondaryDeformableObjectRenderingMesh != nullptr)
   {
     PerformanceCounter interpolationCounter;
+
     VolumetricMesh::interpolate(u, uSecondary, secondaryDeformableObjectRenderingMesh->Getn(), secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices, secondaryDeformableObjectRenderingMesh_interpolation_vertices, secondaryDeformableObjectRenderingMesh_interpolation_weights);
 	//内部的三角形网格发生形变
     secondaryDeformableObjectRenderingMesh->SetVertexDeformations(uSecondary);
 
+	
+	VolumetricMesh::interpolate(deltau, deltaSecondaryu, secondaryDeformableObjectRenderingMesh->Getn(), secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices, secondaryDeformableObjectRenderingMesh_interpolation_vertices, secondaryDeformableObjectRenderingMesh_interpolation_weights);
 	//////////////////////
 	//ObjMesh * mesh = secondaryDeformableObjectRenderingMesh->GetMesh();
 	//double * restPosition = secondaryDeformableObjectRenderingMesh->GetVertexRestPositions();
 	CModelDeformationTransform deformationsave;
-	deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
-
+	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
+	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
 
 	//mesh->saveToAscii("D:/GraduationProject/Vega/models/8.10/position/1.obj",1);
 	//CSence sence(mesh, restPosition);
@@ -1405,6 +1430,8 @@ void initSimulation()
 
     uSecondary = (double*) calloc (3 * secondaryDeformableObjectRenderingMesh->Getn(), sizeof(double));
 
+	deltaSecondaryu= (double*)calloc(3 * secondaryDeformableObjectRenderingMesh->Getn(), sizeof(double));
+
     // load interpolation structure
 	//加载插值结构
     if (strcmp(secondaryRenderingMeshInterpolationFilename, "__none") == 0)
@@ -1477,6 +1504,9 @@ void initSimulation()
   uaccel = (double*) calloc (3*n, sizeof(double));
   f_ext = (double*) calloc (3*n, sizeof(double));
   f_extBase = (double*) calloc (3*n, sizeof(double));
+
+  deltau = (double*)calloc(3 * n, sizeof(double));
+  preu= (double*)calloc(3 * n, sizeof(double));
 
   // load initial condition
   if (strcmp(initialPositionFilename, "__none") != 0)
