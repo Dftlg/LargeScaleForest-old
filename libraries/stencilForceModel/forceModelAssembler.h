@@ -35,6 +35,7 @@
 
 #include "forceModel.h"
 #include "stencilForceModel.h"
+#include <iostream>
 
 #ifdef USE_TBB
   #include <tbb/tbb.h>
@@ -71,6 +72,8 @@ public:
   // tangentStiffnessMatrix point to a sparse matrix object.
   // energy, internalForces, tangentStiffnessMatrix can be nullptr. If nullptr, the corresponding quantity will not be computed.
   virtual void GetEnergyAndForceAndMatrix(const double * u, double * energy, double * internalForces, SparseMatrix * tangentStiffnessMatrix);
+
+  virtual StencilForceModel* GetStencilForceModel() override { return stencilForceModel; };
 
 protected:
   StencilForceModel * stencilForceModel = nullptr;

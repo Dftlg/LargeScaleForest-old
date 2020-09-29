@@ -43,6 +43,7 @@
 #include "sparseMatrix.h"
 #include "forceModel.h"
 #include "integratorBase.h"
+#include "stencilForceModel.h"
 
 class IntegratorBaseSparse : public IntegratorBase
 {
@@ -77,7 +78,7 @@ public:
   virtual double GetTotalMass();
 
   virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex);
-
+  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex);
 protected:
   SparseMatrix * massMatrix; 
   ForceModel * forceModel;

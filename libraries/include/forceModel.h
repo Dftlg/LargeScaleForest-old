@@ -40,6 +40,7 @@
 
 #include <stdlib.h>
 #include "sparseMatrix.h"
+#include "stencilForceModel.h"
 
 class ForceModel
 {
@@ -54,6 +55,7 @@ public:
   virtual void GetTangentStiffnessMatrix(const double * u, SparseMatrix * tangentStiffnessMatrix) = 0; 
 
   // sometimes computation time can be saved if we know that we will need both internal forces and tangent stiffness matrices:
+  virtual StencilForceModel* GetStencilForceModel()= 0;
   virtual void GetForceAndMatrix(const double * u, double * internalForces, SparseMatrix * tangentStiffnessMatrix); 
 
   // reset routines

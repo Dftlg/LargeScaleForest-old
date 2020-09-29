@@ -324,6 +324,7 @@ CorotationalLinearFEM::CorotationalLinearFEM(VolumetricMesh * volumetricMesh_) :
       }
     }
 
+	//将形状函数与本构方程结合称为K矩阵每个体素的K含有24*24的值
     for (int el = 0; el < numElements; el++)
     {
       // double * MInv = MInverse[el];
@@ -349,7 +350,7 @@ CorotationalLinearFEM::CorotationalLinearFEM(VolumetricMesh * volumetricMesh_) :
           for (int j = 0; j < 24; j++)
             for (int k = 0; k < 6; k++)
               EB[24 * i + j] += E[6 * i + k] * Bq[q][24 * k + j];
-
+		//未形变时的K矩阵用来计算f_ext=KU
         // KElementUndeformed[el] += weight_q * B^T * EB
         for (int i = 0; i < 24; i++)
           for (int j = 0; j < 24; j++)
@@ -581,6 +582,7 @@ void CorotationalLinearFEM::ComputeEnergyAndForceAndStiffnessMatrix(const double
   AddEnergyAndForceAndStiffnessMatrixOfSubmesh(u, energy, f, stiffnessMatrix, warp, 0, volumetricMesh->getNumElements());
 }
 
+//通过给定的u来更新局部的刚度矩阵，和局部的内力矩阵
 void CorotationalLinearFEM::ComputeElementEnergyAndForceAndStiffnessMatrix(int el, const double * u, double * elementEnergy, 
     double * elementInternalForces, double * elementStiffnessMatrix, int warp)
 {
@@ -592,9 +594,11 @@ void CorotationalLinearFEM::ComputeElementEnergyAndForceAndStiffnessMatrix(int e
   const int elementStiffnessMatrixSpace = numElementDOFs * numElementDOFs;
   VolumetricMesh::elementType type = volumetricMesh->getElementType();
 
+  //获取当前元素的顶点索引8个
   // int vtxIndex[4];
   const int * vtxIndex = volumetricMesh->getVertexIndices(el);
 
+  //获取顶点形变后的所在位置加上当前形变的位置
   Vec3d deformedPos[maxNumElementVertices];
   for (int i = 0; i < numElementVertices; i++)
     deformedPos[i] = Vec3d(&undeformedPositions[3 * vtxIndex[i]]) + Vec3d(&u[3 * vtxIndex[i]]);
@@ -606,6 +610,7 @@ void CorotationalLinearFEM::ComputeElementEnergyAndForceAndStiffnessMatrix(int e
     // P = [ v0   v1   v2   v3 ]
     //     [  1    1    1    1 ]
     // rows 1,2,3
+	//P形变后3，4，1，6号顶点的数据赋值到P中
     if(type == VolumetricMesh::TET)
     {
       for(int i=0; i<3; i++)
@@ -625,6 +630,7 @@ void CorotationalLinearFEM::ComputeElementEnergyAndForceAndStiffnessMatrix(int e
       P[12 + j] = 1.0;
 
     // F = P * Inverse(M)
+	//M未形变时的3，4，1，6号顶点数据
     double F[9]; // upper-left 3x3 block
     for(int i=0; i<3; i++) 
       for(int j=0; j<3; j++) 
@@ -633,19 +639,22 @@ void CorotationalLinearFEM::ComputeElementEnergyAndForceAndStiffnessMatrix(int e
         for(int k=0; k<4; k++)
           F[3 * i + j] += P[4 * i + k] * MInverse[el][4 * k + j];
       }
-	//F形变梯度
+	//F形变梯度P未形变后的顶点，MInverse为形变前的顶点的逆
     double R[9]; // rotation (row-major)
     double S[9]; // symmetric (row-major)
     double tolerance = 1E-6;
     int forceRotation = 1;
+	//通过极性分解将形变梯度转换为旋转矩阵和形变矩阵
     PolarDecomposition::Compute(F, R, S, tolerance, forceRotation);
 
     // RK = R * K
     // KElement = R * K * R^T
+	//计算新的局部刚度K矩阵R * K * R^T 在2004年论文中公式（8）
     double RK[maxNumElementDOFs * maxNumElementDOFs]; // row-major
     if (elementStiffnessMatrix != NULL)
       WarpMatrix(KElementUndeformed[el], R, RK, elementStiffnessMatrix);
 
+	//计算形变后顶点通过旋转回去后减去未形变顶点的的位移量 公式（13）
     double z[maxNumElementDOFs]; // z = RT x - x0 这个算什么？
     Mat3d Rmat(R);
     Mat3d RTmat = trans(Rmat);
@@ -1189,7 +1198,7 @@ void CorotationalLinearFEM::BuildRowColumnIndices(SparseMatrix * sparseMatrix)
     for(int i=0; i<numElementVertices; i++)
       for(int j=0; j<numElementVertices; j++)
         columnIndices[el][numElementVertices * i + j] = sparseMatrix->GetInverseIndex(3*rowIndices[el][i], 3*rowIndices[el][j]) / 3;
-	//columnIndices中存放如果体素内一个顶点与体素内其他顶点是否存在在SparseMatrix的columnIndices中如果存在返回其索引号。
+	//columnIndices中存放如果体素内一个顶点与体素内其他顶点是否存在在SparseMatrix的columnIndices中如果存在返回其在sparseMatrix的columnIndices的索引号。
 	//SparseMatrix中的columnIndices存储的为用i表示某一顶点的维度 j表示其中该顶点维度与其他顶点的维度相关的索引数据，其中j大小一般为24或者96或者48等
 	//在corotationLinearFem的columnIndices存放的为i表示某个体素，j属于64长度，每8个长度表示体素的一个顶点，其中的每个值表示为该顶点是否能在rowLength(24,96,48）长度中，找到相应的索引值
   }
