@@ -98,6 +98,28 @@ void readDataFromObjFile(std::string vPath, std::vector<glm::vec3>&voObjVertices
 	inFile.close();
 }
 
+void readDataFromSkeleronFile(std::string vPath, std::vector<glm::vec3>&voObjVertices)
+{
+	std::ifstream inFile(vPath);
+	if (!inFile)
+	{
+		std::cout << "Can't open the file!!!" << std::endl;
+		return;
+	}
+	std::string lineString;
+
+	getline(inFile, lineString);
+	while (getline(inFile, lineString))
+	{
+		std::istringstream tempString(lineString);
+		glm::vec3 tempVertex;
+		tempString >> tempVertex.x >> tempVertex.y >> tempVertex.z;
+		voObjVertices.push_back(tempVertex);
+
+	}
+	inFile.close();
+}
+
 void findCubicIndexForVertices(std::vector<glm::vec3>& vObjVertices, std::vector<glm::vec3>&vElementVertices, std::vector<std::vector<int>>& vElementIndex, std::vector<int>& voObjVerticesRelatedElementIndex)
 {
 	for (int i = 0; i < vObjVertices.size(); i++)
@@ -148,10 +170,12 @@ int main()
 	std::vector<std::vector<int>> elementIndex;
 	std::vector<int> objVerticesRelatedElementIndex;
 	std::string vegFilePath = "../../models/8.10/1.veg";
-	std::string objFilePath = "../../models/1.obj";
-	std::string indexOutputPath = "../../models/test.txt";
+	std::string objFilePath = "../../models/8.10/1.obj";
+	std::string skeletonFilePath = "../../models/8.10/stem.skeleton";
+	std::string indexOutputPath = "../../models/8.10/test.txt";
 	readDataFromVegFile(vegFilePath, elementVertices, elementIndex);
-	readDataFromObjFile(objFilePath, objVertices);
+	readDataFromSkeleronFile(skeletonFilePath, objVertices);
+	//readDataFromObjFile(objFilePath, objVertices);
 	findCubicIndexForVertices(objVertices, elementVertices, elementIndex, objVerticesRelatedElementIndex);
 	writeFindIndex2File(indexOutputPath, objVerticesRelatedElementIndex);
 	system("pause");
