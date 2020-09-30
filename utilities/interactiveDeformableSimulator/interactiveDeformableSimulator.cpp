@@ -721,8 +721,8 @@ void idleFunction(void)
 		for (int i = 0; i < 3*n; i++)
 		{
 			deltau[i] = u[i] - preu[i];
-			memcpy(preu, integratorBase->Getq(), sizeof(double) * 3 * n);
 		}
+		memcpy(preu, integratorBase->Getq(), sizeof(double) * 3 * n);
 	}
 
 	
