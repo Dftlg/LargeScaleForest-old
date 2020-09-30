@@ -241,6 +241,22 @@ int main()
 	//点和shader的连接
 	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_index, ssbo_binding_point_index);
 
+
+	glm::vec4* deltaU = new glm::vec4[vertexNums];
+	GLuint shader_delta_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaDeformationArray");
+	GLint SSBOBinding1 = 0, BlockDataSize1 = 0;
+	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding1);
+	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize1);
+	unsigned int deltaSSBO;
+	glGenBuffers(1, &deltaSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*vertexNums, deltaU, GL_DYNAMIC_DRAW);
+	GLuint deltassbo_binding_point_index = 2;
+	//点和SSBO的连接
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_index, deltaSSBO);
+	//点和shader的连接
+	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_delta_index, deltassbo_binding_point_index);
+
 	ourTreeShader.use();
 	ourTreeShader.setInt("frameNums", frameNums);
 	ourTreeShader.setInt("vertexNums", vertexNums);

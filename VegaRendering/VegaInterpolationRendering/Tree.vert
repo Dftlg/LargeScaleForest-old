@@ -20,9 +20,17 @@ layout (std430, binding=1) buffer DeformationArray
 	vec4 u[];
 };
 
+layout (std430, binding=2) buffer DeltaDeformationArray
+{
+	vec4 sum_u[];
+};
+
 void main()
 {
-	vec4 tempPos=vec4(aPos,1.0)+u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId];
+	//vec4 tempPos=vec4(aPos,1.0)+u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId];
+	
+	sum_u[faceId]=u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId]+sum_u[faceId];
+	vec4 tempPos=vec4(aPos,1.0)+sum_u[faceId];
 //	vec4 tempPos;
 //	if(gl_InstanceID<5)
 //	{
