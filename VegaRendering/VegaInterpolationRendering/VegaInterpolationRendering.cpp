@@ -93,8 +93,6 @@ int main()
 	CShader ourPlaneShader("Plane.vert", "Plane.frag");
 	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
 
-
-
 	//plane vertices
 	float planeVertices[] = {
 		// positions          // texture Coords 
@@ -332,7 +330,7 @@ int main()
 		glBindVertexArray(skyboxVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
 
