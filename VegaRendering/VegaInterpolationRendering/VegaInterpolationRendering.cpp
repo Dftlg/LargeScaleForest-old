@@ -93,6 +93,8 @@ int main()
 	CShader ourPlaneShader("Plane.vert", "Plane.frag");
 	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
 
+
+
 	//plane vertices
 	float planeVertices[] = {
 		// positions          // texture Coords 
@@ -242,7 +244,7 @@ int main()
 	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_index, ssbo_binding_point_index);
 
 
-	glm::vec4* deltaU = new glm::vec4[vertexNums];
+	glm::vec4* deltaU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
 	GLuint shader_delta_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaDeformationArray");
 	GLint SSBOBinding1 = 0, BlockDataSize1 = 0;
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding1);
@@ -250,7 +252,7 @@ int main()
 	unsigned int deltaSSBO;
 	glGenBuffers(1, &deltaSSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*vertexNums, deltaU, GL_DYNAMIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(ourModel.getAssimpVerticesNumber()), deltaU, GL_DYNAMIC_DRAW);
 	GLuint deltassbo_binding_point_index = 2;
 	//点和SSBO的连接
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_index, deltaSSBO);
@@ -293,7 +295,7 @@ int main()
 		glBindVertexArray(planeVAO);
 		glBindTexture(GL_TEXTURE_2D, floorTexture);
 		ourPlaneShader.setMat4("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		//tree
 		ourTreeShader.use();

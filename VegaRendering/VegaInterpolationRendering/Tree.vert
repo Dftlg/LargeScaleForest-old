@@ -4,6 +4,7 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 layout (location = 3) in int faceId;
 layout (location = 4) in mat4 instanceMatrix;
+layout (location = 8 ) in int positionIndex;
 
 out vec2 TexCoords;
 
@@ -29,8 +30,10 @@ void main()
 {
 	//vec4 tempPos=vec4(aPos,1.0)+u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId];
 	
-	sum_u[faceId]=u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId]+sum_u[faceId];
-	vec4 tempPos=vec4(aPos,1.0)+sum_u[faceId];
+	//sum_u[faceId]=u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId]+sum_u[faceId];
+	sum_u[positionIndex]=u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId]+sum_u[positionIndex];
+	vec4 tempPos=sum_u[positionIndex];
+	//vec4 tempPos=vec4(aPos,1.0)+sum_u[faceId];
 //	vec4 tempPos;
 //	if(gl_InstanceID<5)
 //	{

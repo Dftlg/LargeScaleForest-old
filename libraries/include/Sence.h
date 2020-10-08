@@ -39,11 +39,13 @@ public:
 	std::vector<CMesh> getMeshes() { return m_Meshes; }
 	void senceDraw(const CShader& vShader, std::vector<std::vector<glm::vec3>> deformationFrames);
 	void setFileDirectiory(std::string vFileDirectory) { m_FileDirectory = vFileDirectory; }
+	int getAssimpVerticesNumber() { return m_AssimpVerticesNumber; }
 	void draw(const CShader& vShader);
 	void setMeshRotation();
 	glm::mat4* randomRotation();
 	void setMeshGroupIndex();
 	bool gammaCorrection;
+	
 
 private:
 	void __changeObjMeshStruct2Charptr(int vOutputMaterials=1);
@@ -66,4 +68,5 @@ private:
 	//所有的group中面的顶点索引
 	std::vector<std::vector<int>> m_GroupsIndex;
 	int m_VerticesNumber;
+	int  m_AssimpVerticesNumber;
 };
