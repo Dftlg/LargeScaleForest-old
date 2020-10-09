@@ -73,7 +73,7 @@
     <IncludePath>$(SolutionDir)libraries\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)libraries\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)libraries\include;$(SolutionDir)VegaRendering\Common;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)x64\Release;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\libraries\lib\$(Configuration)\</OutDir>
   </PropertyGroup>
@@ -143,11 +143,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libraries\include\Mesh.h" />
-    <ClInclude Include="..\..\libraries\include\Sence.h" />
     <ClInclude Include="BaseMesh.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FileManager.h" />
+    <ClInclude Include="Sence.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

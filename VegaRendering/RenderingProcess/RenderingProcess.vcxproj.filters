@@ -47,10 +47,7 @@
     <ClInclude Include="BaseMesh.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libraries\include\Mesh.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libraries\include\Sence.h">
+    <ClInclude Include="Sence.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
