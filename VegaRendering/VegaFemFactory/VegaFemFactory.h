@@ -19,6 +19,7 @@ public:
 	CVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile);
 	~CVegaFemFactory() = default;
 
+	void readKVFFileData(const std::string & vFile, Common::SFileFrames & vFileFrame);
 	void readFilePath4Directory(const std::string & vDirectoryName);
 	void readFramesDeformationData(std::vector<Common::SFileFrames>& vSearchFrames, int vSearchConnectionIndex);
 	void readDeformationDataByMutileThread(Common::SFileFrames& vBaseFileFramesStruct, const std::string& vFilePath, int vSFileFramesIndex);

@@ -32,7 +32,7 @@ namespace Common
 
 	static bool InstanceTrees = true;
 
-	static int TreesNumber = 1;
+	const int TreesNumber = 100;
 
 	static int MaxTimeStep = 60;
 
@@ -173,6 +173,17 @@ namespace Common
 		}
 	};
 
+	//一个文件中帧的KVF数据
+	struct SpKVFData
+	{
+		int FrameIndex;
+		std::vector<int> KLengths;
+		std::vector<std::vector<double>> Kmatrix;
+
+		std::vector<glm::vec3> InternalForces;
+		std::vector<glm::vec3> Velocity;
+	};
+
 	//每一个是一个文件
 	struct SFileFrames
 	{
@@ -185,6 +196,7 @@ namespace Common
 		int Phi;
 		std::vector<int> ForceFluctuationSequence;
 		std::vector<SFileData> Frames;
+		std::vector<SpKVFData> KVFFrameDatas;
 		SFileFrames() = default;
 		SFileFrames(std::string vIndex, std::string vFilePath)
 		{
@@ -203,12 +215,5 @@ namespace Common
 			ConnectedIndex = vConnectedIndex;
 		}
 	};
-	//struct SKVFFrames
-	//{
-	//	std::string FileName;
-	//	std::vector<double> Deformation;
-	//	std::vector<double> InternalForces;
-	//	std::vector<
-	//};
 
 }

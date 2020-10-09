@@ -349,6 +349,8 @@ int main()
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 
+		Sleep(200);
+
 	}
 
 	glDeleteVertexArrays(1, &skyboxVAO);

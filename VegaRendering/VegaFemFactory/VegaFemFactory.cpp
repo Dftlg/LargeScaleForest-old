@@ -52,6 +52,8 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 			if (vSearchFrames[searchindex].FileName == m_FilesData[fileIndex].FileName)
 			{
 				//readDeformationDataByMutileThread(m_FilesData[fileIndex], m_FilesData[fileIndex].FilePath, fileIndex);
+				
+
 				int timeStepCount = 1;
 				std::ifstream positionFile(m_FilesData[fileIndex].FilePath);
 				std::string lineString;
@@ -108,6 +110,48 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 	m_AllReallyLoadConnectedFem.push_back(tempConnectedFile);
 
 	std::cout << "Finish Load Search FileData To ConnectedFileFrames" << std::endl;
+}
+
+void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFrames & vFileFrame)
+{
+	const size_t last_slash_idx = vFile.rfind('.txt');
+	std::string FramesKVFFileName = vFile.substr(0, last_slash_idx - 3);
+	FramesKVFFileName = FramesKVFFileName + ".spkvf";
+	std::ifstream KVFFile(FramesKVFFileName);
+	std::string lineString;
+	char s[4096];
+	double position[3];
+	if (!KVFFile.is_open())
+	{
+		std::cout << "Error: could not open vertex file" << FramesKVFFileName << std::endl;
+	}
+	getline(KVFFile, lineString);
+	int ElementNumber = atoi(lineString.c_str())*8*3;
+	while (getline(KVFFile, lineString))
+	{
+		Common::SpKVFData tempKVFData;
+		if (lineString == "FrameIndex")
+		{
+			getline(KVFFile, lineString);
+			tempKVFData.FrameIndex = atoi(lineString.c_str());
+		}
+		getline(KVFFile, lineString);
+		for (auto i = 0; i < ElementNumber; i++)
+		{
+			getline(KVFFile, lineString);
+			std::istringstream DataSet(lineString);
+			int KmatrixOneLineNumber;
+			DataSet >> KmatrixOneLineNumber;
+			tempKVFData.KLengths.push_back(KmatrixOneLineNumber);
+			for (auto k = 0; k < KmatrixOneLineNumber; k++)
+			{
+				double tempKnumber;
+				DataSet >> tempKnumber;
+				tempKVFData.Kmatrix[i].push_back(tempKnumber);
+			}
+		}
+	}
+	
 }
 
 //多线程读取一个文件

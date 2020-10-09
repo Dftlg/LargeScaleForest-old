@@ -401,7 +401,11 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 
 	if (connectionFile.is_open())
 	{
+		//输出体素个数
+		connectionFile << vElementIndex.size() << std::endl;
 		//输出帧号
+
+		connectionFile << "FrameIndex" << std::endl;
 		connectionFile << vFrameIndex << std::endl;
 
 		connectionFile << "Kmatrix" << std::endl;
@@ -412,6 +416,7 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 			const int *vIndices=forceModel->GetStencilForceModel()->GetStencilVertexIndices(0,vElementIndex[i]);
 			for (int v = 0; v < ElementNumber; v++)
 			{
+				//std::vector<int> RowLengthsInElement;
 				//存储当前ele的某个顶点内力值
 				if (vertexPos.count(vIndices[v]) == 0)
 				{
