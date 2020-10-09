@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)libraries\include;$(SolutionDir)VegaRendering\Common;$(SolutionDir)VegaRendering\VegaFemFactory;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)libraries\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)VegaRendering\Common;$(SolutionDir)VegaRendering\VegaFemFactory;$(SolutionDir)libraries\include;$(IncludePath)</IncludePath>

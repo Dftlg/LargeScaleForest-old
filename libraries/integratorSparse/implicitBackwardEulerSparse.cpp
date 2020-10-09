@@ -453,7 +453,6 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 			}
 		}
 		connectionFile << "internalForces" << std::endl;
-		connectionFile << vertexPos.size() << std::endl;
 		for (auto it = vertexPos.begin(); it != vertexPos.end(); ++it)
 		{
 			connectionFile << (it)->first << " ";
@@ -463,7 +462,6 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 		}
 
 		connectionFile << "velocity" << std::endl;
-		connectionFile << vertexVel.size() << std::endl;
 		for (auto it = vertexVel.begin(); it != vertexVel.end(); ++it)
 		{
 			connectionFile << (it)->first << " ";
