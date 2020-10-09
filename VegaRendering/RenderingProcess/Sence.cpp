@@ -52,7 +52,7 @@ glm::mat4* CSence::randomRotation()
 	return modelMatrices;
 }
 
-void CSence::setMeshGroupIndex()
+void CSence::setMeshGroupAndAssimpIndex()
 {
 	int count = 0;
 	m_AssimpVerticesNumber = 0;
@@ -60,7 +60,7 @@ void CSence::setMeshGroupIndex()
 	{
 		int lastCapacity = m_AssimpVerticesNumber;
 		int nextCapacity = getGroupsIndex()[count].size();
-		Mesh.setGroupAndPositionIndex(m_GroupsIndex[count],lastCapacity,nextCapacity);
+		Mesh.setGroupAndAssimpIndex(m_GroupsIndex[count],lastCapacity,nextCapacity);
 		m_AssimpVerticesNumber += nextCapacity;
 		count++;
 	}

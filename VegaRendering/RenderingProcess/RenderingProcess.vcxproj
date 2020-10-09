@@ -73,7 +73,7 @@
     <IncludePath>$(SolutionDir)libraries\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)libraries\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)libraries\include;$(SolutionDir)VegaRendering\Common;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)x64\Release;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\libraries\lib\$(Configuration)\</OutDir>
   </PropertyGroup>
@@ -146,7 +146,6 @@
     <ClInclude Include="BaseMesh.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FileManager.h" />
-    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Sence.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
