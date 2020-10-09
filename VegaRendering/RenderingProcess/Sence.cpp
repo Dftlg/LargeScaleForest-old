@@ -389,12 +389,3 @@ std::vector<Common::STexture> CSence::loadMaterialTextures(aiMaterial *vMat, aiT
 	}
 	return Textures;
 }
-
-void CSence::setAssimpVerticesNumber()
-{
-	m_AssimpVerticesNumber = 0;
-	for (auto i = 0; i < m_Meshes.size(); i++)
-	{
-		m_AssimpVerticesNumber += m_Meshes[i].getIndicesSize();
-	}
-}
