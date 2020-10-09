@@ -73,7 +73,7 @@
     <IncludePath>$(SolutionDir)libraries\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)libraries\include;$(SolutionDir)VegaRendering\Common;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)VegaRendering\Common;$(SolutionDir)VegaRendering\VegaFemFactory;$(SolutionDir)libraries\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)x64\Release;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\libraries\lib\$(Configuration)\</OutDir>
   </PropertyGroup>
