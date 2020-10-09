@@ -209,7 +209,7 @@ int main()
 	//obj模型的顶点数
 	int vertexNums = vFem.getFileFrames(0).Frames[0].BaseFileDeformations.size();
 
-	std::vector<int> vertexRepeat=vFem.getModelTransformStruct()->
+	//std::vector<int> vertexRepeat=vFem.getModelTransformStruct()->
 
 	std::cout << frameNums << " " << vertexNums << std::endl;
 	glm::vec4* deformU = new glm::vec4[frameNums*vertexNums*numbercounter];
@@ -265,7 +265,7 @@ int main()
 	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_delta_index, deltassbo_binding_point_index);
 
 
-	GLuint atomicsBuffer;
+	/*GLuint atomicsBuffer;
 	glGenBuffers(1, &atomicsBuffer);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicsBuffer);
 	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint) * vertexNums, NULL, GL_DYNAMIC_DRAW);
@@ -274,7 +274,7 @@ int main()
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER,atomicsBuffer);
 	int * Booldelta = new int[vertexNums];
 	glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint) * vertexNums, Booldelta);
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);*/
 
 	
 	//GLuint shader_delta_bool_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaBoolDeformationArray");
@@ -339,10 +339,10 @@ int main()
 		ourTreeShader.setInt("frameIndex", i);
 
 
-		int* deltaUbooldefor = new int[vertexNums];
+		/*int* deltaUbooldefor = new int[vertexNums];
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicsBuffer);
 		glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(int)*vertexNums, deltaUbooldefor);
-
+*/
 		if (i >= 30)
 		{
 			i = i % 30;
