@@ -144,10 +144,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libraries\include\Mesh.h" />
+    <ClInclude Include="..\..\libraries\include\Sence.h" />
     <ClInclude Include="BaseMesh.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FileManager.h" />
-    <ClInclude Include="Sence.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

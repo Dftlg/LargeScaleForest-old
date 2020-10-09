@@ -38,9 +38,6 @@
     <ClInclude Include="Shader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Sence.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="FileManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -51,6 +48,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libraries\include\Mesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libraries\include\Sence.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
