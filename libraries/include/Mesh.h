@@ -19,7 +19,7 @@ public:
 	void draw(const CShader& vShader) const;
 	void reset(const std::vector<Common::SVertex>& vVertices, const std::vector<unsigned int>& vIndices, const std::vector<Common::STexture> vTestures);
 	void setRotation(glm::mat4* temp);
-	void setGroupAndPositionIndex(std::vector<int>& vGroupIndex,int vLastCapacity, int vNextCapacity);
+	void setGroupAndAssimpIndex(std::vector<int>& vGroupIndex,int vLastCapacity, int vNextCapacity);
 
 private:
 	unsigned int m_InstanceVBO;

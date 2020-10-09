@@ -35,6 +35,9 @@ public:
 	void SetParaMesh();
 	void setGroupsIndex(CVegaFemFactory& vfemFactoryObject);
 	void setVerticesNumber(CVegaFemFactory& vfemFactoryObject);
+	void setAssimpVerticesNumber();
+
+
 	std::vector<std::vector<int>> getGroupsIndex() { return m_GroupsIndex; }
 	std::vector<CMesh> getMeshes() { return m_Meshes; }
 	void senceDraw(const CShader& vShader, std::vector<std::vector<glm::vec3>> deformationFrames);
@@ -43,9 +46,8 @@ public:
 	void draw(const CShader& vShader);
 	void setMeshRotation();
 	glm::mat4* randomRotation();
-	void setMeshGroupIndex();
+	void setMeshGroupAndAssimpIndex();
 	bool gammaCorrection;
-	
 
 private:
 	void __changeObjMeshStruct2Charptr(int vOutputMaterials=1);
@@ -68,5 +70,6 @@ private:
 	//所有的group中面的顶点索引
 	std::vector<std::vector<int>> m_GroupsIndex;
 	int m_VerticesNumber;
-	int  m_AssimpVerticesNumber;
+
+	int m_AssimpVerticesNumber;
 };

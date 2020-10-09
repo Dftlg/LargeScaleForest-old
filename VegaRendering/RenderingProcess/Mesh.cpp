@@ -31,7 +31,7 @@ void CMesh::setRotation(glm::mat4 * temp)
 	__setupInstanceMesh();
 }
 
-void CMesh::setGroupAndPositionIndex(std::vector<int>& vGroupIndex, int vLastCapacity, int vNextCapacity)
+void CMesh::setGroupAndAssimpIndex(std::vector<int>& vGroupIndex, int vLastCapacity, int vNextCapacity)
 {
 	m_GroupIndex = vGroupIndex;
 	for (int i = 0; i < vNextCapacity; i++)

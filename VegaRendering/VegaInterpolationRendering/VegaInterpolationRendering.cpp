@@ -199,7 +199,7 @@ int main()
 	ourModel.setMeshRotation();
 	ourModel.setGroupsIndex(vFem);
 	ourModel.setVerticesNumber(vFem);
-	ourModel.setMeshGroupIndex();
+	ourModel.setMeshGroupAndAssimpIndex();
 	
 	// render loop
 	// -----------

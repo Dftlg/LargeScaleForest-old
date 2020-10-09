@@ -143,10 +143,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\libraries\include\Mesh.h" />
     <ClInclude Include="BaseMesh.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FileManager.h" />
-    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Sence.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>

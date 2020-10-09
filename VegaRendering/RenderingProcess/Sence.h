@@ -45,7 +45,7 @@ public:
 	void draw(const CShader& vShader);
 	void setMeshRotation();
 	glm::mat4* randomRotation();
-	void setMeshGroupIndex();
+	void setMeshGroupAndAssimpIndex();
 	bool gammaCorrection;
 
 private:
