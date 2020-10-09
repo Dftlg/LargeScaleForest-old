@@ -107,15 +107,26 @@ void readDataFromSkeleronFile(std::string vPath, std::vector<glm::vec3>&voObjVer
 		return;
 	}
 	std::string lineString;
+	bool flag = true;
 
-	getline(inFile, lineString);
-	while (getline(inFile, lineString))
+	while (getline(inFile, lineString)&& flag)
 	{
 		std::istringstream tempString(lineString);
-		glm::vec3 tempVertex;
-		tempString >> tempVertex.x >> tempVertex.y >> tempVertex.z;
-		voObjVertices.push_back(tempVertex);
-
+		std::string tempChar;
+		tempString >> tempChar;
+		if (tempChar == "SN")
+		{
+			while (getline(inFile, lineString)&& lineString != "")
+			{
+				std::istringstream tempString(lineString);
+				std::string tempChar; 
+				glm::vec3 tempVertex;
+				//tempString >> tempChar >> tempChar >> tempChar;
+				tempString >> tempVertex.x >> tempVertex.y >> tempVertex.z;
+				voObjVertices.push_back(tempVertex);
+			}
+			flag = false;
+		}
 	}
 	inFile.close();
 }
@@ -171,8 +182,8 @@ int main()
 	std::vector<int> objVerticesRelatedElementIndex;
 	std::string vegFilePath = "../../models/8.10/1.veg";
 	std::string objFilePath = "../../models/8.10/1.obj";
-	std::string skeletonFilePath = "../../models/8.10/stem.skeleton";
-	std::string indexOutputPath = "../../models/8.10/test.txt";
+	std::string skeletonFilePath = "../../models/extract skeleton/1.skel";
+	std::string indexOutputPath = "../../models/extract skeleton/test.txt";
 	readDataFromVegFile(vegFilePath, elementVertices, elementIndex);
 	readDataFromSkeleronFile(skeletonFilePath, objVertices);
 	//readDataFromObjFile(objFilePath, objVertices);
