@@ -19,20 +19,23 @@ public:
 	void draw(const CShader& vShader) const;
 	void reset(const std::vector<Common::SVertex>& vVertices, const std::vector<unsigned int>& vIndices, const std::vector<Common::STexture> vTestures);
 	void setRotation(glm::mat4* temp);
-	void setGroupIndex(std::vector<int>& vGroupIndex);
+	void setGroupAndPositionIndex(std::vector<int>& vGroupIndex,int vLastCapacity, int vNextCapacity);
 
 private:
 	unsigned int m_InstanceVBO;
 	unsigned int m_GroupIndexVBO;
+	unsigned int m_AssimpGroupIndexVBO;
 	
 	void __setupMesh();
 	void __setupInstanceMesh();
 	void __setupGroupIndexMesh();
+	void __setupAssimpGroupIndex();
 	void __setParameter(const std::vector<Common::SVertex>& vVertices, const std::vector<unsigned int>& vIndices, const std::vector<Common::STexture> vTestures);
 
 	std::vector<Common::SVertex> m_Vertices;
 	std::vector<unsigned int> m_Indices;
 	std::vector<Common::STexture> m_Textures;
 	std::vector<int> m_GroupIndex;
+	std::vector<int> m_AssimpGroupIndex;
 	glm::mat4* m_modelMatrices;
 };
