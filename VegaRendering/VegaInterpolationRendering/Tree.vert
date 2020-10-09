@@ -31,10 +31,10 @@ void main()
 	//vec4 tempPos=vec4(aPos,1.0)+u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId];
 	
 	//sum_u[faceId]=u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId]+sum_u[faceId];
-	if(frameIndex%frameNums==0)
-	{
-		sum_u[positionIndex]=vec4(0.0,0.0,0.0,0.0);
-	}
+//	if(frameIndex==0)
+//	{
+//		sum_u[positionIndex]=vec4(0.0,0.0,0.0,0.0);
+//	}
 	sum_u[positionIndex]=u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId]+sum_u[positionIndex];
 	vec4 tempPos=vec4(aPos,1.0)+sum_u[positionIndex];
 

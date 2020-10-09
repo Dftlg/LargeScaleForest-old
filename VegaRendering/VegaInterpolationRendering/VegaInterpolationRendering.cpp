@@ -298,7 +298,8 @@ int main()
 		if (i >= frameNums)
 		{
 			i = i % frameNums;
-
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*(ourModel.getAssimpVerticesNumber()), deltaU);
 		}
 		//tree
 		ourTreeShader.use();
