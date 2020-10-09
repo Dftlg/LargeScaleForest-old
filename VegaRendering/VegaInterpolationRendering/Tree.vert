@@ -31,8 +31,13 @@ void main()
 	//vec4 tempPos=vec4(aPos,1.0)+u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId];
 	
 	//sum_u[faceId]=u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId]+sum_u[faceId];
+	if(frameIndex%frameNums==0)
+	{
+		sum_u[positionIndex]=vec4(0.0,0.0,0.0,0.0);
+	}
 	sum_u[positionIndex]=u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId]+sum_u[positionIndex];
 	vec4 tempPos=vec4(aPos,1.0)+sum_u[positionIndex];
+
 	//vec4 tempPos=vec4(aPos,1.0)+sum_u[faceId];
 //	vec4 tempPos;
 //	if(gl_InstanceID<5)
@@ -44,7 +49,7 @@ void main()
 //		int tempInstanceIndex= gl_InstanceID / 100;
 //		tempPos=vec4(aPos,1.0)+u[tempInstanceIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId];
 //	}
-	//gl_Position = projection * view * model * instanceMatrix * tempPos;
-	gl_Position = tempPos;
+	gl_Position = projection * view * model * instanceMatrix * tempPos;
+	//gl_Position = tempPos;
 	TexCoords = aTexCoords;  
 }

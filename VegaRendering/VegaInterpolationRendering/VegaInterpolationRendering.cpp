@@ -295,6 +295,11 @@ int main()
 		ourPlaneShader.setMat4("model", model);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
+		if (i >= frameNums)
+		{
+			i = i % frameNums;
+
+		}
 		//tree
 		ourTreeShader.use();
 		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -303,10 +308,6 @@ int main()
 		ourTreeShader.setMat4("view", view);	
 		ourTreeShader.setInt("frameIndex", i);
 
-		if (i >= 60)
-		{
-			i = i % 60;
-		}
 		for (int j = 0; j < numbercounter; j++)
 		{
 
