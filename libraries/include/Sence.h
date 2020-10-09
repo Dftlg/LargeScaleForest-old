@@ -45,6 +45,8 @@ public:
 	void setMeshGroupIndex();
 	bool gammaCorrection;
 
+	void setAssimpVerticesNumber();
+
 private:
 	void __changeObjMeshStruct2Charptr(int vOutputMaterials=1);
 	void __loadModel(const std::string& vModelPath, bool vloadNormalizeModel);

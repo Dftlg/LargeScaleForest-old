@@ -19,8 +19,12 @@ public:
 	std::vector<BaseObjConstruct::SGroup> getGroups() { return m_Groups; }
 	std::vector<std::vector<int>> getGroupsIndex(){ return m_GroupsIndex; }
 	int getVerticesNumber() { return m_VerticesNumber; }
+	std::vector<int> getVertexRepeat() { return m_VertexRepeatNumber; }
+
 private:
 	void __VertexFaceRelated();
+
+	void __VertexRepeat();
 
 	//obj模型中的mesh的集合
 	ObjMesh *m_BaseFileMesh;
@@ -29,4 +33,5 @@ private:
 	//一系列的group的集合
 	std::vector<BaseObjConstruct::SGroup> m_Groups;
 	std::vector<std::vector<int>>m_GroupsIndex;
+	std::vector<int> m_VertexRepeatNumber;
 };	
