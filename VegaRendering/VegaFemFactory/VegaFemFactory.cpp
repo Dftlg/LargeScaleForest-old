@@ -150,6 +150,11 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 				tempKVFData.Kmatrix[i].push_back(tempKnumber);
 			}
 		}
+		getline(KVFFile, lineString);
+		if (lineString == "internalForces")
+		{
+
+		}
 	}
 	
 }
