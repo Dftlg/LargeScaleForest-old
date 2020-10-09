@@ -53,7 +53,7 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 			{
 				//readDeformationDataByMutileThread(m_FilesData[fileIndex], m_FilesData[fileIndex].FilePath, fileIndex);
 				
-
+				readKVFFileData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
 				int timeStepCount = 1;
 				std::ifstream positionFile(m_FilesData[fileIndex].FilePath);
 				std::string lineString;
@@ -119,14 +119,13 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 	FramesKVFFileName = FramesKVFFileName + ".spkvf";
 	std::ifstream KVFFile(FramesKVFFileName);
 	std::string lineString;
-	char s[4096];
-	double position[3];
 	if (!KVFFile.is_open())
 	{
 		std::cout << "Error: could not open vertex file" << FramesKVFFileName << std::endl;
 	}
 	getline(KVFFile, lineString);
 	int ElementNumber = atoi(lineString.c_str())*8*3;
+	double position[3];
 	while (getline(KVFFile, lineString))
 	{
 		Common::SpKVFData tempKVFData;
@@ -153,8 +152,40 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 		getline(KVFFile, lineString);
 		if (lineString == "internalForces")
 		{
-
+			getline(KVFFile, lineString);
+			int internalForceNumbers = atoi(lineString.c_str());
+			for (auto i = 0; i < internalForceNumbers; i++)
+			{
+				getline(KVFFile, lineString);
+				std::istringstream InterFace(lineString);
+				double temp;
+				InterFace >> temp;
+				for (int j = 0; j < 3; j++)
+				{
+					InterFace >> position[0] >> position[1] >> position[2];
+					tempKVFData.InternalForces.push_back(glm::vec3(position[0], position[1], position[2]));
+				}
+			}
 		}
+		getline(KVFFile, lineString);
+		if (lineString == "velocity")
+		{
+			getline(KVFFile, lineString);
+			int velocityNumbers = atoi(lineString.c_str());
+			for (auto i = 0; i < velocityNumbers; i++)
+			{
+				getline(KVFFile, lineString);
+				std::istringstream Velocity(lineString);
+				double temp;
+				Velocity >> temp;
+				for (int j = 0; j < 3; j++)
+				{
+					Velocity >> position[0] >> position[1] >> position[2];
+					tempKVFData.Velocity.push_back(glm::vec3(position[0], position[1], position[2]));
+				}
+			}
+		}
+		vFileFrame.KVFFrameDatas.push_back(tempKVFData);
 	}
 	
 }
