@@ -47,7 +47,7 @@ float grasstime = 0.0f;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/8.10/test2", "../../models/8.10/1.obj");
+	CVegaFemFactory vFem("../../models/8.10/test", "../../models/8.10/1.obj");
 	std::vector<int> b{ 500, 500, 500 };
 	std::vector<std::pair<int, int>> angle;
 	int numbercounter = 1;
@@ -92,6 +92,8 @@ int main()
 	CShader ourTreeShader("Tree.vert", "Tree.frag");
 	CShader ourPlaneShader("Plane.vert", "Plane.frag");
 	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
+
+
 
 	//plane vertices
 	float planeVertices[] = {
@@ -198,6 +200,7 @@ int main()
 	ourModel.setGroupsIndex(vFem);
 	ourModel.setVerticesNumber(vFem);
 	ourModel.setMeshGroupIndex();
+	ourModel.setAssimpVerticesNumber();
 	
 	// render loop
 	// -----------
@@ -205,6 +208,9 @@ int main()
 	int frameNums = vFem.getFileFrames(0).Frames.size();
 	//obj模型的顶点数
 	int vertexNums = vFem.getFileFrames(0).Frames[0].BaseFileDeformations.size();
+
+	std::vector<int> vertexRepeat=vFem.getModelTransformStruct()->
+
 	std::cout << frameNums << " " << vertexNums << std::endl;
 	glm::vec4* deformU = new glm::vec4[frameNums*vertexNums*numbercounter];
 	//CTreeInstanceMesh treeDeformationSet = CTreeInstanceMesh(ourModel);
@@ -242,20 +248,49 @@ int main()
 	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_index, ssbo_binding_point_index);
 
 
-	glm::vec4* deltaU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
+	glm::vec4* deltaU = new glm::vec4[vertexNums];
 	GLuint shader_delta_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaDeformationArray");
 	GLint SSBOBinding1 = 0, BlockDataSize1 = 0;
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding1);
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize1);
+
 	unsigned int deltaSSBO;
 	glGenBuffers(1, &deltaSSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(ourModel.getAssimpVerticesNumber()), deltaU, GL_DYNAMIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*vertexNums, deltaU, GL_DYNAMIC_DRAW);
 	GLuint deltassbo_binding_point_index = 2;
 	//点和SSBO的连接
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_index, deltaSSBO);
 	//点和shader的连接
 	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_delta_index, deltassbo_binding_point_index);
+
+
+	GLuint atomicsBuffer;
+	glGenBuffers(1, &atomicsBuffer);
+	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicsBuffer);
+	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint) * vertexNums, NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+
+	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER,atomicsBuffer);
+	int * Booldelta = new int[vertexNums];
+	glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint) * vertexNums, Booldelta);
+	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+
+	
+	//GLuint shader_delta_bool_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaBoolDeformationArray");
+	//GLint SSBOBinding2 = 0, BlockDataSize2 = 0;
+	//glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding2);
+	//glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize2);
+	//unsigned int deltaBoolSSBO;
+	//glGenBuffers(1, &deltaBoolSSBO);
+	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaBoolSSBO);
+	//glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int)*vertexNums, Booldelta, GL_DYNAMIC_DRAW);
+	//GLuint deltassbo_binding_point_bool_index = 3;
+	////点和SSBO的连接
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_bool_index, deltaBoolSSBO);
+	////点和shader的连接
+	//glShaderStorageBlockBinding(ourTreeShader.getID(), shader_delta_bool_index, deltassbo_binding_point_bool_index);
+
 
 	ourTreeShader.use();
 	ourTreeShader.setInt("frameNums", frameNums);
@@ -295,12 +330,6 @@ int main()
 		ourPlaneShader.setMat4("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		if (i >= frameNums)
-		{
-			i = i % frameNums;
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*(ourModel.getAssimpVerticesNumber()), deltaU);
-		}
 		//tree
 		ourTreeShader.use();
 		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -309,6 +338,22 @@ int main()
 		ourTreeShader.setMat4("view", view);	
 		ourTreeShader.setInt("frameIndex", i);
 
+
+		int* deltaUbooldefor = new int[vertexNums];
+		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomicsBuffer);
+		glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(int)*vertexNums, deltaUbooldefor);
+
+		if (i >= 30)
+		{
+			i = i % 30;
+			glm::vec4* deltaUdefor = new glm::vec4[vertexNums];
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*vertexNums, deltaUdefor);
+			/*glGenBuffers(1, &deltaSSBO);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
+			
+			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*vertexNums, deltaUdefor, GL_DYNAMIC_DRAW);*/
+		}
 		for (int j = 0; j < numbercounter; j++)
 		{
 
@@ -319,6 +364,8 @@ int main()
 			ourTreeShader.setInt("treeIndex", j);
 			ourModel.draw(ourTreeShader);
 		}
+		if(i==0)
+		Sleep(1000);
 		//ourModel.draw(ourShader)
 		i++;
 
@@ -338,6 +385,9 @@ int main()
 
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
+
+		/*if(i==1)
+		Sleep(1000);*/
 	}
 
 	glDeleteVertexArrays(1, &skyboxVAO);

@@ -8,6 +8,30 @@ CModelDeformationTransform::CModelDeformationTransform(const std::string & vFile
 	//再将读取的mesh返回到这个本类的model的mesh
 	m_BaseFileMesh = m_BaseFileStruct->GetMesh();
 	__VertexFaceRelated();
+	__VertexRepeat();
+}
+
+void CModelDeformationTransform::__VertexRepeat()
+{
+	m_VertexRepeatNumber=std::vector<int>(m_VerticesNumber);
+	for (unsigned int i = 0; i < m_BaseFileMesh->getNumGroups(); i++)
+	{
+		for (unsigned int iFace = 0; iFace < m_BaseFileMesh->getGroup(i).getNumFaces(); iFace++)
+		{
+			ObjMesh::Face face = m_BaseFileMesh->getGroup(i).getFace(iFace);
+			for (int j = 0; j < 3; j++)
+			{
+				for (int k = 0; k < m_VerticesNumber; k++)
+				{
+					if (k == face.getVertex(j).getPositionIndex())
+					{
+						m_VertexRepeatNumber[k]++;
+						break;
+					}
+				}
+			}
+		}
+	}
 }
 
 //对m_Groups中的数据进行填充
