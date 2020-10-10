@@ -208,6 +208,8 @@ float dampingStiffnessCoef; // Rayleigh stiffness damping
 float dampingLaplacianCoef = 0.0; // Laplacian damping (rarely used)
 float deformableObjectCompliance = 1.0; // scales all user forces by the provided factor
 
+char fixedVerticesKVFFileName[4096];
+
 // adjusts the stiffness of the object to cause all frequencies scale by the provided factor:
 // keep it to 1.0 (except for experts)
 float frequencyScaling = 1.0; 
@@ -247,6 +249,11 @@ int timestepCounter = 0;
 int subTimestepCounter = 0;
 int numFixedVertices;
 int * fixedVertices;
+
+int numFixedKVFNumber;
+int * fixedKVFVertices;
+std::vector<int> KVFVertices;
+
 int numForceLoads = 0;
 //加载力模型
 double * forceLoads = nullptr;
@@ -666,8 +673,11 @@ void idleFunction(void)
     {
 		//计算由力产生的结点位移形变
       int code = integratorBase->DoTimestep();
-	  std::vector<int> tempvec = { 0,4,1677 };
-	  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, tempvec);
+	  /*std::vector<int> tempvec = { 0,4,1677 };*/
+
+
+	  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices);
+
 	  /*integratorBase->WriteKRFextVMartixToFile(outputFilename, subTimestepCounter);*/
 
       printf("."); fflush(nullptr);
@@ -768,7 +778,11 @@ void idleFunction(void)
 	//double * restPosition = secondaryDeformableObjectRenderingMesh->GetVertexRestPositions();
 	CModelDeformationTransform deformationsave;
 	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
-	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
+
+
+	//deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
+
+
 
 	//mesh->saveToAscii("D:/GraduationProject/Vega/models/8.10/position/1.obj",1);
 	//CSence sence(mesh, restPosition);
@@ -1481,6 +1495,18 @@ void initSimulation()
     fixedVertices[0] = massSpringSystem->GetNumParticles();
   }
 
+  if (ListIO::load(fixedVerticesKVFFileName, &numFixedKVFNumber, &fixedKVFVertices) != 0)
+  {
+	  printf("Error reading fixed vertices.\n");
+	  exit(1);
+  }
+
+  for (auto i = 0; i < numFixedKVFNumber; i++)
+  {
+	  KVFVertices.push_back(fixedKVFVertices[i]);
+  }
+
+
   printf("Loaded %d fixed vertices. They are:\n",numFixedVertices);
   ListIO::print(numFixedVertices,fixedVertices);
   // create 0-indexed fixed DOFs
@@ -1777,6 +1803,9 @@ void initConfigurations()
   configFile.addOptionOptional("secondaryRenderingMeshInterpolationFilename", secondaryRenderingMeshInterpolationFilename, "__none");
   configFile.addOptionOptional("useRealTimeNormals", &useRealTimeNormals, 0);
   configFile.addOptionOptional("fixedVerticesFilename", fixedVerticesFilename, "__none");
+
+  configFile.addOptionOptional("fixedVerticesKVFFileName", fixedVerticesKVFFileName, "__none");
+
   configFile.addOptionOptional("enableCompressionResistance", &enableCompressionResistance, enableCompressionResistance);
   configFile.addOptionOptional("compressionResistance", &compressionResistance, compressionResistance);
   configFile.addOption("timestep", &timeStep);
