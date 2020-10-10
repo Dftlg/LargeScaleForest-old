@@ -402,6 +402,7 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 	if (connectionFile.is_open())
 	{
 		//输出体素个数
+		connectionFile << "ElementSize" << std::endl;
 		connectionFile << vElementIndex.size() << std::endl;
 		//输出帧号
 
@@ -453,6 +454,7 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 			}
 		}
 		connectionFile << "internalForces" << std::endl;
+		connectionFile << vertexPos.size() << std::endl;
 		for (auto it = vertexPos.begin(); it != vertexPos.end(); ++it)
 		{
 			connectionFile << (it)->first << " ";
@@ -462,6 +464,7 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 		}
 
 		connectionFile << "velocity" << std::endl;
+		connectionFile << vertexVel.size() << std::endl;
 		for (auto it = vertexVel.begin(); it != vertexVel.end(); ++it)
 		{
 			connectionFile << (it)->first << " ";

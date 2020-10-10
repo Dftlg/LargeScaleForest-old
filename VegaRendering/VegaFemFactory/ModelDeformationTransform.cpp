@@ -8,7 +8,7 @@ CModelDeformationTransform::CModelDeformationTransform(const std::string & vFile
 	//再将读取的mesh返回到这个本类的model的mesh
 	m_BaseFileMesh = m_BaseFileStruct->GetMesh();
 	__VertexFaceRelated();
-	__VertexRepeat();
+	//__VertexRepeat();
 }
 
 void CModelDeformationTransform::__VertexRepeat()
