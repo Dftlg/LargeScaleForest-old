@@ -35,7 +35,8 @@ public:
 	std::vector<Common::SFileFrames> searchFileFrames(const int vTheta, const int vPhi, const std::vector<int> & vForceFluctuationSequence);
 	std::vector<std::vector<glm::vec3>> objDeformation(std::pair<int, int> vForceDirection, std::vector<int> vForceFluctuationSequence);
 	void cleanSFileDataGroup(int vConnectionIndex, int vTimestep);
-
+	//²éÕÒ¼ìË÷±ê×¼
+	void searchMatchedFrameSegment(std::vector<glm::vec3> &voMatchedFramesSequences);
 	
 
 private:

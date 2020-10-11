@@ -201,13 +201,18 @@ int main()
 	ourModel.setVerticesNumber(vFem);
 	ourModel.setMeshGroupAndAssimpIndex();
 	
-	// render loop
-	// -----------
+
+
+	//查找帧段
+	std::vector<glm::vec3> matchedFramesSequences;
+	vFem.searchMatchedFrameSegment(matchedFramesSequences);
+
+
+
 	//帧数
 	int frameNums = vFem.getFileFrames(0).Frames.size();
 	//obj模型的顶点数
 	int vertexNums = vFem.getFileFrames(0).Frames[0].BaseFileDeformations.size();
-
 
 	std::cout << frameNums << " " << vertexNums << std::endl;
 	glm::vec4* deformU = new glm::vec4[frameNums*vertexNums*numbercounter];

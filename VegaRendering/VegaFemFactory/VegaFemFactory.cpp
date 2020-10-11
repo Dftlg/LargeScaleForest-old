@@ -382,6 +382,30 @@ void CVegaFemFactory::cleanSFileDataGroup(int vConnectionIndex, int vTimestep)
 	}
 }
 
+//以5帧为单位进行帧段的查找匹配操作，组成一个匹配好的序列
+void CVegaFemFactory::searchMatchedFrameSegment(std::vector<glm::vec3>& voMatchedFramesSequences)
+{
+	Common::SpKVFData tempSpKVData;
+	tempSpKVData = m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0];
+	double kEvaluation = 0;
+	double internalForces = 0;
+	//tempSpKVData.FrameIndex = 0;
+	//tempSpKVData.KLengths = m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths;
+	//tempSpKVData.KLengths.assign(m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths.begin(), m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths.end());
+	for (int i = 0; i < m_AllReallyLoadConnectedFem[0].FemDataset.size(); i++)
+	{
+		for (int k = 0; k < m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas.size(); k++)
+		{
+			std::vector<glm::vec3> tempInternalForcesSequence = m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[i].InternalForces;
+			for (int j = 0; j < m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].InternalForces.size(); j++)
+			{
+				tempInternalForcesSequence[j].
+				internalForces += (tempInternalForcesSequence[j].x - tempSpKVData.InternalForces[j].x)
+			}
+		}
+	}
+}
+
 void CVegaFemFactory::__getFileSeekDirOfEachBlock(const std::string & vFilePath, std::vector<long long>& vBlock)
 {
 	const size_t last_slash_idx = vFilePath.rfind('.txt');
