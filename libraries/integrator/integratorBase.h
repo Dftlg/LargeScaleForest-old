@@ -191,7 +191,7 @@ public:
   // useful to prevent large values from occuring
   virtual void ConstrainToSphere(double R2);
   virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex) = 0;
-  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex)=0;
+  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex,int vForce)=0;
 
 protected:
 

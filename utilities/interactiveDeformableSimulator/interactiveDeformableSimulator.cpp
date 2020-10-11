@@ -254,6 +254,12 @@ int numFixedKVFNumber;
 int * fixedKVFVertices;
 std::vector<int> KVFVertices;
 
+std::vector<int> ExtraForces;
+int FramesNumber = 0;
+int Amplitude = 0;
+int Frequency = 0;
+int vYpluse = 0;
+
 int numForceLoads = 0;
 //加载力模型
 double * forceLoads = nullptr;
@@ -593,7 +599,9 @@ void idleFunction(void)
 		//计算外力
        /* camera->CameraVector2WorldVector_OrientationOnly3D(
             forceX, forceY, 0, externalForce);*/
-		camera->setWorldCoorinateSystemForce(500, 0, 0, externalForce);
+		camera->setWorldCoorinateSystemForce(ExtraForces[FramesNumber], 0, 0, externalForce);
+		FramesNumber++;
+
 		std::copy(externalForce, externalForce + 3, vForce);
 
         for(int j=0; j<3; j++)
@@ -675,8 +683,8 @@ void idleFunction(void)
       int code = integratorBase->DoTimestep();
 	  /*std::vector<int> tempvec = { 0,4,1677 };*/
 
-
-	  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices);
+	  if(FramesNumber%5==0)
+	  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, ExtraForces[FramesNumber]);
 
 	  /*integratorBase->WriteKRFextVMartixToFile(outputFilename, subTimestepCounter);*/
 
@@ -709,7 +717,7 @@ void idleFunction(void)
 
       subTimestepCounter++;
     }
-	if (subTimestepCounter > 30)
+	if (subTimestepCounter > 60)
 	{
 		exit(1);
 	}
@@ -780,7 +788,7 @@ void idleFunction(void)
 	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
 
 
-	//deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
+	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
 
 
 
@@ -1533,6 +1541,11 @@ void initSimulation()
 
   deltau = (double*)calloc(3 * n, sizeof(double));
   preu= (double*)calloc(3 * n, sizeof(double));
+
+  std::vector<int> tempConfig = GetForceConfigurate(outputFilename);
+ 
+  ExtraForces=GenerateSamplingForce(60, tempConfig[0], tempConfig[1], 0,tempConfig[2]);
+
 
   // load initial condition
   if (strcmp(initialPositionFilename, "__none") != 0)

@@ -205,7 +205,7 @@ void EulerSparse::WriteKRFextVMartixToFile(const std::string & vFilePath, int vF
 {
 
 }
-void EulerSparse::WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex)
+void EulerSparse::WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex, int vForce)
 {
 
 }
