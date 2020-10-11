@@ -177,6 +177,7 @@ namespace Common
 	struct SpKVFData
 	{
 		int FrameIndex;
+		int Force;
 		std::vector<int> KLengths;
 		std::vector<std::vector<double>> Kmatrix;
 

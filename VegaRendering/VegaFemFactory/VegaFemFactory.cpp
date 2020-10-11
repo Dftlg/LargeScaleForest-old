@@ -137,6 +137,12 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 			tempKVFData.FrameIndex = atoi(lineString.c_str());
 		}
 		getline(KVFFile, lineString);
+		getline(KVFFile, lineString);
+		if (lineString == "Force")
+		{
+			getline(KVFFile, lineString);
+			tempKVFData.Force = atoi(lineString.c_str());
+		}
 		for (auto i = 0; i < ElementNumber; i++)
 		{
 			getline(KVFFile, lineString);

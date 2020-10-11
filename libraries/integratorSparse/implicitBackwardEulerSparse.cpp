@@ -388,7 +388,7 @@ void ImplicitBackwardEulerSparse::WriteKRFextVMartixToFile(const std::string & v
 
 }
 
-void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex)
+void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex,int vForce)
 {
 	const size_t last_slash_idx = vFilePath.rfind('.txt');
 	std::string FramesBlockFileName = vFilePath.substr(0, last_slash_idx - 3);
@@ -408,6 +408,9 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 
 		connectionFile << "FrameIndex" << std::endl;
 		connectionFile << vFrameIndex << std::endl;
+
+		connectionFile << "Force" << std::endl;
+		connectionFile << vForce << std::endl;
 
 		connectionFile << "Kmatrix" << std::endl;
 		std::map<int, std::vector<double>> vertexPos;
