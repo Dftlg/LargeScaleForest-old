@@ -103,7 +103,7 @@ void IntegratorBaseSparse::WriteKRFextVMartixToFile(const std::string & vFilePat
 {
 
 }
-void IntegratorBaseSparse::WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex, int vForce)
+void IntegratorBaseSparse::WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex, std::vector<int> & vForce)
 {
 
 }

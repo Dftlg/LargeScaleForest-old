@@ -78,7 +78,7 @@ public:
   virtual double GetTotalMass();
 
   virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex);
-  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex,int vForce);
+  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex, std::vector<int> & vForce);
 protected:
   SparseMatrix * massMatrix; 
   ForceModel * forceModel;

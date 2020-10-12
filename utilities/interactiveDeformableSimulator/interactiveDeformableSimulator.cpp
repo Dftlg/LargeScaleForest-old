@@ -255,6 +255,7 @@ int * fixedKVFVertices;
 std::vector<int> KVFVertices;
 
 std::vector<int> ExtraForces;
+std::vector<int> TempExtraForces;
 int FramesNumber = 0;
 int Amplitude = 0;
 int Frequency = 0;
@@ -676,6 +677,7 @@ void idleFunction(void)
 
     PerformanceCounter totalDynamicsCounter;
 
+	TempExtraForces.push_back(ExtraForces[FramesNumber]);
     // timestep the dynamics 
     for(int i=0; i<substepsPerTimeStep; i++)
     {
@@ -683,9 +685,12 @@ void idleFunction(void)
       int code = integratorBase->DoTimestep();
 	  /*std::vector<int> tempvec = { 0,4,1677 };*/
 
-	  if(FramesNumber%5==0)
-	  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, ExtraForces[FramesNumber]);
-
+	  if (FramesNumber % Common::ForcesSampling == 0)
+	  {
+		  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
+		  TempExtraForces.clear();
+	  }
+	  
 	  /*integratorBase->WriteKRFextVMartixToFile(outputFilename, subTimestepCounter);*/
 
       printf("."); fflush(nullptr);
