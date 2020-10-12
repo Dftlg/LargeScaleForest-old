@@ -136,15 +136,16 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 			getline(KVFFile, lineString);
 			tempKVFData.FrameIndex = atoi(lineString.c_str());
 		}
-		getline(KVFFile, lineString);
+		//getline(KVFFile, lineString);
 		getline(KVFFile, lineString);
 		if (lineString == "Force")
 		{
 			getline(KVFFile, lineString);
 			tempKVFData.Force = atoi(lineString.c_str());
 		}
+		getline(KVFFile, lineString);
 		for (auto i = 0; i < ElementNumber; i++)
-		{
+		{		
 			getline(KVFFile, lineString);
 			std::istringstream DataSet(lineString);
 			int KmatrixOneLineNumber;
