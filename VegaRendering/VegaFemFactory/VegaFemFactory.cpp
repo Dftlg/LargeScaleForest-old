@@ -136,15 +136,16 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 			getline(KVFFile, lineString);
 			tempKVFData.FrameIndex = atoi(lineString.c_str());
 		}
-		getline(KVFFile, lineString);
 		//getline(KVFFile, lineString);
+		getline(KVFFile, lineString);
 		if (lineString == "Force")
 		{
 			getline(KVFFile, lineString);
 			tempKVFData.Force = atoi(lineString.c_str());
 		}
+		getline(KVFFile, lineString);
 		for (auto i = 0; i < ElementNumber; i++)
-		{
+		{		
 			getline(KVFFile, lineString);
 			std::istringstream DataSet(lineString);
 			int KmatrixOneLineNumber;
@@ -393,9 +394,8 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<glm::vec3>& voMatche
 {
 	Common::SpKVFData tempSpKVData;
 	tempSpKVData = m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0];
-	double kEvaluation = 10000;
-	double internalForcesEvaluation = 10000;
-	double ExternalForcesEvalution = 10000;
+	double kEvaluation = 0;
+	double internalForces = 0;
 	//tempSpKVData.FrameIndex = 0;
 	//tempSpKVData.KLengths = m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths;
 	//tempSpKVData.KLengths.assign(m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths.begin(), m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths.end());
@@ -403,24 +403,11 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<glm::vec3>& voMatche
 	{
 		for (int k = 0; k < m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas.size(); k++)
 		{
-			double ExternalForcesEvalution
-			if (abs(tempSpKVData.Force - m_AllReallyLoadConnectedFem[0].FemDataset[i]->KVFFrameDatas[k].Force) < 10)
+			std::vector<glm::vec3> tempInternalForcesSequence = m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[i].InternalForces;
+			for (int j = 0; j < m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].InternalForces.size(); j++)
 			{
-				std::vector<glm::vec3> tempInternalForcesSequence = m_AllReallyLoadConnectedFem[0].FemDataset[i]->KVFFrameDatas[k].InternalForces;
-				std::vector<std::vector<double>> tempKSequence = m_AllReallyLoadConnectedFem[0].FemDataset[i]->KVFFrameDatas[k].Kmatrix;
-				double tempkEvaluation = 0;
-				for (int j = 0; j < tempKSequence.size(); j++)
-				{
-					for (int a = 0; a < tempKSequence[j].size(); a++)
-					{
-						tempkEvaluation += (tempKSequence[j][a] - tempSpKVData.Kmatrix[j][a])*(tempKSequence[j][a] - tempSpKVData.Kmatrix[j][a]);
-					}
-					
-				}
-				if (kEvaluation > tempkEvaluation)
-				{
-					tempSpKVData = m_AllReallyLoadConnectedFem[0].FemDataset[i]->KVFFrameDatas[k];
-				}
+				tempInternalForcesSequence[j].
+				internalForces += (tempInternalForcesSequence[j].x - tempSpKVData.InternalForces[j].x)
 			}
 		}
 	}
