@@ -40,6 +40,8 @@ namespace Common
 
 	static int DeformationObject=true;
 
+	static int ForcesSampling = 5;
+
 	struct SVertex
 	{
 		glm::vec3 Position;
@@ -177,7 +179,7 @@ namespace Common
 	struct SpKVFData
 	{
 		int FrameIndex;
-		int Force;
+		std::vector<int> Forces;
 		std::vector<int> KLengths;
 		std::vector<std::vector<double>> Kmatrix;
 

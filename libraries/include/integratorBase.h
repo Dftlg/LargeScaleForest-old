@@ -105,6 +105,7 @@ Both publications are available online at www.jernejbarbic.com .
 #include <stdlib.h>
 #include<string>
 #include<vector>
+#include "../../VegaRendering/Common/common.h"
 
 // This abstract class is derived into: IntegratorBaseDense (dense systems)
 // and ImplicitNewmarkSparse ((large) sparse systems).
@@ -191,7 +192,7 @@ public:
   // useful to prevent large values from occuring
   virtual void ConstrainToSphere(double R2);
   virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex) = 0;
-  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex,int vForce)=0;
+  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex, std::vector<int> & vForce)=0;
 
 protected:
 
