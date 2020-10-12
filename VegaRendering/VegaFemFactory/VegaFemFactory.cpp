@@ -394,22 +394,58 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<glm::vec3>& voMatche
 {
 	Common::SpKVFData tempSpKVData;
 	tempSpKVData = m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0];
-	double kEvaluation = 0;
-	double internalForces = 0;
-	//tempSpKVData.FrameIndex = 0;
-	//tempSpKVData.KLengths = m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths;
-	//tempSpKVData.KLengths.assign(m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths.begin(), m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths.end());
+	double kEvaluation = 10000;
+	double internalForcesEvaluation = 10000;
+	double ExternalForcesEvalution = 10000;
+	std::vector<int> FrameIndexSequence;
+	FrameIndexSequence.push_back(tempSpKVData.FrameIndex + 1);
 	for (int i = 0; i < m_AllReallyLoadConnectedFem[0].FemDataset.size(); i++)
 	{
 		for (int k = 0; k < m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas.size(); k++)
 		{
-			std::vector<glm::vec3> tempInternalForcesSequence = m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[i].InternalForces;
-			for (int j = 0; j < m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].InternalForces.size(); j++)
+			if (m_AllReallyLoadConnectedFem[0].FemDataset[i]->KVFFrameDatas[k].FrameIndex == tempSpKVData.FrameIndex)
 			{
-				tempInternalForcesSequence[j].
-				internalForces += (tempInternalForcesSequence[j].x - tempSpKVData.InternalForces[j].x)
+				k++;
+			}
+			double tempExternalForcesEvalution = 0;
+			//Forces
+			if (abs(tempSpKVData.Force - m_AllReallyLoadConnectedFem[0].FemDataset[i]->KVFFrameDatas[k].Force) < 10)
+			{
+				std::vector<std::vector<double>> tempKSequence = m_AllReallyLoadConnectedFem[0].FemDataset[i]->KVFFrameDatas[k].Kmatrix;
+				double tempkEvaluation = 0;
+				//k
+				for (int b = 0; b < tempKSequence.size(); b++)
+				{
+					for (int a = 0; a < tempKSequence[b].size(); a++)
+					{
+						tempkEvaluation += (tempKSequence[b][a] - tempSpKVData.Kmatrix[b][a])*(tempKSequence[b][a] - tempSpKVData.Kmatrix[b][a]);
+					}
+				}
+				if (kEvaluation > tempkEvaluation)
+				{
+					std::vector<glm::vec3> tempInternalForcesSequence = m_AllReallyLoadConnectedFem[0].FemDataset[i]->KVFFrameDatas[k].InternalForces;
+					double tempInternalForcesEvaluation = 0;
+					//internalForces
+					for (int b = 0; b < tempInternalForcesSequence.size(); b++)
+					{
+						tempInternalForcesEvaluation += abs(tempInternalForcesSequence[b].x - tempSpKVData.InternalForces[b].x) + abs(tempInternalForcesSequence[b].y - tempSpKVData.InternalForces[b].y) + abs(tempInternalForcesSequence[b].z - tempSpKVData.InternalForces[b].z);
+					}
+					if (internalForcesEvaluation > tempInternalForcesEvaluation)
+					{
+						internalForcesEvaluation = m_AllReallyLoadConnectedFem[0].FemDataset[i]->KVFFrameDatas[k].Force;
+						kEvaluation = tempkEvaluation;
+						internalForcesEvaluation = tempInternalForcesEvaluation;
+						tempSpKVData = m_AllReallyLoadConnectedFem[0].FemDataset[i]->KVFFrameDatas[k];
+						FrameIndexSequence.push_back(tempSpKVData.FrameIndex + 1);
+					}
+				}
 			}
 		}
+	}
+	std::vector<int> testIndex;
+	for (int i = 0; i < FrameIndexSequence.size(); i++)
+	{
+		testIndex.push_back(FrameIndexSequence[i]);
 	}
 }
 
