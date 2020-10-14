@@ -32,11 +32,12 @@ public:
 	Common::SFileFrames getFileFrames(int vIndex) { return m_FilesData[vIndex]; }
 	void setDeformationStateFromFileName();
 	CModelDeformationTransform*  getModelTransformStruct() { return m_ModelTransformStruct;}
-	std::vector<Common::SFileFrames> searchFileFrames(const int vTheta, const int vPhi, const std::vector<int> & vForceFluctuationSequence);
+	std::vector<Common::SFileFrames> searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<int> & vForceFluctuationSequence);
+	std::vector<Common::SFileFrames> searchFileFrameOnAttribute();
 	std::vector<std::vector<glm::vec3>> objDeformation(std::pair<int, int> vForceDirection, std::vector<int> vForceFluctuationSequence);
 	void cleanSFileDataGroup(int vConnectionIndex, int vTimestep);
 	//²éÕÒ¼ìË÷±ê×¼
-	void searchMatchedFrameSegment(std::vector<glm::vec3> &voMatchedFramesSequences);
+	void searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>> &voMatchedFramesSequences);
 	
 
 private:

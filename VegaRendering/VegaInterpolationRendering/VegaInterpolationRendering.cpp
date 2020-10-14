@@ -47,23 +47,28 @@ float grasstime = 0.0f;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/8.10/test1", "../../models/8.10/1.obj");
+	CVegaFemFactory vFem("../../models/8.10/test2", "../../models/8.10/1.obj");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 1;
+	int numbercounter = 2;
+	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
 		angle.push_back(std::make_pair(0, i * 30));
 	}
 
+	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
 	for (int i = 0; i < numbercounter; i++)
 	{
 		//给定角度下相关联的一些位移帧文件集合，但由于目前只有一个，就每个角度特定对应一个
-		std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrames(angle[i].first, angle[i].second, b);
-		vFem.readFramesDeformationData(vtemp, i);//i本来应该是vtemp.size()
+		//std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrames(angle[i].first, angle[i].second, b);
+		std::vector<Common::SFileFrames> temp;
+		temp.push_back(vtemp[i]);
+		vFem.readFramesDeformationData(temp, i);//i本来应该是vtemp.size()
 	}
 
 	// glfw: initialize and configure
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -204,33 +209,46 @@ int main()
 
 
 	//查找帧段
-	std::vector<glm::vec3> matchedFramesSequences;
+	std::vector<std::vector<glm::vec3>> matchedFramesSequences;
 	vFem.searchMatchedFrameSegment(matchedFramesSequences);
-
-
-
 	//帧数
-	int frameNums = vFem.getFileFrames(0).Frames.size();
+	int frameNums = matchedFramesSequences.size();
 	//obj模型的顶点数
-	int vertexNums = vFem.getFileFrames(0).Frames[0].BaseFileDeformations.size();
-
+	int vertexNums = matchedFramesSequences[0].size();
 	std::cout << frameNums << " " << vertexNums << std::endl;
-	glm::vec4* deformU = new glm::vec4[frameNums*vertexNums*numbercounter];
-	//CTreeInstanceMesh treeDeformationSet = CTreeInstanceMesh(ourModel);
-	int count = 0;
-	for (int j = 0; j < numbercounter; j++)
+	glm::vec4* deformU = new glm::vec4[frameNums*vertexNums];
+
+	
+	for (int i = 0; i < frameNums; i++)
 	{
-		for (int i = 0; i < vFem.getFileFrames(j).Frames.size(); i++)
+		for (int k = 0; k < vertexNums; k++)
 		{
-			Common::SFileData frame = vFem.getFileFrames(j).Frames[i];
-			for (int k = 0; k < frame.BaseFileDeformations.size(); k++)
-			{
-				deformU[j*frameNums*vertexNums + i * vertexNums + k] = glm::vec4(frame.BaseFileDeformations[k], 0.0f);
-				count++;
-			}
+			deformU[i * vertexNums + k] = glm::vec4(matchedFramesSequences[i][k] , 0.0f);
 		}
 	}
-	std::cout << deformU[numbercounter*frameNums*vertexNums - 1].x << " " << count << std::endl;
+
+
+	////帧数
+	//int frameNums = vFem.getFileFrames(0).Frames.size();
+	////obj模型的顶点数
+	//int vertexNums = vFem.getFileFrames(0).Frames[0].BaseFileDeformations.size();
+
+	//std::cout << frameNums << " " << vertexNums << std::endl;
+	//glm::vec4* deformU = new glm::vec4[frameNums*vertexNums*numbercounter];
+ 	//int count = 0;
+	//for (int j = 0; j < numbercounter; j++)
+	//{
+	//	for (int i = 0; i < vFem.getFileFrames(j).Frames.size(); i++)
+	//	{
+	//		Common::SFileData frame = vFem.getFileFrames(j).Frames[i];
+	//		for (int k = 0; k < frame.BaseFileDeformations.size(); k++)
+	//		{
+	//			deformU[j*frameNums*vertexNums + i * vertexNums + k] = glm::vec4(frame.BaseFileDeformations[k], 0.0f);
+	//			count++;
+	//		}
+	//	}
+	//}
+	//std::cout << deformU[numbercounter*frameNums*vertexNums - 1].x << " " << count << std::endl;
 
 	GLuint shader_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
 	GLint SSBOBinding = 0, BlockDataSize = 0;
@@ -241,7 +259,8 @@ int main()
 	unsigned int SSBO;
 	glGenBuffers(1, &SSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*frameNums*vertexNums*numbercounter, deformU, GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*frameNums*vertexNums, deformU, GL_STATIC_DRAW);
+	//glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*frameNums*vertexNums*numbercounter, deformU, GL_STATIC_DRAW);
 
 	//shader和点连接
 	GLuint ssbo_binding_point_index = 1;
@@ -319,12 +338,8 @@ int main()
 			i = i % frameNums;
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
-			/*glGenBuffers(1, &deltaSSBO);
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-			
-			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*vertexNums, deltaUdefor, GL_DYNAMIC_DRAW);*/
 		}
-		for (int j = 0; j < numbercounter; j++)
+		for (int j = 0; j < 1; j++)
 		{
 
 			glm::mat4 model = glm::mat4(1.0f);
@@ -354,7 +369,7 @@ int main()
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 
-		Sleep(200);
+		Sleep(100);
 
 	}
 

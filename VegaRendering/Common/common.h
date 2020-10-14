@@ -32,7 +32,7 @@ namespace Common
 
 	static bool InstanceTrees = true;
 
-	const int TreesNumber = 1;
+	const int TreesNumber = 100;
 
 	static int MaxTimeStep = 60;
 
@@ -207,6 +207,8 @@ namespace Common
 			FilePath = vFilePath;
 		}
 	};
+
+	//files gather
 	struct SConnectedFemFiles
 	{
 		unsigned int ConnectedIndex;
