@@ -42,6 +42,8 @@ namespace Common
 
 	static int ForcesSampling = 5;
 
+	static int uDeformationSampling = 10;
+
 	struct SVertex
 	{
 		glm::vec3 Position;
@@ -187,6 +189,12 @@ namespace Common
 		std::vector<glm::vec3> Velocity;
 	};
 
+	struct SpDeformation
+	{
+		int FrameIndex;
+		std::vector<glm::vec3> Deformation;
+	};
+
 	//每一个是一个文件
 	struct SFileFrames
 	{
@@ -200,6 +208,7 @@ namespace Common
 		std::vector<int> ForceFluctuationSequence;
 		std::vector<SFileData> Frames;
 		std::vector<SpKVFData> KVFFrameDatas;
+		std::vector<SpDeformation> Deformations;
 		SFileFrames() = default;
 		SFileFrames(std::string vIndex, std::string vFilePath)
 		{

@@ -48,7 +48,7 @@ float grasstime = 0.0f;
 int main()
 {
 	CVegaFemFactory vFem("../../models/8.10/test2", "../../models/8.10/1.obj");
-	std::vector<int> b{ 200, 1, 0 };
+	std::vector<int> b{ 150, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
 	int numbercounter = 2;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;

@@ -209,6 +209,7 @@ float dampingLaplacianCoef = 0.0; // Laplacian damping (rarely used)
 float deformableObjectCompliance = 1.0; // scales all user forces by the provided factor
 
 char fixedVerticesKVFFileName[4096];
+char uDeformationoutputFileName[4096];
 
 // adjusts the stiffness of the object to cause all frequencies scale by the provided factor:
 // keep it to 1.0 (except for experts)
@@ -687,7 +688,7 @@ void idleFunction(void)
 
 	  if (FramesNumber % Common::ForcesSampling == 0)
 	  {
-		  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
+		  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, FramesNumber, KVFVertices, TempExtraForces);
 		  TempExtraForces.clear();
 	  }
 	  
@@ -792,6 +793,11 @@ void idleFunction(void)
 	CModelDeformationTransform deformationsave;
 	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
 
+	if (FramesNumber % Common::uDeformationSampling == 0)
+	{
+		deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);
+		TempExtraForces.clear();
+	}
 
 	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
 
@@ -1823,6 +1829,7 @@ void initConfigurations()
   configFile.addOptionOptional("fixedVerticesFilename", fixedVerticesFilename, "__none");
 
   configFile.addOptionOptional("fixedVerticesKVFFileName", fixedVerticesKVFFileName, "__none");
+  configFile.addOptionOptional("uDeformationoutputFileName", uDeformationoutputFileName, "__none");
 
   configFile.addOptionOptional("enableCompressionResistance", &enableCompressionResistance, enableCompressionResistance);
   configFile.addOptionOptional("compressionResistance", &compressionResistance, compressionResistance);

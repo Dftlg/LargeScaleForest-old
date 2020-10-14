@@ -54,6 +54,8 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				//readDeformationDataByMutileThread(m_FilesData[fileIndex], m_FilesData[fileIndex].FilePath, fileIndex);
 				
 				readKVFFileData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
+				readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
+
 				int timeStepCount = 1;
 				std::ifstream positionFile(m_FilesData[fileIndex].FilePath);
 				std::string lineString;
@@ -63,12 +65,12 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				{
 					std::cout << "Error: could not open vertex file" << m_FilesData[fileIndex].FilePath << std::endl;
 				}
-				int Frameindex = 0;
+				int Frameindex = 1;
 				int stop = 0;
 				while (getline(positionFile, lineString))
 				{
 					//getline(positionFile, lineString);
-					sprintf(s, "Position%04d", timeStepCount);
+					sprintf(s, "Position%d", timeStepCount);
 					std::istringstream sin(lineString);
 					std::string str;
 					sin >> str;//Position%04d后面有空格
@@ -110,6 +112,40 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 	m_AllReallyLoadConnectedFem.push_back(tempConnectedFile);
 
 	std::cout << "Finish Load Search FileData To ConnectedFileFrames" << std::endl;
+}
+
+void CVegaFemFactory::readUdeformationData(const std::string & vFile, Common::SFileFrames &vFileFrame)
+{
+	const size_t last_slash_idx = vFile.rfind('.txt');
+	std::string FramesUdeformationFileName = vFile.substr(0, last_slash_idx - 3);
+	FramesUdeformationFileName = FramesUdeformationFileName + ".spDemn";
+	std::ifstream UdeformationFile(FramesUdeformationFileName);
+	if (!UdeformationFile.is_open())
+	{
+		std::cout << "Error: could not open vertex file" << FramesUdeformationFileName << std::endl;
+	}
+	double position[3];
+	std::string lineString;
+	while (getline(UdeformationFile, lineString))
+	{
+		Common::SpDeformation tempUdeformation;
+		const size_t lastPosition = lineString.rfind('tion');
+		std::string Frame = lineString.substr(lastPosition+1);
+		tempUdeformation.FrameIndex = atoi(Frame.c_str());
+
+		std::string VertexSizeStr;
+		getline(UdeformationFile, VertexSizeStr);
+		int VertexSize = atoi(VertexSizeStr.c_str());
+		getline(UdeformationFile, lineString);
+		std::istringstream dataset(lineString);
+		for (int j = 0; j < VertexSize; j++)
+		{
+			dataset >> position[0] >> position[1] >> position[2];
+			tempUdeformation.Deformation.push_back(glm::vec3(position[0], position[1], position[2]));
+		}
+		vFileFrame.Deformations.push_back(tempUdeformation);
+	}
+
 }
 
 void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFrames & vFileFrame)
