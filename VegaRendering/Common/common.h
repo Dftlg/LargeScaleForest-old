@@ -44,6 +44,8 @@ namespace Common
 
 	static int uDeformationSampling = 10;
 
+	static int CorrectuDeformationFrame = 20;
+
 	struct SVertex
 	{
 		glm::vec3 Position;
