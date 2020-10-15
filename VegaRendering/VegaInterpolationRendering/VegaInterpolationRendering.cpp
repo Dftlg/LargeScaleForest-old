@@ -219,6 +219,7 @@ int main()
 	glm::vec4* deformU = new glm::vec4[frameNums*vertexNums];
 
 	
+	
 	for (int i = 0; i < frameNums; i++)
 	{
 		for (int k = 0; k < vertexNums; k++)

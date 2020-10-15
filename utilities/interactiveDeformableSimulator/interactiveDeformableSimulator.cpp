@@ -583,6 +583,14 @@ void idleFunction(void)
   // reset external forces (usually to zero)
   memcpy(f_ext, f_extBase, sizeof(double) * 3 * n);
 
+  if (subTimestepCounter == 0)
+  {
+	  /*CModelDeformationTransform tempdeformationsave;
+	  tempdeformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);*/
+	  memcpy(deltau, integratorBase->Getq(), sizeof(double) * 3 * n);
+	  memcpy(preu, integratorBase->Getq(), sizeof(double) * 3 * n);
+  }
+
   if ((!lockScene) && (!pauseSimulation) && (singleStepMode <= 1))
   {
     // determine force in case user is pulling on a vertex
@@ -601,8 +609,7 @@ void idleFunction(void)
 		//计算外力
        /* camera->CameraVector2WorldVector_OrientationOnly3D(
             forceX, forceY, 0, externalForce);*/
-		camera->setWorldCoorinateSystemForce(ExtraForces[FramesNumber], 0, 0, externalForce);
-		FramesNumber++;
+		camera->setWorldCoorinateSystemForce(ExtraForces[subTimestepCounter], 0, 0, externalForce);
 
 		std::copy(externalForce, externalForce + 3, vForce);
 
@@ -678,20 +685,20 @@ void idleFunction(void)
 
     PerformanceCounter totalDynamicsCounter;
 
-	TempExtraForces.push_back(ExtraForces[FramesNumber]);
+	
     // timestep the dynamics 
     for(int i=0; i<substepsPerTimeStep; i++)
     {
+		TempExtraForces.push_back(ExtraForces[subTimestepCounter]);
+		if ((subTimestepCounter+1) % Common::ForcesSampling == 0)
+		{
+			integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
+			TempExtraForces.clear();
+		}
 		//计算由力产生的结点位移形变
       int code = integratorBase->DoTimestep();
 	  /*std::vector<int> tempvec = { 0,4,1677 };*/
 
-	  if (FramesNumber % Common::ForcesSampling == 0)
-	  {
-		  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, FramesNumber, KVFVertices, TempExtraForces);
-		  TempExtraForces.clear();
-	  }
-	  
 	  /*integratorBase->WriteKRFextVMartixToFile(outputFilename, subTimestepCounter);*/
 
       printf("."); fflush(nullptr);
@@ -720,8 +727,7 @@ void idleFunction(void)
         explosionCounter.StartCounter();
         break;
       }
-
-      subTimestepCounter++;
+	  subTimestepCounter++;
     }
 	if (subTimestepCounter > 60)
 	{
@@ -735,22 +741,13 @@ void idleFunction(void)
 
     memcpy(u, integratorBase->Getq(), sizeof(double) * 3 * n);
 
-	if (subTimestepCounter == 1)
+	//计算每一帧产生的delta形变
+	for (int i = 0; i < 3 * n; i++)
 	{
-		memcpy(deltau, integratorBase->Getq(), sizeof(double) * 3 * n);
-		memcpy(preu, integratorBase->Getq(), sizeof(double) * 3 * n);
+		deltau[i] = u[i] - preu[i];
 	}
-	else
-	{
-		for (int i = 0; i < 3*n; i++)
-		{
-			deltau[i] = u[i] - preu[i];
-		}
-		memcpy(preu, integratorBase->Getq(), sizeof(double) * 3 * n);
-	}
-
+	memcpy(preu, integratorBase->Getq(), sizeof(double) * 3 * n);
 	
-
     if (singleStepMode == 1)
       singleStepMode = 2;
 
@@ -793,13 +790,13 @@ void idleFunction(void)
 	CModelDeformationTransform deformationsave;
 	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
 
-	if (FramesNumber % Common::uDeformationSampling == 0)
+	if (subTimestepCounter % Common::uDeformationSampling == 0)
 	{
 		deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);
 		TempExtraForces.clear();
 	}
 
-	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
+	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
 
 
 
