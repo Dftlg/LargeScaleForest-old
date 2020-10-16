@@ -210,6 +210,7 @@ float deformableObjectCompliance = 1.0; // scales all user forces by the provide
 
 char fixedVerticesKVFFileName[4096];
 char uDeformationoutputFileName[4096];
+char ObjectVertexIndexInElement[4096];
 
 // adjusts the stiffness of the object to cause all frequencies scale by the provided factor:
 // keep it to 1.0 (except for experts)
@@ -796,7 +797,7 @@ void idleFunction(void)
 		TempExtraForces.clear();
 	}
 
-	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
+	//deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
 
 
 
@@ -1481,6 +1482,7 @@ void initSimulation()
     printf("Num interpolation element vertices: %d\n", secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices);
 
     VolumetricMesh::loadInterpolationWeights(secondaryRenderingMeshInterpolationFilename, secondaryDeformableObjectRenderingMesh->Getn(), secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices, &secondaryDeformableObjectRenderingMesh_interpolation_vertices, &secondaryDeformableObjectRenderingMesh_interpolation_weights);
+	
   }
   else
     renderSecondaryDeformableObject = 0;
@@ -1521,7 +1523,8 @@ void initSimulation()
   {
 	  KVFVertices.push_back(fixedKVFVertices[i]);
   }
-
+  //存储判断体素形变顶点索引
+  volumetricMesh->SaveObjectVertexsintElement(KVFVertices, secondaryDeformableObjectRenderingMesh->Getn(), secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices, secondaryDeformableObjectRenderingMesh_interpolation_vertices, ObjectVertexIndexInElement);
 
   printf("Loaded %d fixed vertices. They are:\n",numFixedVertices);
   ListIO::print(numFixedVertices,fixedVertices);
@@ -1827,6 +1830,7 @@ void initConfigurations()
 
   configFile.addOptionOptional("fixedVerticesKVFFileName", fixedVerticesKVFFileName, "__none");
   configFile.addOptionOptional("uDeformationoutputFileName", uDeformationoutputFileName, "__none");
+  configFile.addOptionOptional("ObjectVertexIndexInElement", ObjectVertexIndexInElement, "__none");
 
   configFile.addOptionOptional("enableCompressionResistance", &enableCompressionResistance, enableCompressionResistance);
   configFile.addOptionOptional("compressionResistance", &compressionResistance, compressionResistance);

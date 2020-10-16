@@ -179,7 +179,7 @@ namespace Common
 		}
 	};
 
-	//一个文件中帧的KVF数据
+	//一个文件中帧的KVF数据，KVF数据既代表前面帧的结果，又可以用来判断后面帧的数据
 	struct SpKVFData
 	{
 		int FrameIndex;

@@ -819,3 +819,10 @@ std::vector<Common::SFileFrames> CVegaFemFactory::searchFileFrameOnAttribute()
 	return fileFrames;
 }
 
+void CVegaFemFactory::searchMatchedDeformationFrames(std::vector<glm::vec3> & vFrameUDeformationData)
+{
+	for (auto i = 0; i < m_FilesData.size(); i++)
+	{
+		
+	}
+}

@@ -40,7 +40,7 @@ public:
 	//²éÕÒ¼ìË÷±ê×¼
 	void searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>> &voMatchedFramesSequences);
 	
-	void searchMatchedDeformationFrames();
+	void searchMatchedDeformationFrames(std::vector<glm::vec3> & vFrameUDeformationData);
 
 private:
 
