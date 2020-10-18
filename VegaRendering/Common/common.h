@@ -208,8 +208,10 @@ namespace Common
 		int Theta;
 		int Phi;
 		std::vector<int> ForceFluctuationSequence;
+		//delta U数据
 		std::vector<SFileData> Frames;
 		std::vector<SpKVFData> KVFFrameDatas;
+		//U 数据
 		std::vector<SpDeformation> Deformations;
 		SFileFrames() = default;
 		SFileFrames(std::string vIndex, std::string vFilePath)
@@ -218,6 +220,19 @@ namespace Common
 			FilePath = vFilePath;
 		}
 	};
+
+	struct SMatchedDeformationFrames
+	{
+		std::string FileName;
+		std::string FrameIndex;
+		int CounterNumber;
+		bool operator<(const SMatchedDeformationFrames &Deformation2) const
+		{
+			return CounterNumber > Deformation2.CounterNumber;
+		}
+	};
+
+	
 
 	//files gather
 	struct SConnectedFemFiles
