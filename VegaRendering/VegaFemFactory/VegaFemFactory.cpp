@@ -508,7 +508,6 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 			{
 				forceError += (tempSpKVData.Forces[j] - tempForceSequence[i].second[j])*(tempSpKVData.Forces[j] - tempForceSequence[i].second[j]);
 			}*/
-
 			forceError += (tempSpKVData.Forces[0] - tempForceSequence[i].second[0])*(tempSpKVData.Forces[0] - tempForceSequence[i].second[0]);
 			forceError += (tempSpKVData.Forces[2] - tempForceSequence[i].second[2])*(tempSpKVData.Forces[2] - tempForceSequence[i].second[2]);
 			forceError += (tempSpKVData.Forces[4] - tempForceSequence[i].second[4])*(tempSpKVData.Forces[4] - tempForceSequence[i].second[4]);
@@ -663,7 +662,7 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 		int similarity = 0;
 		for (int i = 0; i < 5; i++)
 		{
-			std::cout << reorderForcesError[i].first << " " << reorderKMartixError[i].first << std::endl;
+			//std::cout << reorderForcesError[i].first << " " << reorderKMartixError[i].first << std::endl;
 			for (int k = 0; k < 5; k++)
 			{
 				if (reorderForcesError[i].first == reorderKMartixError[k].first)
@@ -714,8 +713,6 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 
 		sort(allWeightsSumResults.begin(), allWeightsSumResults.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second;});
 
-		/*FrameIndexSequence.push_back(tempKErrorSequence[0].first);
-		tempSpKVData = m_AllReallyLoadConnectedFem[tempKErrorSequence[0].first / 60].FemDataset[0]->KVFFrameDatas[(tempKErrorSequence[0].first % 60) / 5];*/
 		FrameIndexSequence.push_back(allWeightsSumResults[0].first);
 		std::cout << "seleted:" << allWeightsSumResults[0].first << std::endl;
 		tempSpKVData = m_AllReallyLoadConnectedFem[allWeightsSumResults[0].first / 60].FemDataset[0]->KVFFrameDatas[(allWeightsSumResults[0].first % 60) / 5];
@@ -741,11 +738,6 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 	for (int i = 0; i < FrameIndexSequence.size(); i++)
 	{	
 		fileAndFrameIndexSequence.push_back(std::make_pair(FrameIndexSequence[i] / 60, FrameIndexSequence[i] % 60));
-		/*voMatchedFramesSequences.push_back(m_AllReallyLoadConnectedFem[FrameIndexSequence[i] / 60].FemDataset[0]->Frames[(FrameIndexSequence[i] % 60)-4].BaseFileDeformations);
-		voMatchedFramesSequences.push_back(m_AllReallyLoadConnectedFem[FrameIndexSequence[i] / 60].FemDataset[0]->Frames[(FrameIndexSequence[i] % 60)-3].BaseFileDeformations);
-		voMatchedFramesSequences.push_back(m_AllReallyLoadConnectedFem[FrameIndexSequence[i] / 60].FemDataset[0]->Frames[(FrameIndexSequence[i] % 60)-2].BaseFileDeformations);
-		voMatchedFramesSequences.push_back(m_AllReallyLoadConnectedFem[FrameIndexSequence[i] / 60].FemDataset[0]->Frames[(FrameIndexSequence[i] % 60)-1].BaseFileDeformations);
-		voMatchedFramesSequences.push_back(m_AllReallyLoadConnectedFem[FrameIndexSequence[i] / 60].FemDataset[0]->Frames[(FrameIndexSequence[i] % 60)].BaseFileDeformations);*/
 	}
 	readFramesDeformationDataBasedFilesIndex(fileAndFrameIndexSequence, voMatchedFramesSequences);
 }
