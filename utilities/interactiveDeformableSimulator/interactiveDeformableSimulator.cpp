@@ -601,7 +601,7 @@ void idleFunction(void)
        /* camera->CameraVector2WorldVector_OrientationOnly3D(
             forceX, forceY, 0, externalForce);*/
 		camera->setWorldCoorinateSystemForce(ExtraForces[FramesNumber], 0, 0, externalForce);
-		FramesNumber++;
+		//FramesNumber++;
 
 		std::copy(externalForce, externalForce + 3, vForce);
 
@@ -685,12 +685,12 @@ void idleFunction(void)
       int code = integratorBase->DoTimestep();
 	  /*std::vector<int> tempvec = { 0,4,1677 };*/
 
-	  if (FramesNumber % Common::ForcesSampling == 0)
+	  if ((FramesNumber+1) % Common::ForcesSampling == 0&&FramesNumber!=0)
 	  {
 		  integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
 		  TempExtraForces.clear();
 	  }
-	  
+	  FramesNumber++;
 	  /*integratorBase->WriteKRFextVMartixToFile(outputFilename, subTimestepCounter);*/
 
       printf("."); fflush(nullptr);

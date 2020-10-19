@@ -47,10 +47,10 @@ float grasstime = 0.0f;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/8.10/test2", "../../models/8.10/1.obj");
+	CVegaFemFactory vFem("../../models/8.10/test3", "../../models/8.10/1.obj");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 2;
+	int numbercounter = 33;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -369,7 +369,7 @@ int main()
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 
-		Sleep(100);
+		Sleep(80);
 
 	}
 
