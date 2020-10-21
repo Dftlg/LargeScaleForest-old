@@ -247,6 +247,8 @@ public:
   // in this version, the element containing the "pos" must be known, and prescribed directly
   virtual void interpolateGradient(int element, const double * U, int numFields, Vec3d pos, double * grad) const = 0;
 
+
+  void SaveObjectVertexsintElement(std::vector<int> vElementIndex, int numTargetLocations, int numElementVertices, int * vertices,const std::string & voSaveFilePath);
   // === material-related nested classes ===
 
   // a set of integers, with a name (used for example, to store elements that share the same material properties)

@@ -42,6 +42,10 @@ namespace Common
 
 	static int ForcesSampling = 5;
 
+	static int uDeformationSampling = 10;
+
+	static int CorrectuDeformationFrame = 20;
+
 	struct SVertex
 	{
 		glm::vec3 Position;
@@ -175,7 +179,7 @@ namespace Common
 		}
 	};
 
-	//一个文件中帧的KVF数据
+	//一个文件中帧的KVF数据，KVF数据既代表前面帧的结果，又可以用来判断后面帧的数据
 	struct SpKVFData
 	{
 		int FrameIndex;
@@ -185,6 +189,12 @@ namespace Common
 
 		std::vector<glm::vec3> InternalForces;
 		std::vector<glm::vec3> Velocity;
+	};
+
+	struct SpDeformation
+	{
+		int FrameIndex;
+		std::vector<glm::vec3> Deformation;
 	};
 
 	//每一个是一个文件
@@ -198,8 +208,11 @@ namespace Common
 		int Theta;
 		int Phi;
 		std::vector<int> ForceFluctuationSequence;
+		//delta U数据
 		std::vector<SFileData> Frames;
 		std::vector<SpKVFData> KVFFrameDatas;
+		//U 数据
+		std::vector<SpDeformation> Deformations;
 		SFileFrames() = default;
 		SFileFrames(std::string vIndex, std::string vFilePath)
 		{
@@ -207,6 +220,19 @@ namespace Common
 			FilePath = vFilePath;
 		}
 	};
+
+	struct SMatchedDeformationFrames
+	{
+		std::string FileName;
+		std::string FrameIndex;
+		int CounterNumber;
+		bool operator<(const SMatchedDeformationFrames &Deformation2) const
+		{
+			return CounterNumber > Deformation2.CounterNumber;
+		}
+	};
+
+	
 
 	//files gather
 	struct SConnectedFemFiles

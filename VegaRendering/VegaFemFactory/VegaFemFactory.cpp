@@ -1,6 +1,6 @@
 #include "VegaFemFactory.h"
 
-CVegaFemFactory::CVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile)
+CVegaFemFactory::CVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile,const std::string &vCorrectDeformationUVertexIndex)
 {
 	//m_FilesData中每个对象的文件名和句对路径加上
 	readFilePath4Directory(vDirectoryName);
@@ -54,6 +54,8 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				//readDeformationDataByMutileThread(m_FilesData[fileIndex], m_FilesData[fileIndex].FilePath, fileIndex);
 				
 				readKVFFileData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
+				readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
+
 				int timeStepCount = 1;
 				std::ifstream positionFile(m_FilesData[fileIndex].FilePath);
 				std::string lineString;
@@ -63,13 +65,13 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				{
 					std::cout << "Error: could not open vertex file" << m_FilesData[fileIndex].FilePath << std::endl;
 				}
-				int Frameindex = 0;
+				int Frameindex = 1;
 				int stop = 0;
 				while (stop==1)
 				{
 					getline(positionFile, lineString);
 					//getline(positionFile, lineString);
-					sprintf(s, "Position%04d", timeStepCount);
+					sprintf(s, "Position%d", timeStepCount);
 					std::istringstream sin(lineString);
 					std::string str;
 					sin >> str;//Position%04d后面有空格
@@ -419,6 +421,7 @@ std::string CVegaFemFactory::getFileName(const std::string & vFileDirectory)
 }
 
 //将模型的原始形变数据扩大。
+//返回值用新的变量是否可以用引用，感觉不行，插值出的不能再SFileData中找到。
 //vConnectionIndex代表了第i棵树，vTimestep代表了第几帧
 std::vector<Common::SFileDataGroup> CVegaFemFactory::getConnectedFemMutileDeformation(int vConnectionIndex, int vTimestep)
 {
@@ -902,5 +905,51 @@ std::vector<Common::SFileFrames> CVegaFemFactory::searchFileFrameOnAttribute()
 		fileFrames.push_back(file);
 	}
 	return fileFrames;
+}
+
+void CVegaFemFactory::readCorrectUdeformationIndex(const std::string & vFilePath)
+{
+	std::ifstream positionFile(vFilePath.c_str(), std::ios::in);
+	if (!positionFile.good())
+	{
+		std::cout << "failed to Open File" << vFilePath << "Can't get CorrectDeformationIndex" << std::endl;
+	}
+	std::string lineString;
+	while (getline(positionFile,lineString))
+	{
+		int tempVertexSize = std::atoi(lineString.c_str());
+		std::vector<int> tempVertices;
+		for (auto i = 0; i < tempVertexSize; i++)
+		{
+			getline(positionFile, lineString);
+			tempVertices.push_back(std::atoi(lineString.c_str()));
+		}
+		m_CorrectDeformationIndex.push_back(tempVertices);
+		tempVertices.clear();
+	}
+}
+
+void CVegaFemFactory::searchMatchedDeformationFrames(std::vector<glm::vec3> & vFrameUDeformationData)
+{
+	std::vector<Common::SMatchedDeformationFrames> MatchedFrames;
+	Common::SMatchedDeformationFrames tempMatchedFrame;
+	for (auto i = 0; i < m_FilesData.size(); i++)
+	{
+		//每个文件中10帧的数据形变
+		for (auto fileFrameSpDeformation = 0; fileFrameSpDeformation < m_FilesData[i].Deformations.size(); fileFrameSpDeformation++)
+		{
+			int Counter = 0;
+			for (auto objectVertexIndex = 0; objectVertexIndex < m_CorrectDeformationIndex.size(); objectVertexIndex++)
+			{
+				//统计共有多少个顶点满足范围条件
+				Counter += distanceError(vFrameUDeformationData[objectVertexIndex], m_FilesData[i].Deformations[fileFrameSpDeformation].Deformation[objectVertexIndex]);
+			}	
+			tempMatchedFrame.CounterNumber = Counter;
+			tempMatchedFrame.FileName = m_FilesData[i].FileName;
+			tempMatchedFrame.FrameIndex = m_FilesData[i].Deformations[fileFrameSpDeformation].FrameIndex;
+			MatchedFrames.push_back(tempMatchedFrame);
+		}
+	}
+	std::sort(MatchedFrames.begin(), MatchedFrames.end());
 }
 

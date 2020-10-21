@@ -2500,6 +2500,7 @@ int VolumetricMesh::saveInterpolationWeightsBinary(FILE * fout, int numTargetLoc
   return 0;
 }
 
+//体积网格位移，目标三角网格位移，
 void VolumetricMesh::interpolate(const double * u, double * uTarget, int numTargetLocations, int numElementVertices_, const int * vertices_, const double * weights)
 {
   for(int i=0; i< numTargetLocations; i++)
@@ -3185,4 +3186,73 @@ void VolumetricMesh::addMaterial(const Material * material, const Set & newSet, 
     }
   } // end if (removeEmptyMaterials)
 }
+
+void VolumetricMesh::SaveObjectVertexsintElement(std::vector<int> vElementIndex, int numTargetLocations, int numElementVertices, int * vertices, const std::string & voSaveFilePath)
+{
+	//std::vector<int> N1 = { 0,6 };
+	//std::vector<int> N2 = { 1,7 };
+	//std::vector<int> N3 = { 2,4 };
+	//std::vector<int> N4 = { 3,5 };
+	//每个体素相关的顶点数据
+	std::vector<std::vector<int>> VegMeshVectexs;
+
+	/*std::vector<int> test = { 764,893, 897 , 768 , 765 , 894 , 898, 769 };
+	std::vector<int> test1 = { 764,893, 897 , 769 , 765 , 894 , 898, 769 };*/
+
+	/*VegMeshVectexs.push_back(test);
+	VegMeshVectexs.push_back(test1);*/
+
+	for (int i = 0; i < vElementIndex.size(); i++)
+	{
+		const int *vertices=getVertexIndices(vElementIndex[i]);
+		std::vector<int> tempVectexs;
+		for (int k = 0; k < numElementVertices; k++)
+		{
+			tempVectexs.push_back(vertices[k]);
+		}
+		VegMeshVectexs.push_back(tempVectexs);
+		tempVectexs.clear();
+	}
+
+	std::vector<std::vector<int>> ObjectVectexs;
+	bool BreakLoop=false;
+	//NumberCounter用来判断如果一个体素内的obj点存储已经过一定值，那么就不再查找该体素
+	for (auto k = 0; k < VegMeshVectexs.size(); k++)
+	{
+		//int NumberCounter = 0;
+		std::vector<int> tempVertexs;
+		for (auto i = 0; i < numTargetLocations; i++)
+		{
+			BreakLoop = false;
+			for (auto j = 0; j < numElementVertices; j++)
+			{
+				if (VegMeshVectexs[k][j] != vertices[numElementVertices * i + j])
+				{
+					BreakLoop = true;
+					break;
+				}			
+			}
+			if (BreakLoop == true) continue;
+			/*if (NumberCounter > 20)break;
+			NumberCounter++;*/
+			tempVertexs.push_back(i);
+		}
+		//取样
+		ObjectVectexs.push_back(tempVertexs);
+	}
+	std::ofstream connectionFile;
+	connectionFile.open(voSaveFilePath, std::ios::in | std::ios::app);
+	if (connectionFile.is_open())
+	{
+		for (int i = 0; i < ObjectVectexs.size(); i++)
+		{
+			connectionFile << ObjectVectexs[i].size() << std::endl;
+			for (auto relatedVertex = 0; relatedVertex < ObjectVectexs[i].size(); relatedVertex++)
+			{
+				connectionFile << ObjectVectexs[i][relatedVertex] << "\n";
+			}
+		}
+	}
+}
+
 

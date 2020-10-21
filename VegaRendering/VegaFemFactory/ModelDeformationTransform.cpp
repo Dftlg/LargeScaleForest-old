@@ -99,7 +99,7 @@ void CModelDeformationTransform::SaveDeformationVertexFromBaseModel(const double
 		}
 		else
 		{
-			sprintf(s, "Position%04d", vtimeStepCounter);
+			sprintf(s, "Position%d", vtimeStepCounter);
 			fprintf(file, "%s \n", s);
 			sprintf(s, "%d", vDeformationSize);
 			fprintf(file, "%s \n", s);

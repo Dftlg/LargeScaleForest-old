@@ -17,10 +17,12 @@ class CVegaFemFactory
 public:
 
 	CVegaFemFactory() = default;
-	CVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile);
+	CVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex);
 	~CVegaFemFactory() = default;
 
+	void readCorrectUdeformationIndex(const std::string & vFilePath);
 	void readKVFFileData(const std::string & vFile, Common::SFileFrames & vFileFrame);
+	void readUdeformationData(const std::string & vFile, Common::SFileFrames &vFileFrame);
 	void readFilePath4Directory(const std::string & vDirectoryName);
 	void readFramesDeformationData(std::vector<Common::SFileFrames>& vSearchFrames, int vSearchConnectionIndex);
 	void readFramesDeformationDataBasedFilesIndex(std::vector<std::pair<int, int>>&vFilesAndFramesIndexSequence, std::vector<std::vector<glm::vec3>> &voMatchedFramesData);
@@ -41,6 +43,18 @@ public:
 	//查找检索标准
 	void searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>> &voMatchedFramesSequences);
 	
+	void searchMatchedDeformationFrames(std::vector<glm::vec3> & vFrameUDeformationData);
+
+	inline float addDistance(float vorigin) { return vorigin + 0.0005; };
+	inline float minusDistance(float vorigin) { return vorigin - 0.0005; };
+	inline int distanceError(glm::vec3 vorigin, glm::vec3 vinput) 
+	{ 
+		if ((addDistance(vorigin.x) > vinput.x&& minusDistance(vorigin.x) < vinput.x) &&
+			(addDistance(vorigin.y) > vinput.y&& minusDistance(vorigin.y) < vinput.y) &&
+			addDistance(vorigin.z) > vinput.z&& minusDistance(vorigin.z) < vinput.z)
+			return 1;
+		return 0;
+	};
 
 private:
 
@@ -52,4 +66,7 @@ private:
 	std::vector<Common::SConnectedFemFiles> m_AllReallyLoadConnectedFem;
 	//可以看作是一个obj的model对象，有mesh集合，以及group组集合
 	CModelDeformationTransform* m_ModelTransformStruct;
+
+	//需要匹配的某些体素下的Object顶点
+	std::vector<std::vector<int>> m_CorrectDeformationIndex;
 };
