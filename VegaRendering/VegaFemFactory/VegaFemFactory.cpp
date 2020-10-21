@@ -54,7 +54,7 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				//readDeformationDataByMutileThread(m_FilesData[fileIndex], m_FilesData[fileIndex].FilePath, fileIndex);
 				
 				readKVFFileData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
-				readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
+				//readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
 
 				int timeStepCount = 1;
 				std::ifstream positionFile(m_FilesData[fileIndex].FilePath);

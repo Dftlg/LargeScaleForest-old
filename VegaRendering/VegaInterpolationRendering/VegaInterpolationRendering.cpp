@@ -47,7 +47,7 @@ float grasstime = 0.0f;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/8.10/test3", "../../models/8.10/1.obj");
+	CVegaFemFactory vFem("../../models/8.10/test3", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
 	int numbercounter = 37;
