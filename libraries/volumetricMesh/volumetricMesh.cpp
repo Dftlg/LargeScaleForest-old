@@ -3205,13 +3205,13 @@ void VolumetricMesh::SaveObjectVertexsintElement(std::vector<int> vElementIndex,
 	for (int i = 0; i < vElementIndex.size(); i++)
 	{
 		const int *vertices=getVertexIndices(vElementIndex[i]);
-		std::vector<int> tempVectexs;
+		/*std::vector<int> tempVectexs;
 		for (int k = 0; k < numElementVertices; k++)
 		{
 			tempVectexs.push_back(vertices[k]);
 		}
 		VegMeshVectexs.push_back(tempVectexs);
-		tempVectexs.clear();
+		tempVectexs.clear();*/
 	}
 
 	std::vector<std::vector<int>> ObjectVectexs;
