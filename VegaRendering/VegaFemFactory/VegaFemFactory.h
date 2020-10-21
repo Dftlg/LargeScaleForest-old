@@ -9,6 +9,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include "common.h"
+#include "ExtraTool.h"
 #include "ModelDeformationTransform.h"
 
 class CVegaFemFactory
@@ -24,6 +25,7 @@ public:
 	void readUdeformationData(const std::string & vFile, Common::SFileFrames &vFileFrame);
 	void readFilePath4Directory(const std::string & vDirectoryName);
 	void readFramesDeformationData(std::vector<Common::SFileFrames>& vSearchFrames, int vSearchConnectionIndex);
+	void readFramesDeformationDataBasedFilesIndex(std::vector<std::pair<int, int>>&vFilesAndFramesIndexSequence, std::vector<std::vector<glm::vec3>> &voMatchedFramesData);
 	void readDeformationDataByMutileThread(Common::SFileFrames& vBaseFileFramesStruct, const std::string& vFilePath, int vSFileFramesIndex);
 	void readDeformationDataInOneThread(Common::SFileData& vFileData, int vTid, const std::string& vFilePath, long long vBlockSize);
 	void addSeekgOfEachFramesBlock(const std::string& vFilePath);

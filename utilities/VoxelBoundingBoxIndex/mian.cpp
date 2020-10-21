@@ -161,6 +161,8 @@ void findCubicIndexForVertices(std::vector<glm::vec3>& vObjVertices, std::vector
 
 void writeFindIndex2File(std::string vPath, std::vector<int>& vObjVerticesRelatedElementIndex)
 {
+	sort(vObjVerticesRelatedElementIndex.begin(), vObjVerticesRelatedElementIndex.end());
+	vObjVerticesRelatedElementIndex.erase(std::unique(vObjVerticesRelatedElementIndex.begin(), vObjVerticesRelatedElementIndex.end()), vObjVerticesRelatedElementIndex.end());
 	std::ofstream outFile(vPath);
 	if (!outFile)
 	{
@@ -174,19 +176,20 @@ void writeFindIndex2File(std::string vPath, std::vector<int>& vObjVerticesRelate
 	outFile.close();
 }
 
+
 int main()
 {
 	std::vector<glm::vec3> elementVertices;
 	std::vector<glm::vec3>objVertices;
 	std::vector<std::vector<int>> elementIndex;
 	std::vector<int> objVerticesRelatedElementIndex;
-	std::string vegFilePath = "../../models/8.10/1.veg";
-	std::string objFilePath = "../../models/8.10/1.obj";
-	std::string skeletonFilePath = "../../models/extract skeleton/1.skel";
-	std::string indexOutputPath = "../../models/extract skeleton/test.txt";
+	std::string vegFilePath = "D:/GraduationProject/Vega/models/10.20/tree.veg";
+	std::string objFilePath = "D:/GraduationProject/Vega/models/10.20/stem.obj";
+	//std::string skeletonFilePath = "D:/GraduationProject/Vega/models/8.10/1.skel";
+	std::string indexOutputPath = "D:/GraduationProject/Vega/models/10.20/stem.txt";
 	readDataFromVegFile(vegFilePath, elementVertices, elementIndex);
-	readDataFromSkeleronFile(skeletonFilePath, objVertices);
-	//readDataFromObjFile(objFilePath, objVertices);
+	//readDataFromSkeleronFile(skeletonFilePath, objVertices);
+	readDataFromObjFile(objFilePath, objVertices);
 	findCubicIndexForVertices(objVertices, elementVertices, elementIndex, objVerticesRelatedElementIndex);
 	writeFindIndex2File(indexOutputPath, objVerticesRelatedElementIndex);
 	system("pause");

@@ -19,8 +19,8 @@ std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency
 	std::vector<int> tempForces;
 	for (int i = 0; i < vSize; i++)
 	{
-		tempForces.push_back(int(vAmplitude * sin(angle*vFrequency) + vPhase + vYpluse));
-		angle += (2 * M_PI) / vSize;
+		tempForces.push_back(int(vAmplitude * cos(angle*vFrequency) + vYpluse));
+		angle += (2*M_PI) / vSize;
 	}
 	return tempForces;
 }
