@@ -50,7 +50,7 @@ int main()
 	CVegaFemFactory vFem("../../models/8.10/test3", "../../models/8.10/1.obj");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 33;
+	int numbercounter = 37;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -369,7 +369,7 @@ int main()
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 
-		Sleep(80);
+		Sleep(50);
 
 	}
 

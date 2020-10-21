@@ -344,7 +344,7 @@ int main()
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 
-		//Sleep(100);
+		Sleep(50);
 
 	}
 

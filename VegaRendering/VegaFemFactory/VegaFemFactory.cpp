@@ -472,7 +472,7 @@ void CVegaFemFactory::cleanSFileDataGroup(int vConnectionIndex, int vTimestep)
 //以5帧为单位进行帧段的查找匹配操作，组成一个匹配好的序列
 void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>>& voMatchedFramesSequences)
 {
-	std::vector<int>ExtraForces = GenerateSamplingForce(60,135, 1, 0, 0);
+	std::vector<int>ExtraForces = GenerateSamplingForce(60,130, 1, 0, 0);
 	Common::SpKVFData tempSpKVData;
 	for (int i = 0; i < 5; i++)
 	{
@@ -700,8 +700,8 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 
 		//Select a weight between externalF、K、V、InternalF as the criterion for updating
 		std::vector<std::pair<int, double>> allWeightsSumResults;
-		double forcesWeight = 0.6;
-		double kMartixWeight =0.2;
+		double forcesWeight = 0.5;
+		double kMartixWeight =0.3;
 		double velocityWeight = 0.1;
 		double internalForceWeight = 0.1;
 		for (int i = 0; i < reorderSegmentIndexSequence.size(); i++)
