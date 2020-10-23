@@ -32,7 +32,7 @@ namespace Common
 
 	static bool InstanceTrees = true;
 
-	const int TreesNumber = 1;
+	const int TreesNumber = 81;
 
 	static int MaxTimeStep = 60;
 
@@ -45,6 +45,16 @@ namespace Common
 	static int uDeformationSampling = 10;
 
 	static int CorrectuDeformationFrame = 20;
+
+	static int SamplingFrameNumber = 60;
+
+	static int ProductFrameNumber = 60;
+
+	static int KErrorRange = 10;
+	static double VelocityErrorRange = 0.001;
+	static double internalForceErrorRange = 50;
+
+	static float Pi = 3.1415926;
 
 	struct SVertex
 	{

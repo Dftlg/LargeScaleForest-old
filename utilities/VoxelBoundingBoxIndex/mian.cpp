@@ -4,6 +4,10 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/classification.hpp>
+
 
 void readDataFromVegFile(std::string vPath, std::vector<glm::vec3>&voElementVertices, std::vector<std::vector<int>>& voElementIndex)
 {
@@ -13,6 +17,7 @@ void readDataFromVegFile(std::string vPath, std::vector<glm::vec3>&voElementVert
 		std::cout << "Can't open the file!!!" << std::endl;
 		return;
 	}
+	std::cout << "Read element's index and element's vertices index from veg file!!!" << std::endl;
 	bool flag=true, verticesFlag = false, cubicIndexFlag = false;
 	std::string lineString;
 	while (flag)
@@ -77,8 +82,8 @@ void readDataFromObjFile(std::string vPath, std::vector<glm::vec3>&voObjVertices
 		std::cout << "Can't open the file!!!" << std::endl;
 		return;
 	}
+	std::cout << "Read model's vertices from obj file!!!" << std::endl;
 	std::string lineString;
-
 	while (getline(inFile, lineString))
 	{
 		std::istringstream tempString(lineString);
@@ -106,9 +111,10 @@ void readDataFromSkeleronFile(std::string vPath, std::vector<glm::vec3>&voObjVer
 		std::cout << "Can't open the file!!!" << std::endl;
 		return;
 	}
+
+	std::cout << "Read skelton's vertices from skel file!!!" << std::endl;
 	std::string lineString;
 	bool flag = true;
-
 	while (getline(inFile, lineString)&& flag)
 	{
 		std::istringstream tempString(lineString);
@@ -131,8 +137,34 @@ void readDataFromSkeleronFile(std::string vPath, std::vector<glm::vec3>&voObjVer
 	inFile.close();
 }
 
-void findCubicIndexForVertices(std::vector<glm::vec3>& vObjVertices, std::vector<glm::vec3>&vElementVertices, std::vector<std::vector<int>>& vElementIndex, std::vector<int>& voObjVerticesRelatedElementIndex)
+void readDataFromTxt(std::string vPath, std::vector<int>&voTxtIndex)
 {
+	std::ifstream inFile(vPath);
+	if (!inFile)
+	{
+		std::cout << "Can't open the file!!!" << std::endl;
+		return;
+	}
+
+	std::cout << "Read element's index from txt file!!!" << std::endl;
+	std::string lineString;
+	while (getline(inFile, lineString))
+	{
+		std::istringstream tempString(lineString);
+		std::vector<std::string> lineStringSplit;
+		boost::split(lineStringSplit, tempString.str(), boost::is_any_of(","), boost::token_compress_off);
+		for (int i = 0; i < lineStringSplit.size()-1; i++)
+		{
+			voTxtIndex.push_back(atoi(lineStringSplit[i].c_str()));
+		}
+		
+	}
+
+}
+
+void findCubicIndexForVertices(std::vector<glm::vec3>& vObjVertices, std::vector<glm::vec3>&vElementVertices, std::vector<std::vector<int>>& vElementIndex, std::vector<int>& vElementIndexForObjVertices)
+{
+	std::cout << "Begin find element's index for the vertice!!!" << std::endl;
 	for (int i = 0; i < vObjVertices.size(); i++)
 	{
 		for (int k = 0; k < vElementIndex.size(); k++)
@@ -152,29 +184,44 @@ void findCubicIndexForVertices(std::vector<glm::vec3>& vObjVertices, std::vector
 			float maxZ = *max_element(tempZ.begin(), tempZ.end());
 			if (vObjVertices[i].x>minX && vObjVertices[i].x < maxX && vObjVertices[i].y> minY && vObjVertices[i].y < maxY && vObjVertices[i].z > minZ && vObjVertices[i].z < maxZ)
 			{
-				voObjVerticesRelatedElementIndex.push_back(k + 1);
+				vElementIndexForObjVertices.push_back(k + 1);
 				k = vElementIndex.size();
 			}
 		}
 	}
+	sort(vElementIndexForObjVertices.begin(), vElementIndexForObjVertices.end());
+	vElementIndexForObjVertices.erase(std::unique(vElementIndexForObjVertices.begin(), vElementIndexForObjVertices.end()), vElementIndexForObjVertices.end());
 }
 
-void writeFindIndex2File(std::string vPath, std::vector<int>& vObjVerticesRelatedElementIndex)
+void findCubicVertices(std::vector<std::vector<int>> vElementIndex, std::vector<int>& vElementIndexForObjVertices, std::vector<int>& voFindElementVertices)
 {
-	sort(vObjVerticesRelatedElementIndex.begin(), vObjVerticesRelatedElementIndex.end());
-	vObjVerticesRelatedElementIndex.erase(std::unique(vObjVerticesRelatedElementIndex.begin(), vObjVerticesRelatedElementIndex.end()), vObjVerticesRelatedElementIndex.end());
+	std::cout << "Begin find element's vertices for the element!!!" << std::endl;
+	for (int i = 0; i < vElementIndexForObjVertices.size(); i++)
+	{
+		for (int k = 0; k < vElementIndex[0].size(); k++)
+		{
+			voFindElementVertices.push_back(vElementIndex[vElementIndexForObjVertices[i] - 1][k]);
+		}
+	}
+}
+
+void write2File(std::string vPath, std::vector<int>& vElementIndexForObjVertices)
+{
+	std::cout << "Writing the result to the file !!!" << std::endl;
 	std::ofstream outFile(vPath);
 	if (!outFile)
 	{
 		std::cout << "Can't open the file!!!" << std::endl;
 		return;
 	}
-	for (int i = 0; i <vObjVerticesRelatedElementIndex.size(); i++)
+	for (int i = 0; i <vElementIndexForObjVertices.size(); i++)
 	{
-		outFile << vObjVerticesRelatedElementIndex[i] << ",";
+		outFile << vElementIndexForObjVertices[i] << ",";
 	}
 	outFile.close();
 }
+
+
 
 
 int main()
@@ -182,15 +229,22 @@ int main()
 	std::vector<glm::vec3> elementVertices;
 	std::vector<glm::vec3>objVertices;
 	std::vector<std::vector<int>> elementIndex;
-	std::vector<int> objVerticesRelatedElementIndex;
-	std::string vegFilePath = "D:/GraduationProject/Vega/models/10.20/tree.veg";
-	std::string objFilePath = "D:/GraduationProject/Vega/models/10.20/stem.obj";
-	//std::string skeletonFilePath = "D:/GraduationProject/Vega/models/8.10/1.skel";
-	std::string indexOutputPath = "D:/GraduationProject/Vega/models/10.20/stem.txt";
+	std::vector<int> elementIndexForObjVertices;
+	std::vector<int> findedElementVertices;
+	std::string vegFilePath = "D:/GraduationProject/LargeScaleForest/models/8.10/1.veg";
+	//std::string objFilePath = "D:/GraduationProject/Vega/models/8.10/test.obj";
+	//std::string skeletonFilePath = "D:/GraduationProject/Vega/models/extract skeleton/1.skel";
+	std::string cubicIndexFilePath = "D:/GraduationProject/LargeScaleForest/models/extract skeleton/1.txt";
+	//std::string cubicIndexOutputPath = "D:/LargeScaleForest/Vega/models/extract skeleton/test_cubic_index.txt";
+	std::string cubicVerticesOputputPath = "D:/GraduationProject/LargeScaleForest/models/extract skeleton/test_vertices_index.bou";
+	
 	readDataFromVegFile(vegFilePath, elementVertices, elementIndex);
 	//readDataFromSkeleronFile(skeletonFilePath, objVertices);
-	readDataFromObjFile(objFilePath, objVertices);
-	findCubicIndexForVertices(objVertices, elementVertices, elementIndex, objVerticesRelatedElementIndex);
-	writeFindIndex2File(indexOutputPath, objVerticesRelatedElementIndex);
+	//readDataFromObjFile(objFilePath, objVertices);
+	readDataFromTxt(cubicIndexFilePath, elementIndexForObjVertices);
+	//findCubicIndexForVertices(objVertices, elementVertices, elementIndex, elementIndexForObjVertices);
+	findCubicVertices(elementIndex, elementIndexForObjVertices, findedElementVertices);
+	//write2File(cubicIndexOutputPath, elementIndexForObjVertices);
+	write2File(cubicVerticesOputputPath, findedElementVertices);
 	system("pause");
 }

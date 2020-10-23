@@ -47,7 +47,7 @@ float grasstime = 0.0f;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/8.10/test2", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
+	CVegaFemFactory vFem("../../models/8.10/test3", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
 	int numbercounter = 37;
@@ -210,7 +210,10 @@ int main()
 
 	//查找帧段
 	std::vector<std::vector<glm::vec3>> matchedFramesSequences;
-	vFem.searchMatchedFrameSegment(matchedFramesSequences);
+	std::vector<int>vExtraForces = GenerateSamplingForce(60,130, 1, 0, 0);
+	Common::SpKVFData voSpKVData;
+	bool flag = true;
+	vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
 	//帧数
 	int frameNums = matchedFramesSequences.size();
 	//obj模型的顶点数
