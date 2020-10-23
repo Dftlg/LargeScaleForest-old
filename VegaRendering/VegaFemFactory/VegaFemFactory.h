@@ -24,6 +24,7 @@ public:
 	void readKVFFileData(const std::string & vFile, Common::SFileFrames & vFileFrame);
 	void readUdeformationData(const std::string & vFile, Common::SFileFrames &vFileFrame);
 	void readFilePath4Directory(const std::string & vDirectoryName);
+	void write2File(const std::string& vPath, std::vector <std::pair<int, double>>& vOutputData);
 	void readFramesDeformationData(std::vector<Common::SFileFrames>& vSearchFrames, int vSearchConnectionIndex);
 	void readFramesDeformationDataBasedFilesIndex(std::vector<std::pair<int, int>>&vFilesAndFramesIndexSequence, std::vector<std::vector<glm::vec3>> &voMatchedFramesData);
 	void readDeformationDataByMutileThread(Common::SFileFrames& vBaseFileFramesStruct, const std::string& vFilePath, int vSFileFramesIndex);
@@ -41,7 +42,7 @@ public:
 	std::vector<std::vector<glm::vec3>> objDeformation(std::pair<int, int> vForceDirection, std::vector<int> vForceFluctuationSequence);
 	void cleanSFileDataGroup(int vConnectionIndex, int vTimestep);
 	//²éÕÒ¼ìË÷±ê×¼
-	void searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>> &voMatchedFramesSequences);
+	void searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>>& voMatchedFramesSequences, Common::SpKVFData& voSpKVData, std::vector<int> &vExtraForces, bool vIsFirstFrame);
 	
 	void searchMatchedDeformationFrames(std::vector<glm::vec3> & vFrameUDeformationData);
 
@@ -55,6 +56,31 @@ public:
 			return 1;
 		return 0;
 	};
+	inline int SquareError(int vFirstNumber, int vSecondNumber)
+	{
+		return (vFirstNumber - vSecondNumber)*(vFirstNumber - vSecondNumber);
+	};
+	inline double SquareError(double vFirstNumber, double vSecondNumber)
+	{
+		return (vFirstNumber - vSecondNumber)*(vFirstNumber - vSecondNumber);
+	};
+	inline bool AbsError(double vFirstNumber, double vSecondNumber,double vJudgeRange)
+	{
+		return (abs(vFirstNumber - vSecondNumber) < vJudgeRange);
+	};
+	inline bool AbsError(glm::vec3 vFirstNumber, glm::vec3 vSecondNumber, double vJudegRange)
+	{
+		if (abs(vFirstNumber.x - vSecondNumber.x) < vJudegRange && 
+			abs(vFirstNumber.y - vSecondNumber.y) < vJudegRange &&
+			abs(vFirstNumber.z - vSecondNumber.z) < vJudegRange)
+			return true;
+		return false;
+	};
+	inline double GaussianFunction(double vVariable,double vSigma=1, double vMiu=0)
+	{
+		return (1 / (vSigma*sqrt(2 * Common::Pi))*exp(-0.5*pow((vVariable - vMiu) / vSigma, 2)));
+	}
+
 
 private:
 

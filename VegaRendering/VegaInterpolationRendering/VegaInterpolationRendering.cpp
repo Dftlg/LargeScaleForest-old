@@ -210,7 +210,10 @@ int main()
 
 	//查找帧段
 	std::vector<std::vector<glm::vec3>> matchedFramesSequences;
-	vFem.searchMatchedFrameSegment(matchedFramesSequences);
+	std::vector<int>vExtraForces = GenerateSamplingForce(60,130, 1, 0, 0);
+	Common::SpKVFData voSpKVData;
+	bool flag = true;
+	vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
 	//帧数
 	int frameNums = matchedFramesSequences.size();
 	//obj模型的顶点数
