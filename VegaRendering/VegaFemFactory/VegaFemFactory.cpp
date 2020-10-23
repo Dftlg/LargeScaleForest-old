@@ -9,7 +9,7 @@ CVegaFemFactory::CVegaFemFactory(const std::string & vDirectoryName, const std::
 	//可以看作是一个obj的model对象，有mesh集合，以及group组集合，
 	m_ModelTransformStruct = new CModelDeformationTransform(vMutilVerticesBaseFile);
 	//加载需要判断的位移索引
-	readCorrectUdeformationIndex(vCorrectDeformationUVertexIndex);
+	//readCorrectUdeformationIndex(vCorrectDeformationUVertexIndex);
 }
 
 //将文件夹下所有文件创建多个SFileFrames文件对象，但并未加载数据，只是将文件对应的名字和绝对路径加上
@@ -56,7 +56,7 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				//readDeformationDataByMutileThread(m_FilesData[fileIndex], m_FilesData[fileIndex].FilePath, fileIndex);
 				
 				readKVFFileData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
-				readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
+				//readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
 
 				int timeStepCount = 1;
 				std::ifstream positionFile(m_FilesData[fileIndex].FilePath);
@@ -660,9 +660,9 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 		double internalForcesSum = 90;
 		for (int i = 0; i < reorderForcesError.size(); i++)
 		{
-			if (reorderForcesError[i].first - reorderForcesError[0].first >200)
+			if (reorderForcesError[i].second - reorderForcesError[0].second >200)
 				break;
-			forcesErrorSum += reorderForcesError[i].first;
+			forcesErrorSum += reorderForcesError[i].second;
 		}
 		int similarity = 0;
 		for (int i = 0; i < 5; i++)
@@ -678,7 +678,11 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 			}
 		}
 		std::cout << similarity << std::endl;
-
+		/*std::cout << "////////////////"<<std::endl;
+		for (int i = 0; i < reorderSegmentIndexSequence.size(); i++)
+		{
+			std::cout << reorderForcesError[i].second << std::endl;
+		}*/
 		
 	    for (int i = 0; i < reorderSegmentIndexSequence.size(); i++)
 	    {
@@ -698,6 +702,14 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 			//internalForce weight
 			tempInternalForcesErrorSequence[i].second = tempInternalForcesErrorSequence[i].second / internalForcesSum;
 	    }
+
+		std::cout << "////////////////" << std::endl;
+		std::vector <std::pair<int, double>>reorderForcesError1 = tempForceErrorSequence;
+		sort(reorderForcesError1.begin(), reorderForcesError1.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second > y.second;	});
+		for (int i = 0; i < reorderSegmentIndexSequence.size(); i++)
+		{
+			std::cout << reorderForcesError1[i].second << std::endl;
+		}
 		/*std::vector <std::pair<int, double>> reorderForcesErrorT = tempForceErrorSequence;
 		std::vector <std::pair<int, double>> reorderKMartixErrorT = tempKErrorSequence;
 		sort(reorderForcesErrorT.begin(), reorderForcesErrorT.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second; });
@@ -705,8 +717,8 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 
 		//Select a weight between externalF、K、V、InternalF as the criterion for updating
 		std::vector<std::pair<int, double>> allWeightsSumResults;
-		double forcesWeight = 0.5;
-		double kMartixWeight =0.3;
+		double forcesWeight = 0.45;
+		double kMartixWeight =0.35;
 		double velocityWeight = 0.1;
 		double internalForceWeight = 0.1;
 		for (int i = 0; i < reorderSegmentIndexSequence.size(); i++)
