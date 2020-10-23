@@ -8,6 +8,8 @@ CVegaFemFactory::CVegaFemFactory(const std::string & vDirectoryName, const std::
 	setDeformationStateFromFileName();
 	//可以看作是一个obj的model对象，有mesh集合，以及group组集合，
 	m_ModelTransformStruct = new CModelDeformationTransform(vMutilVerticesBaseFile);
+	//加载需要判断的位移索引
+	readCorrectUdeformationIndex(vCorrectDeformationUVertexIndex);
 }
 
 //将文件夹下所有文件创建多个SFileFrames文件对象，但并未加载数据，只是将文件对应的名字和绝对路径加上
@@ -70,7 +72,7 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				//readDeformationDataByMutileThread(m_FilesData[fileIndex], m_FilesData[fileIndex].FilePath, fileIndex);
 				
 				readKVFFileData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
-				//readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
+				readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
 
 				int timeStepCount = 1;
 				std::ifstream positionFile(m_FilesData[fileIndex].FilePath);
@@ -1002,5 +1004,44 @@ void CVegaFemFactory::searchMatchedDeformationFrames(std::vector<glm::vec3> & vF
 		}
 	}
 	std::sort(MatchedFrames.begin(), MatchedFrames.end());
+}
+
+void CVegaFemFactory::readUdeformationData(const std::string & vFile, Common::SFileFrames &vFileFrame)
+{
+	const size_t last_slash_idx = vFile.rfind('.txt');
+	std::string FramesSpUdeformation = vFile.substr(0, last_slash_idx - 3);
+	FramesSpUdeformation = FramesSpUdeformation + ".spDemn";
+	std::ifstream UdeformationFile(FramesSpUdeformation);
+	std::string lineString;
+	if (!UdeformationFile.is_open())
+	{
+		std::cout << "Error: could not open SpDeformation file" << FramesSpUdeformation << std::endl;
+		return;
+	}
+
+	double position[3];
+	while (getline(UdeformationFile, lineString))
+	{
+		const size_t last_idx = lineString.rfind('tion');
+		std::string index = lineString.substr(last_idx+1);
+		int tempIndex = atoi(index.c_str());
+
+		getline(UdeformationFile, lineString);
+		int DeformationVertexNumber = atoi(lineString.c_str());
+
+		getline(UdeformationFile, lineString);
+	
+		std::istringstream Dataset(lineString);
+
+		//一个位移文件数据中的一帧顶点位移
+		std::vector<glm::vec3> tempDeformation;
+		double position[3];
+		for (int j = 0; j < DeformationVertexNumber; j++)
+		{
+			Dataset >> position[0] >> position[1] >> position[2];
+			tempDeformation.push_back(glm::vec3(position[0], position[1], position[2]));
+		}
+		vFileFrame.Deformations.push_back(Common::SpDeformation(tempIndex, tempDeformation));
+	}
 }
 

@@ -22,7 +22,7 @@ public:
 
 	void readCorrectUdeformationIndex(const std::string & vFilePath);
 	void readKVFFileData(const std::string & vFile, Common::SFileFrames & vFileFrame);
-	//void readUdeformationData(const std::string & vFile, Common::SFileFrames &vFileFrame);
+	void readUdeformationData(const std::string & vFile, Common::SFileFrames &vFileFrame);
 	void readFilePath4Directory(const std::string & vDirectoryName);
 	void write2File(const std::string& vPath, std::vector <std::pair<int, double>>& vOutputData);
 	void readFramesDeformationData(std::vector<Common::SFileFrames>& vSearchFrames, int vSearchConnectionIndex);

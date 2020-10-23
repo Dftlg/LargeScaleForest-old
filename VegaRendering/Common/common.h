@@ -205,6 +205,11 @@ namespace Common
 	{
 		int FrameIndex;
 		std::vector<glm::vec3> Deformation;
+		SpDeformation(int vFrameIndex, std::vector<glm::vec3> & vDeformation)
+		{
+			FrameIndex = vFrameIndex;
+			Deformation = vDeformation;
+		}
 	};
 
 	//每一个是一个文件

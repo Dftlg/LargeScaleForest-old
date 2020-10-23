@@ -3205,18 +3205,58 @@ void VolumetricMesh::SaveObjectVertexsintElement(std::vector<int> vElementIndex,
 	for (int i = 0; i < vElementIndex.size(); i++)
 	{
 		const int *vertices=getVertexIndices(vElementIndex[i]);
-		/*std::vector<int> tempVectexs;
+		std::vector<int> tempVectexs;
 		for (int k = 0; k < numElementVertices; k++)
 		{
 			tempVectexs.push_back(vertices[k]);
 		}
 		VegMeshVectexs.push_back(tempVectexs);
-		tempVectexs.clear();*/
+
+		tempVectexs.clear();
 	}
+
+	/*std::vector<std::vector<int>> allindex;
+
+	for (auto i = 0; i < numTargetLocations; i++)
+	{
+		std::vector<int> tempindex;
+		for (auto j = 0; j < numElementVertices; j++)
+		{
+			tempindex.push_back(vertices[numElementVertices * i + j]);
+		}
+		sort(tempindex.begin(), tempindex.end());
+		allindex.push_back(tempindex);
+	}*/
+
+	//std::vector<std::vector<int>> ObjectVectexs;
+	//for (auto k = 0; k < VegMeshVectexs.size(); k++)
+	//{
+	//	//int NumberCounter = 0;
+	//	std::vector<int> tempVertexs;
+	//	for (auto i = 0; i < numTargetLocations; i++)
+	//	{
+	//		int counter = 0;
+	//		for (auto j = 0; j < numElementVertices; j++)
+	//		{
+	//			if (VegMeshVectexs[k][j] == allindex[i][j])
+	//			{
+	//				counter++;
+	//			}
+	//		}
+	//		if (counter == 8)
+	//		{
+	//			tempVertexs.push_back(i);
+	//		}
+	//		counter = 0;
+	//	}
+	//	//取样
+	//	ObjectVectexs.push_back(tempVertexs);
+	//}
 
 	std::vector<std::vector<int>> ObjectVectexs;
 	bool BreakLoop=false;
-	//NumberCounter用来判断如果一个体素内的obj点存储已经过一定值，那么就不再查找该体素
+	/*NumberCounter用来判断如果一个体素内的obj点存储已经过一定值，那么就不再查找该体素
+	存储的顶点索引从0开始*/
 	for (auto k = 0; k < VegMeshVectexs.size(); k++)
 	{
 		//int NumberCounter = 0;
