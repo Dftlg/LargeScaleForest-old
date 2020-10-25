@@ -214,6 +214,15 @@ int main()
 	Common::SpKVFData voSpKVData;
 	bool flag = true;
 	vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
+	//for (int i = 1; i < 6; i++)
+	//{
+	//	std::vector<glm::vec3> tempUDeformations;
+	//	for (int k = 0; k < 5; k++)
+	//	{
+
+	//	}
+	//	vFem.searchMatchedDeformationFrames
+	//}
 	//帧数
 	int frameNums = matchedFramesSequences.size();
 	//obj模型的顶点数

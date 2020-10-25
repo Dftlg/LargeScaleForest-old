@@ -9,7 +9,7 @@ CVegaFemFactory::CVegaFemFactory(const std::string & vDirectoryName, const std::
 	//可以看作是一个obj的model对象，有mesh集合，以及group组集合，
 	m_ModelTransformStruct = new CModelDeformationTransform(vMutilVerticesBaseFile);
 	//加载需要判断的位移索引
-	readCorrectUdeformationIndex(vCorrectDeformationUVertexIndex);
+	//readCorrectUdeformationIndex(vCorrectDeformationUVertexIndex);
 }
 
 //将文件夹下所有文件创建多个SFileFrames文件对象，但并未加载数据，只是将文件对应的名字和绝对路径加上
@@ -74,7 +74,7 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				//readDeformationDataByMutileThread(m_FilesData[fileIndex], m_FilesData[fileIndex].FilePath, fileIndex);
 				
 				readKVFFileData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
-				readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
+				//readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
 
 				int timeStepCount = 0;
 				std::ifstream positionFile(m_FilesData[fileIndex].FilePath);
@@ -750,7 +750,7 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 		}
 
 		sort(allWeightsSumResults.begin(), allWeightsSumResults.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second;});
-		write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization.txt", allWeightsSumResults);
+		//write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization.txt", allWeightsSumResults);
 		FrameIndexSequence.push_back(allWeightsSumResults[0].first);
 		//std::cout << "seleted:" << allWeightsSumResults[0].first << std::endl;
 		voSpKVData = m_AllReallyLoadConnectedFem[allWeightsSumResults[0].first / 60].FemDataset[0]->KVFFrameDatas[(allWeightsSumResults[0].first % 60) / 5];
