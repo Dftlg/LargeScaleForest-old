@@ -32,7 +32,7 @@ namespace Common
 
 	static bool InstanceTrees = true;
 
-	const int TreesNumber = 81;
+	const int TreesNumber = 1;
 
 	static int MaxTimeStep = 60;
 
@@ -50,8 +50,10 @@ namespace Common
 
 	static int ProductFrameNumber = 60;
 
-	static int KErrorRange = 10;
-	static double VelocityErrorRange = 0.001;
+	//static int KErrorRange = 10;
+	static int ExpandForceError = 1;
+	static int KErrorRange = 20;
+	static double VelocityErrorRange = 0.07;
 	static double internalForceErrorRange = 50;
 
 	static float Pi = 3.1415926;

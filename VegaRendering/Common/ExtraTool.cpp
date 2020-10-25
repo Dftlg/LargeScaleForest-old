@@ -13,13 +13,14 @@ int RandomGenerate()
 	return (randomNumber % 90)*-1;
 }
 
+//采样频率，振幅，频率，相位，偏距
 std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency, double vPhase,int vYpluse)
 {
 	double angle = 0.0;
 	std::vector<int> tempForces;
 	for (int i = 0; i < vSize; i++)
 	{
-		tempForces.push_back(int(vAmplitude * cos(angle*vFrequency) + vYpluse));
+		tempForces.push_back(int(vAmplitude * cos(angle*vFrequency+vPhase) + vYpluse));
 		angle += (2*M_PI) / vSize;
 	}
 	return tempForces;

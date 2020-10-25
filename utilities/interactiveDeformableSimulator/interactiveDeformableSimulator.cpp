@@ -798,7 +798,7 @@ void idleFunction(void)
 		TempExtraForces.clear();
 	}
 	//存储deltaU的形变数据
-	//deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
+	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
 
 
 
@@ -1556,7 +1556,7 @@ void initSimulation()
 
   std::vector<int> tempConfig = GetForceConfigurate(outputFilename);
  
-  ExtraForces=GenerateSamplingForce(60, tempConfig[0], tempConfig[1], 0,tempConfig[2]);
+  ExtraForces=GenerateSamplingForce(60, tempConfig[0], tempConfig[1], tempConfig[2],tempConfig[3]);
 
 
   // load initial condition

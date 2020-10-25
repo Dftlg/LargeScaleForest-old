@@ -47,10 +47,10 @@ float grasstime = 0.0f;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/8.10/test3", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
+	CVegaFemFactory vFem("../../models/8.10/test4", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 37;
+	int numbercounter = 4;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -336,14 +336,14 @@ int main()
 		ourTreeShader.setMat4("view", view);	
 		ourTreeShader.setInt("frameIndex", i);
 
-		if (i >= Common::CorrectuDeformationFrame)
+		/*if (i >= Common::CorrectuDeformationFrame)
 		{
 			glm::vec4* tempU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
 			glGetBufferSubData(deltaSSBO, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), tempU);
 
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
-		}
+		}*/
 
 		if (i >= frameNums)
 		{
@@ -381,7 +381,7 @@ int main()
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 
-		Sleep(50);
+		Sleep(100);
 
 	}
 

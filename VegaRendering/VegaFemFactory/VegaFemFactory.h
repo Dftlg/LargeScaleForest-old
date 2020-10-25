@@ -40,6 +40,19 @@ public:
 	std::vector<Common::SFileFrames> searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<int> & vForceFluctuationSequence);
 	std::vector<Common::SFileFrames> searchFileFrameOnAttribute();
 	std::vector<std::vector<glm::vec3>> objDeformation(std::pair<int, int> vForceDirection, std::vector<int> vForceFluctuationSequence);
+
+	double getKMatrixSumNumber()
+	{
+		double Sum = 0;
+		if (!m_AllReallyLoadConnectedFem.empty())
+			for(int i=0;i< m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths.size();i++)
+				Sum+= m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths[i];
+		return Sum;
+	}
+	std::vector<int> getKMatrixEachElementRelatedDataLength() { if (!m_AllReallyLoadConnectedFem.empty()) return m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths; }
+	double getVeocitySumNumber() {if (!m_AllReallyLoadConnectedFem.empty()) return m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].Velocity.size();}
+	double getInternalForceSumNuber() { if (!m_AllReallyLoadConnectedFem.empty()) return m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].InternalForces.size(); }
+
 	void cleanSFileDataGroup(int vConnectionIndex, int vTimestep);
 	//查找检索标准
 	void searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>>& voMatchedFramesSequences, Common::SpKVFData& voSpKVData, std::vector<int> &vExtraForces, bool vIsFirstFrame);
@@ -64,6 +77,10 @@ public:
 	{
 		return (vFirstNumber - vSecondNumber)*(vFirstNumber - vSecondNumber);
 	};
+	inline int AbsError(int vFirstNumber, int vSecondNumber)
+	{
+		return abs(vFirstNumber - vSecondNumber);
+	};
 	inline bool AbsError(double vFirstNumber, double vSecondNumber,double vJudgeRange)
 	{
 		return (abs(vFirstNumber - vSecondNumber) < vJudgeRange);
@@ -76,9 +93,12 @@ public:
 			return true;
 		return false;
 	};
-	inline double GaussianFunction(double vVariable,double vSigma=1, double vMiu=0)
+	inline double GaussianFunction(double vVariable,double vSigma=1, double vMiu=0,double vTruncated=0.001)
 	{
-		return (1 / (vSigma*sqrt(2 * Common::Pi))*exp(-0.5*pow((vVariable - vMiu) / vSigma, 2)));
+		double GaussianValue=(1 / (vSigma*sqrt(2 * Common::Pi))*exp(-0.5*pow((vVariable - vMiu) / vSigma, 2)));
+		if (GaussianValue < vTruncated)
+			GaussianValue = 0;
+		return GaussianValue;
 	}
 
 
@@ -95,4 +115,7 @@ private:
 
 	//需要匹配的某些体素下的Object顶点
 	std::vector<std::vector<int>> m_CorrectDeformationIndex;
+	
+	int CurrentFrameIndex = 0;
+
 };
