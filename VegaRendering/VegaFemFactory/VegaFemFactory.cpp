@@ -750,7 +750,7 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 		}
 
 		sort(allWeightsSumResults.begin(), allWeightsSumResults.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second;});
-		write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization.txt", allWeightsSumResults);
+		//write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization.txt", allWeightsSumResults);
 		FrameIndexSequence.push_back(allWeightsSumResults[0].first);
 		//std::cout << "seleted:" << allWeightsSumResults[0].first << std::endl;
 		voSpKVData = m_AllReallyLoadConnectedFem[allWeightsSumResults[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(allWeightsSumResults[0].first % Common::SamplingFrameNumber) / 5];
