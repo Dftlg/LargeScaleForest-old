@@ -336,14 +336,14 @@ int main()
 		ourTreeShader.setMat4("view", view);	
 		ourTreeShader.setInt("frameIndex", i);
 
-		if (i >= Common::CorrectuDeformationFrame)
+		/*if (i >= Common::CorrectuDeformationFrame)
 		{
 			glm::vec4* tempU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
 			glGetBufferSubData(deltaSSBO, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), tempU);
 
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
-		}
+		}*/
 
 		if (i >= frameNums)
 		{
@@ -381,7 +381,7 @@ int main()
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 
-		Sleep(50);
+		Sleep(40);
 
 	}
 

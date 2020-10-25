@@ -676,8 +676,8 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 		double velocityErrorSum = 90;
 		double internalForcesSum = 90;
 		std::vector <std::pair<int, double>>reordergaussianForceErrrorSequence = gaussianForceErrrorSequence;
-		sort(reordergaussianForceErrrorSequence.begin(), reordergaussianForceErrrorSequence.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second > y.second;	});
-		write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//gaussianError.txt", reordergaussianForceErrrorSequence);
+		//sort(reordergaussianForceErrrorSequence.begin(), reordergaussianForceErrrorSequence.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second > y.second;	});
+		//write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//gaussianError.txt", reordergaussianForceErrrorSequence);
 		for (int i = 0;i< reordergaussianForceErrrorSequence.size();i++)
 		{
 			//std::cout << reordergaussianForceErrrorSequence[i].second << std::endl;
@@ -746,9 +746,9 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 			tempInternalForcesErrorSequence[i].second = tempInternalForcesErrorSequence[i].second / internalForcesSum;
 	    }
 		reordergaussianForceErrrorSequence.clear();
-		reordergaussianForceErrrorSequence = gaussianForceErrrorSequence;
-		sort(reordergaussianForceErrrorSequence.begin(), reordergaussianForceErrrorSequence.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second > y.second;	});
-		write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization.txt", reordergaussianForceErrrorSequence);
+		//reordergaussianForceErrrorSequence = gaussianForceErrrorSequence;
+		//sort(reordergaussianForceErrrorSequence.begin(), reordergaussianForceErrrorSequence.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second > y.second;	});
+		//write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization.txt", reordergaussianForceErrrorSequence);
 		/*std::vector <std::pair<int, double>> reorderForcesErrorT = tempForceErrorSequence;
 		std::vector <std::pair<int, double>> reorderKMartixErrorT = tempKErrorSequence;
 		sort(reorderForcesErrorT.begin(), reorderForcesErrorT.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second; });
@@ -756,10 +756,10 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 
 		//Select a weight between externalF¡¢K¡¢V¡¢InternalF as the criterion for updating
 		std::vector<std::pair<int, double>> allWeightsSumResults;
-		double forcesWeight = 0.6;
-		double kMartixWeight =0.2;
-		double velocityWeight = 0.1;
-		double internalForceWeight = 0.1;
+		double forcesWeight = 0.0;
+		double kMartixWeight =1.0;
+		double velocityWeight = 0.0;
+		double internalForceWeight = 0.0;
 		for (int i = 0; i < reorderSpKVFSegmentIndexSequence.size(); i++)
 		{
 			double tempResult = 0;
@@ -767,7 +767,7 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 			allWeightsSumResults.push_back(std::make_pair(reorderSpKVFSegmentIndexSequence[i], tempResult));
 		}
 
-		sort(allWeightsSumResults.begin(), allWeightsSumResults.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second;});
+		sort(allWeightsSumResults.begin(), allWeightsSumResults.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second;});
 
 		FrameIndexSequence.push_back(allWeightsSumResults[0].first);
 		//std::cout << "seleted:" << allWeightsSumResults[0].first << std::endl;

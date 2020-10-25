@@ -32,7 +32,7 @@ namespace Common
 
 	static bool InstanceTrees = true;
 
-	const int TreesNumber = 81;
+	const int TreesNumber = 1;
 
 	static int MaxTimeStep = 60;
 
