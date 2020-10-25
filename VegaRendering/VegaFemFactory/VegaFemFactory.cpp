@@ -9,7 +9,7 @@ CVegaFemFactory::CVegaFemFactory(const std::string & vDirectoryName, const std::
 	//可以看作是一个obj的model对象，有mesh集合，以及group组集合，
 	m_ModelTransformStruct = new CModelDeformationTransform(vMutilVerticesBaseFile);
 	//加载需要判断的位移索引
-	//readCorrectUdeformationIndex(vCorrectDeformationUVertexIndex);
+	readCorrectUdeformationIndex(vCorrectDeformationUVertexIndex);
 }
 
 //将文件夹下所有文件创建多个SFileFrames文件对象，但并未加载数据，只是将文件对应的名字和绝对路径加上
@@ -74,7 +74,7 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				//readDeformationDataByMutileThread(m_FilesData[fileIndex], m_FilesData[fileIndex].FilePath, fileIndex);
 				
 				readKVFFileData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
-				//readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
+				readUdeformationData(m_FilesData[fileIndex].FilePath, m_FilesData[fileIndex]);
 
 				int timeStepCount = 0;
 				std::ifstream positionFile(m_FilesData[fileIndex].FilePath);
@@ -197,6 +197,11 @@ void CVegaFemFactory::readFramesDeformationDataBasedFilesIndex(std::vector<std::
 
 	for (int i = 0; i < vFilesAndFramesIndexSequence.size(); i++)
 	{
+		//每20帧进行一次形变矫正
+		//if (i%4 ==0||i!=0 )
+		//{
+		//	voMatchedFramesData
+		//}
 		for(int k=4;k>=0;k--)
 		voMatchedFramesData.push_back(m_AllReallyLoadConnectedFem[vFilesAndFramesIndexSequence[i].first].FemDataset[0]->Frames[vFilesAndFramesIndexSequence[i].second - k].BaseFileDeformations);
 

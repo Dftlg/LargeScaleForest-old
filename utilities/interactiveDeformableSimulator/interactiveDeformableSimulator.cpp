@@ -468,8 +468,8 @@ void displayFunction(void)
   glColor3f(0,0,0);
 
   //显示包围网格边框
-  /*if (renderWireframe)
-    deformableObjectRenderingMesh->RenderEdges();*/
+  //if (renderWireframe)
+  //  deformableObjectRenderingMesh->RenderEdges();
 
   // disable stencil buffer modifications
   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -730,10 +730,10 @@ void idleFunction(void)
       }
 	  subTimestepCounter++;
     }
-	if (subTimestepCounter > 60)
+	/*if (subTimestepCounter > 60)
 	{
 		exit(1);
-	}
+	}*/
 	//用于判断文件力的数量
     //timestepCounter++;
 

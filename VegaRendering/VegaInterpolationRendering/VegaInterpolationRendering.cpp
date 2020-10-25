@@ -210,7 +210,7 @@ int main()
 
 	//查找帧段
 	std::vector<std::vector<glm::vec3>> matchedFramesSequences;
-	std::vector<int>vExtraForces = GenerateSamplingForce(60,130, 1, 0, 0);
+	std::vector<int>vExtraForces = GenerateSamplingForce(120,130, 1, 0, 0,4);
 	Common::SpKVFData voSpKVData;
 	bool flag = true;
 	vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
@@ -336,14 +336,14 @@ int main()
 		ourTreeShader.setMat4("view", view);	
 		ourTreeShader.setInt("frameIndex", i);
 
-		/*if (i >= Common::CorrectuDeformationFrame)
+		if (i >= Common::CorrectuDeformationFrame)
 		{
 			glm::vec4* tempU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
 			glGetBufferSubData(deltaSSBO, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), tempU);
 
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
-		}*/
+		}
 
 		if (i >= frameNums)
 		{
