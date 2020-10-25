@@ -48,7 +48,7 @@ namespace Common
 
 	static int SamplingFrameNumber = 60;
 
-	static int ProductFrameNumber = 60;
+	static int ProductFrameNumber = 80;
 
 	//static int KErrorRange = 10;
 	static int ExpandForceError = 1;
