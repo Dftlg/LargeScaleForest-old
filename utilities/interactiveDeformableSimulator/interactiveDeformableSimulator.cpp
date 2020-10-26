@@ -730,10 +730,10 @@ void idleFunction(void)
       }
 	  subTimestepCounter++;
     }
-	if (subTimestepCounter > 60)
+	/*if (subTimestepCounter > 60)
 	{
 		exit(1);
-	}
+	}*/
 	//用于判断文件力的数量
     //timestepCounter++;
 
@@ -794,11 +794,11 @@ void idleFunction(void)
 	//每uDeformationSampling帧存储最终的形变数据U
 	if (subTimestepCounter % Common::uDeformationSampling == 0)
 	{
-		deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);
+		//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);
 		TempExtraForces.clear();
 	}
 	//存储deltaU的形变数据
-	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
+	//deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
 
 
 

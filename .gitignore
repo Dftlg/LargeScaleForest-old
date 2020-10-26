@@ -74,6 +74,8 @@ artifacts/
 *.txt
 *.spkvf
 *.spDemn
+*.rar
+*.mtl
 
 # Chutzpah Test files
 _Chutzpah*

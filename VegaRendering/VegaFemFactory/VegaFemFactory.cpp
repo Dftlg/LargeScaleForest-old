@@ -582,7 +582,7 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 			std::vector<std::pair<int, double>>tempSortedForceSequence = tempForceErrorSequence;
 			sort(tempSortedForceSequence.begin(), tempSortedForceSequence.end(), [](const std::pair<int, int>&x, const std::pair<int, int>&y)->int {return x.second < y.second; });
 			CurrentFrameIndex = tempSortedForceSequence[0].first;
-			voSpKVData = m_AllReallyLoadConnectedFem[tempForceErrorSequence[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(tempForceErrorSequence[0].first % Common::SamplingFrameNumber) / 5];
+			voSpKVData = m_AllReallyLoadConnectedFem[tempSortedForceSequence[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(tempSortedForceSequence[0].first % Common::SamplingFrameNumber) / 5];
 			std::vector<int>tempForces;
 			//存储生成的下一段的外力
 		
