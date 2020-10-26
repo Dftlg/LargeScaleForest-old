@@ -48,7 +48,7 @@ namespace Common
 
 	static int SamplingFrameNumber = 60;
 
-	static int ProductFrameNumber = 80;
+	static int ProductFrameNumber = 150;
 
 	//static int KErrorRange = 10;
 	static int ExpandForceError = 1;
@@ -224,7 +224,7 @@ namespace Common
 		bool isLoadDataSet = false;
 		int Theta;
 		int Phi;
-		std::vector<int> ForceFluctuationSequence;
+		std::vector<double> ForceFluctuationSequence;
 		//delta UÊý¾Ý
 		std::vector<SFileData> Frames;
 		std::vector<SpKVFData> KVFFrameDatas;
@@ -241,7 +241,7 @@ namespace Common
 	struct SMatchedDeformationFrames
 	{
 		std::string FileName;
-		std::string FrameIndex;
+		int FrameIndex;
 		int CounterNumber;
 		bool operator<(const SMatchedDeformationFrames &Deformation2) const
 		{

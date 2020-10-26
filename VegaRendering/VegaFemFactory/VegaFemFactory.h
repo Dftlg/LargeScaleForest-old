@@ -24,7 +24,7 @@ public:
 	void readKVFFileData(const std::string & vFile, Common::SFileFrames & vFileFrame);
 	void readUdeformationData(const std::string & vFile, Common::SFileFrames &vFileFrame);
 	void readFilePath4Directory(const std::string & vDirectoryName);
-	void write2File(const std::string& vPath, std::vector <std::pair<int, double>>& vOutputData);
+	void write2File(const std::string& vPath, std::vector <std::pair<int, double>>& vOutputData, std::vector <std::pair<int, double>>& vForceFrame, std::vector <std::pair<int, double>>& vKVfFrame, int vFrameIndex);
 	void readFramesDeformationData(std::vector<Common::SFileFrames>& vSearchFrames, int vSearchConnectionIndex);
 	void readFramesDeformationDataBasedFilesIndex(std::vector<std::pair<int, int>>&vFilesAndFramesIndexSequence, std::vector<std::vector<glm::vec3>> &voMatchedFramesData);
 	void readDeformationDataByMutileThread(Common::SFileFrames& vBaseFileFramesStruct, const std::string& vFilePath, int vSFileFramesIndex);
@@ -37,7 +37,7 @@ public:
 	Common::SFileFrames getFileFrames(int vIndex) { return m_FilesData[vIndex]; }
 	void setDeformationStateFromFileName();
 	CModelDeformationTransform*  getModelTransformStruct() { return m_ModelTransformStruct;}
-	std::vector<Common::SFileFrames> searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<int> & vForceFluctuationSequence);
+	std::vector<Common::SFileFrames> searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<double> & vForceFluctuationSequence);
 	std::vector<Common::SFileFrames> searchFileFrameOnAttribute();
 	std::vector<std::vector<glm::vec3>> objDeformation(std::pair<int, int> vForceDirection, std::vector<int> vForceFluctuationSequence);
 
@@ -57,7 +57,7 @@ public:
 	//²éÕÒ¼ìË÷±ê×¼
 	void searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>>& voMatchedFramesSequences, Common::SpKVFData& voSpKVData, std::vector<int> &vExtraForces, bool vIsFirstFrame);
 	
-	void searchMatchedDeformationFrames(std::vector<glm::vec3> & vFrameUDeformationData);
+	void searchMatchedDeformationFrames(std::vector<glm::vec3> & vUdeltaDeformation,std::vector<glm::vec3> & vFrameUDeformationData);
 
 	inline float addDistance(float vorigin) { return vorigin + 0.0005; };
 	inline float minusDistance(float vorigin) { return vorigin - 0.0005; };

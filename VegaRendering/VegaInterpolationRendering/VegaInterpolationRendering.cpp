@@ -214,14 +214,16 @@ int main()
 	Common::SpKVFData voSpKVData;
 	bool flag = true;
 	vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
-	//for (int i = 1; i < 6; i++)
-	//{
-	//	std::vector<glm::vec3> tempUDeformations;
-	//	for (int k = 0; k < 5; k++)
-	//	{
 
+	//std::vector<glm::vec3> tempUDeformations(matchedFramesSequences[0].size(), glm::vec3(0, 0, 0));
+	//for (int i = 0; i < matchedFramesSequences.size(); i++)
+	//{
+	//	for (int k = 0; k < matchedFramesSequences[i].size(); k++)
+	//	{
+	//		tempUDeformations[k] += matchedFramesSequences[i][k];
 	//	}
-	//	vFem.searchMatchedDeformationFrames
+	//	if (i % 20 == 0 && i != 0)
+	//		vFem.searchMatchedDeformationFrames(matchedFramesSequences[i], tempUDeformations);
 	//}
 	//帧数
 	int frameNums = matchedFramesSequences.size();

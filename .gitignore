@@ -277,3 +277,4 @@ __pycache__/
 /models/8.10/temp/positionthe0phi0force100,1,0,0.spDemn
 /models/8.10/new/positionthe0phi0force100,1,0,0.spDemn
 /models/8.10/test4/positionthe0phi0force130,1,0,0.spDemn
+*.spDemn
