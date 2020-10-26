@@ -50,7 +50,7 @@ int main()
 	CVegaFemFactory vFem("../../models/8.10/test4", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 4;
+	int numbercounter = 30;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -210,7 +210,7 @@ int main()
 
 	//查找帧段
 	std::vector<std::vector<glm::vec3>> matchedFramesSequences;
-	std::vector<int>vExtraForces = GenerateSamplingForce(Common::ProductFrameNumber,130, 1, 0, 0,4);
+	std::vector<int>vExtraForces = GenerateSamplingForce(Common::ProductFrameNumber,130, 1, 0, 0,8);
 	Common::SpKVFData voSpKVData;
 	bool flag = true;
 	vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);

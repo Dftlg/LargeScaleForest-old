@@ -192,7 +192,7 @@ void CVegaFemFactory::readFramesDeformationDataBasedFilesIndex(std::vector<std::
 		//tempConnectedFile.FemDataset.push_back(&m_FilesData[tempIndexSequece[i]]);
 		//m_AllReallyLoadConnectedFem[tempIndexSequece[i]] = tempConnectedFile;
 		time_t last = time(NULL);
-		std::cout << "the time of load " << tempIndexSequece[i] << " is" << last - current << std::endl;
+		std::cout << "the time of load " << tempIndexSequece[i] << " is " << last - current << std::endl;
 	}
 
 	for (int i = 0; i < vFilesAndFramesIndexSequence.size(); i++)

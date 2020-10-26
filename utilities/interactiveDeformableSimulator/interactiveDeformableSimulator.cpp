@@ -730,10 +730,10 @@ void idleFunction(void)
       }
 	  subTimestepCounter++;
     }
-	/*if (subTimestepCounter > 60)
+	if (subTimestepCounter > 60)
 	{
 		exit(1);
-	}*/
+	}
 	//用于判断文件力的数量
     //timestepCounter++;
 

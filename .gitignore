@@ -73,6 +73,7 @@ artifacts/
 *.scc
 *.txt
 *.spkvf
+*.spDemn
 
 # Chutzpah Test files
 _Chutzpah*
