@@ -20,24 +20,23 @@ std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency
 	std::vector<int> tempForces;
 	for (int i = 0; i < vSize; i++)
 	{
-		tempForces.push_back(int(vAmplitude * cos(((wavelength*M_PI) / vSize) *(i + vPhase)) + vYpluse));
-		/*tempForces.push_back(int(vAmplitude * cos(angle*vFrequency+vPhase) + vYpluse));
-		angle += (wavelength*M_PI) / vSize;*/
+		tempForces.push_back(int(vAmplitude * cos(angle*vFrequency+vPhase*M_PI) + vYpluse));
+		angle += (wavelength*M_PI) / vSize;
 	}
 	return tempForces;
 }
 
-std::vector<int> GetForceConfigurate(const std::string& vFilePath)
+std::vector<double> GetForceConfigurate(const std::string& vFilePath)
 {
 	std::vector<std::string> ForceConfig;
-	std::vector<int> tempConfig;
+	std::vector<double> tempConfig;
 	int forcePos = vFilePath.find("force");
 	std::string tempFile = vFilePath.substr(forcePos+5);
 	boost::split(ForceConfig, tempFile, boost::is_any_of(","), boost::token_compress_off);
 	std::vector<std::string>::iterator it;
 	for (it = ForceConfig.begin(); it != ForceConfig.end(); ++it)
 	{
-		tempConfig.push_back(std::stoi(*it));
+		tempConfig.push_back(std::stof(*it));
 	}
 	return tempConfig;
 	

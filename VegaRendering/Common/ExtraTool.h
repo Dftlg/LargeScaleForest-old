@@ -15,4 +15,4 @@ int RandomGenerate();
 
 std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency, double vPhase, int vYpluse, int wavelength = 2);
 
-std::vector<int> GetForceConfigurate(const std::string & vFilePath);
+std::vector<double> GetForceConfigurate(const std::string & vFilePath);

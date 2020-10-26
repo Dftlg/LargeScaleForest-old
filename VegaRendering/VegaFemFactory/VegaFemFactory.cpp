@@ -37,7 +37,7 @@ void CVegaFemFactory::readFilePath4Directory(const std::string & vDirectoryName)
 
 }
 
-void CVegaFemFactory::write2File(const std::string & vPath, std::vector <std::pair<int, double>>& vOutputData)
+void CVegaFemFactory::write2File(const std::string & vPath, std::vector <std::pair<int, double>>& vOutputData, std::vector <std::pair<int, double>>& vForceFrame, std::vector <std::pair<int, double>>& vKVfFrame,int vFrameIndex)
 {
 	std::ofstream outFile;
 	outFile.open(vPath, std::ios::in | std::ios::app);
@@ -47,10 +47,11 @@ void CVegaFemFactory::write2File(const std::string & vPath, std::vector <std::pa
 		return;
 	}
 	outFile<<"/////////////////////"<<std::endl;
+	outFile << "Frame" << vFrameIndex << std::endl;
 	for (int i = 0; i < vOutputData.size(); i++)
 	{
-		outFile << vOutputData[i].first << ",";
-		outFile << vOutputData[i].second <<std::endl;
+		outFile << vOutputData[i].first << ",    ";
+		outFile << vOutputData[i].second <<",    "<< vForceFrame[i].second<<",     "<<vKVfFrame[i].second<<std::endl;
 	}
 	outFile.close();
 }
@@ -431,7 +432,7 @@ void CVegaFemFactory::setDeformationStateFromFileName()
 		std::vector<std::string>::iterator it;
 		for (it = ForceSequence.begin(); it != ForceSequence.end(); ++it)
 		{
-			m_FilesData[i].ForceFluctuationSequence.push_back(std::stoi(*it));
+			m_FilesData[i].ForceFluctuationSequence.push_back(std::stof(*it));
 		}
 	}
 }
@@ -523,6 +524,7 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 	double kMartixErrorSum = getKMatrixSumNumber();
 	double velocityErrorSum = getVeocitySumNumber();
 	double internalForcesSum = getInternalForceSumNuber();
+	std::cout << kMartixErrorSum << "    " << velocityErrorSum << "    " << internalForcesSum << std::endl;
 	for (int i = 0; i < m_AllReallyLoadConnectedFem.size(); i++)
 	{
 		for (int k = 0; k < m_AllReallyLoadConnectedFem[i].FemDataset[0]->KVFFrameDatas.size(); k++)
@@ -729,6 +731,8 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 		int NextFrameIndex = CurrentFrameIndex + 5;
 
 		std::vector<std::pair<int, double>> allWeightsSumResults;
+
+		std::vector<std::pair<int, double>> tempKVfResults(tempKErrorSequence.size());
 		double forcesWeight = 0.35;
 		//double kMartixWeight =0.2;
 		//double velocityWeight = 0.1;
@@ -739,18 +743,19 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 			double tempResult = 0;
 			if (NextFrameIndex == tempVelocityErrorSequence[i].first)
 			{
-				tempResult = (gaussianForceErrrorSequence[i].second)*0.7 + 0.3 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second*2 + tempInternalForcesErrorSequence[i].second) / 4;
+				tempKVfResults[i].second = (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second  + tempInternalForcesErrorSequence[i].second) / 3;
+				tempResult = (gaussianForceErrrorSequence[i].second)*0.7 + 0.3 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
 			}
 			else
 			{
+				tempKVfResults[i].second = (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second  + tempInternalForcesErrorSequence[i].second) / 3;
 				tempResult = (gaussianForceErrrorSequence[i].second)*forcesWeight + KVfWeight * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
-			}
-			//tempResult = (gaussianForceErrrorSequence[i].second)*forcesWeight + (tempKErrorSequence[i].second)*kMartixWeight + (tempVelocityErrorSequence[i].second)*velocityWeight + (tempInternalForcesErrorSequence[i].second)*internalForceWeight;		
+			}	
 			allWeightsSumResults.push_back(std::make_pair(reorderSpKVFSegmentIndexSequence[i], tempResult));
 		}
-
+		write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization.txt", allWeightsSumResults, gaussianForceErrrorSequence, tempKVfResults, CurrentFrameIndex);
 		sort(allWeightsSumResults.begin(), allWeightsSumResults.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second;});
-		//write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization.txt", allWeightsSumResults);
+		write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization1.txt", allWeightsSumResults, gaussianForceErrrorSequence,tempKVfResults,CurrentFrameIndex);
 		FrameIndexSequence.push_back(allWeightsSumResults[0].first);
 		//std::cout << "seleted:" << allWeightsSumResults[0].first << std::endl;
 		voSpKVData = m_AllReallyLoadConnectedFem[allWeightsSumResults[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(allWeightsSumResults[0].first % Common::SamplingFrameNumber) / 5];
@@ -769,14 +774,14 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 
 	for (int i = 0; i < FrameIndexSequence.size(); i++)
 	{
-		std::cout << FrameIndexSequence[i] / 60 << "--" << FrameIndexSequence[i] % 60 << " ";
+		std::cout << FrameIndexSequence[i] / Common::SamplingFrameNumber << "--" << FrameIndexSequence[i] % Common::SamplingFrameNumber << " ";
 	}
 	std::cout << std::endl;
 	std::vector<std::pair<int, int>>fileAndFrameIndexSequence;
 	
 	for (int i = 0; i < FrameIndexSequence.size(); i++)
 	{	
-		fileAndFrameIndexSequence.push_back(std::make_pair(FrameIndexSequence[i] / 60, FrameIndexSequence[i] % 60));
+		fileAndFrameIndexSequence.push_back(std::make_pair(FrameIndexSequence[i] / Common::SamplingFrameNumber, FrameIndexSequence[i] % Common::SamplingFrameNumber));
 	}
 	readFramesDeformationDataBasedFilesIndex(fileAndFrameIndexSequence, voMatchedFramesSequences);
 }
@@ -808,27 +813,10 @@ void CVegaFemFactory::__getFileSeekDirOfEachBlock(const std::string & vFilePath,
 	}
 }
 
-std::vector<std::vector<glm::vec3>> CVegaFemFactory::objDeformation(std::pair<int, int> vForceDirection, std::vector<int> vForceFluctuationSequence)
-{
-	std::vector<Common::SFileFrames> proximityFileFrames = searchFileFramesOnAnimation(vForceDirection.first, vForceDirection.second, vForceFluctuationSequence);
-	std::vector<std::vector<glm::vec3>> u;
-	for (auto frame : proximityFileFrames)
-	{
-
-		//u.push_back(frame.Frames[0].PositionsDeformation);
-	}
-
-	//if(proximityFileFrames.size()==4)
-	//search DataSet
-	//权重设置,双线性插值
-	/*std::string FileIndex=*/
-	//返回一个模型的位移再由四面体转换到物体顶点的所有位移量。
-	return u;
-}
 
 //在已经加载FileIndex但尚未加载位移数据的SFileFrames所有搜索相关的SFileFrames并返回
 //返回临近的多个方向数据索引标识
-std::vector<Common::SFileFrames> CVegaFemFactory::searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<int>& vForceFluctuationSequence)
+std::vector<Common::SFileFrames> CVegaFemFactory::searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<double>& vForceFluctuationSequence)
 {
 	int ThetaIndex = vTheta / 30;
 	int PhiIndex = vPhi / 30;
@@ -965,7 +953,7 @@ void CVegaFemFactory::readCorrectUdeformationIndex(const std::string & vFilePath
 	}
 }
 
-void CVegaFemFactory::searchMatchedDeformationFrames(std::vector<glm::vec3> & vFrameUDeformationData)
+void CVegaFemFactory::searchMatchedDeformationFrames(std::vector<glm::vec3> & vUdeltaDeformation,std::vector<glm::vec3> & vFrameUDeformationData)
 {
 	std::vector<Common::SMatchedDeformationFrames> MatchedFrames;
 	Common::SMatchedDeformationFrames tempMatchedFrame;
@@ -975,18 +963,38 @@ void CVegaFemFactory::searchMatchedDeformationFrames(std::vector<glm::vec3> & vF
 		for (auto fileFrameSpDeformation = 0; fileFrameSpDeformation < m_FilesData[i].Deformations.size(); fileFrameSpDeformation++)
 		{
 			int Counter = 0;
-			for (auto objectVertexIndex = 0; objectVertexIndex < m_CorrectDeformationIndex.size(); objectVertexIndex++)
+			for (auto vertexInElement = 0; vertexInElement < m_CorrectDeformationIndex.size(); vertexInElement++)
 			{
-				//统计共有多少个顶点满足范围条件
-				Counter += distanceError(vFrameUDeformationData[objectVertexIndex], m_FilesData[i].Deformations[fileFrameSpDeformation].Deformation[objectVertexIndex]);
-			}	
+				for (auto objectVertexIndex = 0; objectVertexIndex < m_CorrectDeformationIndex[vertexInElement].size(); objectVertexIndex++)
+				{
+					//统计顶点
+					Counter += distanceError(vFrameUDeformationData[objectVertexIndex], m_FilesData[i].Deformations[fileFrameSpDeformation].Deformation[objectVertexIndex]);
+				}
+			}
 			tempMatchedFrame.CounterNumber = Counter;
 			tempMatchedFrame.FileName = m_FilesData[i].FileName;
 			tempMatchedFrame.FrameIndex = m_FilesData[i].Deformations[fileFrameSpDeformation].FrameIndex;
 			MatchedFrames.push_back(tempMatchedFrame);
 		}
 	}
+	//获取最匹配的形变数据
 	std::sort(MatchedFrames.begin(), MatchedFrames.end());
+	for (int i = 0; i < m_FilesData.size(); i++)
+	{
+		if (MatchedFrames[0].FileName == m_FilesData[i].FileName)
+		{
+			for (int k = 0; k < m_FilesData[i].Deformations.size(); k++)
+			{
+				if (MatchedFrames[0].FrameIndex == m_FilesData[i].Deformations[k].FrameIndex)
+				{
+					for (int j = 0; j < m_FilesData[i].Deformations[k].Deformation.size(); j++)
+					{
+						vUdeltaDeformation[j] = vUdeltaDeformation[j] + (vFrameUDeformationData[j] - m_FilesData[i].Deformations[k].Deformation[j]);
+					}
+				}
+			}
+		}
+	}
 }
 
 void CVegaFemFactory::readUdeformationData(const std::string & vFile, Common::SFileFrames &vFileFrame)
@@ -1027,4 +1035,3 @@ void CVegaFemFactory::readUdeformationData(const std::string & vFile, Common::SF
 		vFileFrame.Deformations.push_back(Common::SpDeformation(tempIndex, tempDeformation));
 	}
 }
-

@@ -730,10 +730,10 @@ void idleFunction(void)
       }
 	  subTimestepCounter++;
     }
-	/*if (subTimestepCounter > 60)
+	if (subTimestepCounter > 120)
 	{
 		exit(1);
-	}*/
+	}
 	//用于判断文件力的数量
     //timestepCounter++;
 
@@ -1554,9 +1554,9 @@ void initSimulation()
   deltau = (double*)calloc(3 * n, sizeof(double));
   preu= (double*)calloc(3 * n, sizeof(double));
 
-  std::vector<int> tempConfig = GetForceConfigurate(outputFilename);
+  std::vector<double> tempConfig = GetForceConfigurate(outputFilename);
  
-  ExtraForces=GenerateSamplingForce(60, tempConfig[0], tempConfig[1], tempConfig[2],tempConfig[3]);
+  ExtraForces=GenerateSamplingForce(120, tempConfig[0], tempConfig[1], tempConfig[2],tempConfig[3],4);
 
 
   // load initial condition
