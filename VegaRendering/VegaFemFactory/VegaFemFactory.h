@@ -35,12 +35,12 @@ public:
 	std::string getFileName(const std::string & vFileDirectory);
 	//返回一个形变文件
 	Common::SFileFrames getFileFrames(int vIndex) { return m_FilesData[vIndex]; }
+	std::vector<std::vector<int>> getMultipleFramesIndex() { return m_MultipleFramesIndex; }
 	void setDeformationStateFromFileName();
 	CModelDeformationTransform*  getModelTransformStruct() { return m_ModelTransformStruct;}
 	std::vector<Common::SFileFrames> searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<double> & vForceFluctuationSequence);
 	std::vector<Common::SFileFrames> searchFileFrameOnAttribute();
-	std::vector<std::vector<glm::vec3>> objDeformation(std::pair<int, int> vForceDirection, std::vector<int> vForceFluctuationSequence);
-
+	
 	double getKMatrixSumNumber()
 	{
 		double Sum = 0;
@@ -54,10 +54,16 @@ public:
 	double getInternalForceSumNuber() { if (!m_AllReallyLoadConnectedFem.empty()) return m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].InternalForces.size(); }
 
 	void cleanSFileDataGroup(int vConnectionIndex, int vTimestep);
+
+	void initMatchedFrameStruct(int vTreeSize);
 	//查找检索标准
 	void searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>>& voMatchedFramesSequences, Common::SpKVFData& voSpKVData, std::vector<int> &vExtraForces, bool vIsFirstFrame);
 	
 	void searchMatchedDeformationFrames(std::vector<glm::vec3> & vUdeltaDeformation,std::vector<glm::vec3> & vFrameUDeformationData);
+
+	void searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces);
+
+	void searchMatchedOneTreeFrameSequences(std::vector<int> & voMatchedFrameSequenceIndex, Common::SpKVFData& voSpKVData, std::vector<int>&voExtraForces, int &voCurrentFrameIndex, int& vIsFirstFrame);
 
 	inline float addDistance(float vorigin) { return vorigin + 0.0005; };
 	inline float minusDistance(float vorigin) { return vorigin - 0.0005; };
@@ -115,7 +121,24 @@ private:
 
 	//需要匹配的某些体素下的Object顶点
 	std::vector<std::vector<int>> m_CorrectDeformationIndex;
+
+	//第一个是文件的SpKVF的段索引号4，9，14，19，第二个值是当前索引下力的序列
+	std::vector<std::pair<int, std::vector<int>>> m_ForceSequence;
+	//SpKVF的段索引号，当前索引下K矩阵
+	std::vector<std::pair<int, std::vector<std::vector<double>>* >> m_KMartixSequence;
+	//SpKVF的段索引号，当前索引下v矩阵
+	std::vector<std::pair<int, std::vector<glm::vec3>* >> m_VelocitySequence;
+	//SpKVF的段索引号，当前索引下f内矩阵
+	std::vector<std::pair<int, std::vector<glm::vec3>* >> m_InternalForcesSequence;
+	//所有文件的SpKVF数据索引
+	std::vector<int> m_reorderSpKVFSegmentIndexSequence;
 	
+	std::vector<std::vector<int>> m_MultipleFramesIndex;
+	std::vector<Common::SpKVFData> m_TempSpKVFData;
+	std::vector<int> m_CurrentFrameIndex;
+	std::vector<int> m_Flag;
+
+
 	int CurrentFrameIndex = 0;
 
 };

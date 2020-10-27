@@ -13,7 +13,7 @@ newmtl wire_000000000
 	Ks 0.3500 0.3500 0.3500
 	Ke 0.0000 0.0000 0.0000
 	map_Ka D:\GraduationProject\Vega\models\10.20\colorleaf1.jpg
-	map_Kd D:\GraduationProject\Vega\models\10.20\colorleaf1.jpg
+	map_Kd D:\GraduationProject\Vega\models\10.20\abc.bmp
 	map_d D:\GraduationProject\Vega\models\10.20\opacityleaf.jpg
 
 newmtl bark_000000000

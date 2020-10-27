@@ -468,8 +468,8 @@ void displayFunction(void)
   glColor3f(0,0,0);
 
   //显示包围网格边框
-  //if (renderWireframe)
-  //  deformableObjectRenderingMesh->RenderEdges();
+  if (renderWireframe)
+    deformableObjectRenderingMesh->RenderEdges();
 
   // disable stencil buffer modifications
   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -693,7 +693,7 @@ void idleFunction(void)
 		TempExtraForces.push_back(ExtraForces[subTimestepCounter]);
 		if ((subTimestepCounter+1) % Common::ForcesSampling == 0)
 		{
-			integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
+			//integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
 			TempExtraForces.clear();
 		}
 		//计算由力产生的结点位移形变
@@ -794,11 +794,11 @@ void idleFunction(void)
 	//每uDeformationSampling帧存储最终的形变数据U
 	if (subTimestepCounter % Common::uDeformationSampling == 0)
 	{
-		deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);
+		//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);
 		TempExtraForces.clear();
 	}
 	//存储deltaU的形变数据
-	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
+	//deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
 
 
 

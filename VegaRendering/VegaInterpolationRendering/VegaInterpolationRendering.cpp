@@ -47,10 +47,10 @@ float grasstime = 0.0f;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/8.10/test4", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
+	CVegaFemFactory vFem("../../models/8.10/test6", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 4;
+	int numbercounter = 8;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -209,11 +209,51 @@ int main()
 
 
 	//查找帧段
-	std::vector<std::vector<glm::vec3>> matchedFramesSequences;
-	std::vector<int>vExtraForces = GenerateSamplingForce(Common::ProductFrameNumber,130, 1, 0, 0,4);
-	Common::SpKVFData voSpKVData;
-	bool flag = true;
-	vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
+	//std::vector<std::vector<glm::vec3>> matchedFramesSequences;
+	//std::vector<int>vExtraForces = GenerateSamplingForce(Common::ProductFrameNumber,130, 1, 0, 0,4);
+	//Common::SpKVFData voSpKVData;
+	//bool flag = true;
+	//vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
+
+	std::vector<std::vector<int>> vMultipleExtraForces;
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 1, 0, 4));
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 125, 1, 1, 0, 4));
+	/*vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 110, 1, 0, 0, 4));*/
+
+	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
+
+	//在while循环里初始化
+	int Size=vMultipleExtraForces[0].size() / 5;
+	int step = 0;
+	while (1)
+	{
+		if (step == Size)
+			break;
+
+		std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
+		for (int i = 0; i < vMultipleExtraForces.size(); i++)
+		{
+			for (int k = (step)*5; k < (step+1)*5; k++)
+			{
+				tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
+			}
+		}
+		vFem.searchMatchedFrameSequences(tempMultipleFiveForces);
+		std::vector<std::vector<int>> temp=vFem.getMultipleFramesIndex();
+			
+		std::cout << "Each Froce connect Frame" << std::endl;
+		for (int i = 0; i < vMultipleExtraForces.size(); i++)
+		{
+			for (int k = 0; k < temp[i].size(); k++)
+				std::cout << temp[i][k] / Common::SamplingFrameNumber << "--" << temp[i][k] % Common::SamplingFrameNumber << " ";
+
+			std::cout << "||";
+		}
+		std::cout<<std::endl;
+		tempMultipleFiveForces.clear();
+		step++;
+	}
 
 	//std::vector<glm::vec3> tempUDeformations(matchedFramesSequences[0].size(), glm::vec3(0, 0, 0));
 	//for (int i = 0; i < matchedFramesSequences.size(); i++)
@@ -226,21 +266,22 @@ int main()
 	//		vFem.searchMatchedDeformationFrames(matchedFramesSequences[i], tempUDeformations);
 	//}
 	//帧数
-	int frameNums = matchedFramesSequences.size();
-	//obj模型的顶点数
-	int vertexNums = matchedFramesSequences[0].size();
-	std::cout << frameNums << " " << vertexNums << std::endl;
-	glm::vec4* deformU = new glm::vec4[frameNums*vertexNums];
 
-	
-	
-	for (int i = 0; i < frameNums; i++)
-	{
-		for (int k = 0; k < vertexNums; k++)
-		{
-			deformU[i * vertexNums + k] = glm::vec4(matchedFramesSequences[i][k] , 0.0f);
-		}
-	}
+	//int frameNums = matchedFramesSequences.size();
+	////obj模型的顶点数
+	//int vertexNums = matchedFramesSequences[0].size();
+	//std::cout << frameNums << " " << vertexNums << std::endl;
+	//glm::vec4* deformU = new glm::vec4[frameNums*vertexNums];
+
+	//
+	//
+	//for (int i = 0; i < frameNums; i++)
+	//{
+	//	for (int k = 0; k < vertexNums; k++)
+	//	{
+	//		deformU[i * vertexNums + k] = glm::vec4(matchedFramesSequences[i][k] , 0.0f);
+	//	}
+	//}
 
 
 	////帧数
@@ -272,17 +313,17 @@ int main()
 
 	//初始化SSBO
 	unsigned int SSBO;
-	glGenBuffers(1, &SSBO);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*frameNums*vertexNums, deformU, GL_STATIC_DRAW);
-	//glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*frameNums*vertexNums*numbercounter, deformU, GL_STATIC_DRAW);
+	//glGenBuffers(1, &SSBO);
+	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+	//glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*frameNums*vertexNums, deformU, GL_STATIC_DRAW);
+	////glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*frameNums*vertexNums*numbercounter, deformU, GL_STATIC_DRAW);
 
 	//shader和点连接
 	GLuint ssbo_binding_point_index = 1;
 	//点和SSBO的连接
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, SSBO);
-	//点和shader的连接
-	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_index, ssbo_binding_point_index);
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, SSBO);
+	////点和shader的连接
+	//glShaderStorageBlockBinding(ourTreeShader.getID(), shader_index, ssbo_binding_point_index);
 
 
 	glm::vec4* deltaU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
@@ -302,8 +343,8 @@ int main()
 	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_delta_index, deltassbo_binding_point_index);
 
 	ourTreeShader.use();
-	ourTreeShader.setInt("frameNums", frameNums);
-	ourTreeShader.setInt("vertexNums", vertexNums);
+	//ourTreeShader.setInt("frameNums", frameNums);
+	//ourTreeShader.setInt("vertexNums", vertexNums);
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
 	glm::mat4 view;
@@ -356,12 +397,12 @@ int main()
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
 		}*/
 
-		if (i >= frameNums)
+		/*if (i >= frameNums)
 		{
 			i = i % frameNums;
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
-		}
+		}*/
 		for (int j = 0; j < 1; j++)
 		{
 
