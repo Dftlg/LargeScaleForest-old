@@ -1757,7 +1757,7 @@ VolumetricMesh::elementType VolumetricMesh::getElementTypeASCII(const char * fil
     return elementType_;
   }
 
-  char lineBuffer[1024];
+  char lineBuffer[8192];
   while (volumetricMeshParser.getNextLine(lineBuffer, 0, 0) != NULL)
   {
     //printf("%s\n", lineBuffer);

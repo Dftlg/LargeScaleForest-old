@@ -544,7 +544,7 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 		tempKMartixSequence.push_back(std::make_pair(reorderSpKVFSegmentIndexSequence[i], tempKMartix));
 		tempVelocity = m_AllReallyLoadConnectedFem[reorderSpKVFSegmentIndexSequence[i] / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(reorderSpKVFSegmentIndexSequence[i] % Common::SamplingFrameNumber) / 5].Velocity;
 		tempVelocitySequence.push_back(std::make_pair(reorderSpKVFSegmentIndexSequence[i], tempVelocity));
-		tempInternalForces = m_AllReallyLoadConnectedFem[reorderSpKVFSegmentIndexSequence[i] / 60].FemDataset[0]->KVFFrameDatas[(reorderSpKVFSegmentIndexSequence[i] % 60) / 5].InternalForces;
+		tempInternalForces = m_AllReallyLoadConnectedFem[reorderSpKVFSegmentIndexSequence[i] / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(reorderSpKVFSegmentIndexSequence[i] % Common::SamplingFrameNumber) / 5].InternalForces;
 		tempInternalForcesSequence.push_back(std::make_pair(reorderSpKVFSegmentIndexSequence[i], tempInternalForces));
 		tempKMartix.clear();
 		tempVelocity.clear();
@@ -768,7 +768,7 @@ void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec
 		std::vector<std::pair<int, double>>().swap(tempForceErrorSequence);
 		std::vector<std::pair<int, double>>().swap(tempKErrorSequence);
 		std::vector<std::pair<int, double>>().swap(tempVelocityErrorSequence);
-		std::vector<std::pair<int, double>>().swap(tempInternalForcesErrorSequence);		
+		std::vector<std::pair<int, double>>().swap(tempInternalForcesErrorSequence);	
 	}
 
 

@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="VegaFemFactory.cpp">
+    <ClCompile Include="ModelDeformationTransform.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModelDeformationTransform.cpp">
+    <ClCompile Include="VegaFemFactory.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

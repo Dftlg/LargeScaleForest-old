@@ -76,6 +76,9 @@ artifacts/
 *.spDemn
 *.rar
 *.mtl
+*.bou
+*.veg
+*.interp
 
 # Chutzpah Test files
 _Chutzpah*

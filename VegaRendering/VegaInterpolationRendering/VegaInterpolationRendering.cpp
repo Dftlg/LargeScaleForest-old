@@ -47,10 +47,10 @@ float grasstime = 0.0f;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/8.10/test5", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
+	CVegaFemFactory vFem("../../models/8.10/test6", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 30;
+	int numbercounter = 8;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -210,10 +210,12 @@ int main()
 
 	//查找帧段
 	std::vector<std::vector<glm::vec3>> matchedFramesSequences;
-	std::vector<int>vExtraForces = GenerateSamplingForce(Common::ProductFrameNumber,103, 1, 1, 0,8);
+	std::vector<int>vExtraForces = GenerateSamplingForce(Common::ProductFrameNumber,125, 1, 1, 0,4);
 	Common::SpKVFData voSpKVData;
 	bool flag = true;
+
 	vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
+
 
 	//std::vector<glm::vec3> tempUDeformations(matchedFramesSequences[0].size(), glm::vec3(0, 0, 0));
 	//for (int i = 0; i < matchedFramesSequences.size(); i++)

@@ -1,8 +1,8 @@
 *globalAmbientIntensity
-0.2
+0.8
 
 *enableSpecularTerm
-true
+false
 
 *twoSidedLighting
 true

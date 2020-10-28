@@ -46,9 +46,9 @@ namespace Common
 
 	static int CorrectuDeformationFrame = 20;
 
-	static int SamplingFrameNumber = 60;
+	static int SamplingFrameNumber = 180;
 
-	static int ProductFrameNumber = 240;
+	static int ProductFrameNumber = 120;
 
 	static int ExpandForceError = 1;
 	static int KErrorRange = 20;

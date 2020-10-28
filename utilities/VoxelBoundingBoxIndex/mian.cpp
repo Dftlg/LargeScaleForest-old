@@ -14,7 +14,7 @@ void readDataFromVegFile(std::string vPath, std::vector<glm::vec3>&voElementVert
 	std::ifstream inFile(vPath);
 	if (!inFile)
 	{
-		std::cout << "Can't open the file!!!" << std::endl;
+		std::cout << "Veg file can't open the file!!!" << std::endl;
 		return;
 	}
 	std::cout << "Read element's index and element's vertices index from veg file!!!" << std::endl;
@@ -79,7 +79,7 @@ void readDataFromObjFile(std::string vPath, std::vector<glm::vec3>&voObjVertices
 	std::ifstream inFile(vPath);
 	if (!inFile)
 	{
-		std::cout << "Can't open the file!!!" << std::endl;
+		std::cout << "Obj file can't open the file!!!" << std::endl;
 		return;
 	}
 	std::cout << "Read model's vertices from obj file!!!" << std::endl;
@@ -108,7 +108,7 @@ void readDataFromSkeleronFile(std::string vPath, std::vector<glm::vec3>&voObjVer
 	std::ifstream inFile(vPath);
 	if (!inFile)
 	{
-		std::cout << "Can't open the file!!!" << std::endl;
+		std::cout << "Skelton file can't open the file!!!" << std::endl;
 		return;
 	}
 
@@ -205,6 +205,17 @@ void findCubicVertices(std::vector<std::vector<int>> vElementIndex, std::vector<
 	}
 }
 
+void removeDuplicatd(std::vector<int>& vOperateObject, std::vector<int>&vConstrastObject , std::vector<int>&voTargetIndex)
+{
+	for (int i = 0; i < vOperateObject.size(); i++)
+	{
+		if (std::count(vConstrastObject.begin(), vConstrastObject.end(), vOperateObject[i]) ==0)
+		{
+			voTargetIndex.push_back(vOperateObject[i]);
+		}
+	}
+}
+
 void write2File(std::string vPath, std::vector<int>& vElementIndexForObjVertices)
 {
 	std::cout << "Writing the result to the file !!!" << std::endl;
@@ -230,21 +241,40 @@ int main()
 	std::vector<glm::vec3>objVertices;
 	std::vector<std::vector<int>> elementIndex;
 	std::vector<int> elementIndexForObjVertices;
+	std::vector<int> elementIndexForObjVertices2;
+	std::vector<int> elementIndexForObjVertices3;
 	std::vector<int> findedElementVertices;
-	std::string vegFilePath = "D:/GraduationProject/LargeScaleForest/models/8.10/1.veg";
-	//std::string objFilePath = "D:/GraduationProject/Vega/models/8.10/test.obj";
+	std::string vegFilePath = "D:/GraduationProject/Vega/models/10.20/tree.veg";
+	std::string objFilePath = "D:/GraduationProject/Vega/models/10.20/stem.obj";
 	//std::string skeletonFilePath = "D:/GraduationProject/Vega/models/extract skeleton/1.skel";
-	std::string cubicIndexFilePath = "D:/GraduationProject/LargeScaleForest/models/extract skeleton/1.txt";
-	//std::string cubicIndexOutputPath = "D:/LargeScaleForest/Vega/models/extract skeleton/test_cubic_index.txt";
-	std::string cubicVerticesOputputPath = "D:/GraduationProject/LargeScaleForest/models/extract skeleton/test_vertices_index.bou";
-	
+	//std::string cubicIndexFilePath1 = "D:/GraduationProject/Vega/models/10.20/fibrous_all_cubic_index.txt";
+	//std::string cubicIndexFilePath2 = "D:/GraduationProject/Vega/models/10.20/stem_cubic_index.txt";
+	//std::string cubicIndexFilePath3 = "D:/GraduationProject/Vega/models/10.20/fibrous_all_cubic_index1.txt";
+	std::string cubicIndexOutputPath = "D:/GraduationProject/Vega/models/10.20/stem_cubic_index.txt";
+	std::string cubicVerticesOputputPath = "D:/GraduationProject/Vega/models/10.20/stem_vertices_index.bou";
+
+#pragma region findCubicIndex
 	readDataFromVegFile(vegFilePath, elementVertices, elementIndex);
 	//readDataFromSkeleronFile(skeletonFilePath, objVertices);
-	//readDataFromObjFile(objFilePath, objVertices);
-	readDataFromTxt(cubicIndexFilePath, elementIndexForObjVertices);
-	//findCubicIndexForVertices(objVertices, elementVertices, elementIndex, elementIndexForObjVertices);
-	findCubicVertices(elementIndex, elementIndexForObjVertices, findedElementVertices);
-	//write2File(cubicIndexOutputPath, elementIndexForObjVertices);
+	readDataFromObjFile(objFilePath, objVertices);
+	findCubicIndexForVertices(objVertices, elementVertices, elementIndex, elementIndexForObjVertices);
+#pragma endregion
+	
+#pragma region removeDuplicatedIndex
+	//readDataFromTxt(cubicIndexFilePath1, elementIndexForObjVertices1);
+	//readDataFromTxt(cubicIndexFilePath2, elementIndexForObjVertices2);
+	//removeDuplicatd(elementIndexForObjVertices1, elementIndexForObjVertices2, elementIndexForObjVertices3);
+#pragma endregion
+	
+#pragma region findCubicVertices
+	//readDataFromTxt(cubicIndexFilePath1, elementIndexForObjVertices);
+	//findCubicVertices(elementIndex, elementIndexForObjVertices, findedElementVertices);
+#pragma endregion
+
+#pragma region write2File
+	write2File(cubicIndexOutputPath, elementIndexForObjVertices);
 	write2File(cubicVerticesOputputPath, findedElementVertices);
+#pragma 
+
 	system("pause");
 }
