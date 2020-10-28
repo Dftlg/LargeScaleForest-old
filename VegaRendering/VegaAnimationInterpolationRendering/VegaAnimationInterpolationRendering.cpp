@@ -205,18 +205,19 @@ int main()
 
 
 	//帧数
-	int frameNums = vFem.getFileFrames(0).Frames.size();
+	
+	int frameNums = vFem.getFileFrames(0)->Frames.size();
 	//obj模型的顶点数
-	int vertexNums = vFem.getFileFrames(0).Frames[0].BaseFileDeformations.size();
+	int vertexNums = vFem.getFileFrames(0)->Frames[0].BaseFileDeformations.size();
 
 	std::cout << frameNums << " " << vertexNums << std::endl;
 	glm::vec4* deformU = new glm::vec4[frameNums*vertexNums*numbercounter];
 	int count = 0;
 	for (int j = 0; j < numbercounter; j++)
 	{
-		for (int i = 0; i < vFem.getFileFrames(j).Frames.size(); i++)
+		for (int i = 0; i < vFem.getFileFrames(j)->Frames.size(); i++)
 		{
-			Common::SFileData frame = vFem.getFileFrames(j).Frames[i];
+			Common::SFileData frame = vFem.getFileFrames(j)->Frames[i];
 			for (int k = 0; k < frame.BaseFileDeformations.size(); k++)
 			{
 				deformU[j*frameNums*vertexNums + i * vertexNums + k] = glm::vec4(frame.BaseFileDeformations[k], 0.0f);

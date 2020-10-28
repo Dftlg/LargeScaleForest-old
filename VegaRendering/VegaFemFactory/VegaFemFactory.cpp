@@ -88,37 +88,37 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				}
 				int Frameindex = 1;
 				/*int stop = 0;*/
-				//while (getline(positionFile, lineString))
-				//{
-				//	//getline(positionFile, lineString);
-				//	//getline(positionFile, lineString);
-				//	sprintf(s, "Position%d", timeStepCount);
-				//	std::istringstream sin(lineString);
-				//	std::string str;
-				//	sin >> str;//Position%04d后面有空格
-				//	//一帧
-				//	if (str == s)
-				//	{
-				//		std::string VertexSizeStr;
-				//		getline(positionFile, VertexSizeStr);
-				//		int VertexSize = atoi(VertexSizeStr.c_str());
+				while (getline(positionFile, lineString))
+				{
+					//getline(positionFile, lineString);
+					//getline(positionFile, lineString);
+					sprintf(s, "Position%d", timeStepCount);
+					std::istringstream sin(lineString);
+					std::string str;
+					sin >> str;//Position%04d后面有空格
+					//一帧
+					if (str == s)
+					{
+						std::string VertexSizeStr;
+						getline(positionFile, VertexSizeStr);
+						int VertexSize = atoi(VertexSizeStr.c_str());
 
-				//		getline(positionFile, lineString);
-				//		std::istringstream dataset(lineString);
+						getline(positionFile, lineString);
+						std::istringstream dataset(lineString);
 
-				//		//一个位移文件数据中的一帧顶点位移
-				//		Common::SFileData tempFileData(Frameindex);
-				//		for (int j = 0; j < VertexSize; j++)
-				//		{
-				//			dataset >> position[0] >> position[1] >> position[2];
-				//			tempFileData.BaseFileDeformations.push_back(glm::vec3(position[0], position[1], position[2]));
-				//		}
-				//		timeStepCount++;
-				//		Frameindex++;
-				//		m_FilesData[fileIndex].Frames.push_back(tempFileData);
-				//	}
-				//	/*stop++;*/
-				//}
+						//一个位移文件数据中的一帧顶点位移
+						Common::SFileData tempFileData(Frameindex);
+						for (int j = 0; j < VertexSize; j++)
+						{
+							dataset >> position[0] >> position[1] >> position[2];
+							tempFileData.BaseFileDeformations.push_back(glm::vec3(position[0], position[1], position[2]));
+						}
+						timeStepCount++;
+						Frameindex++;
+						m_FilesData[fileIndex].Frames.push_back(tempFileData);
+					}
+					/*stop++;*/
+				}
 				m_FilesData[fileIndex].isLoadDataSet = true;
 				tempConnectedFile.FemDataset.push_back(&m_FilesData[fileIndex]);
 				counterConnectFileNumber++;

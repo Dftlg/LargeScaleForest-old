@@ -34,7 +34,9 @@ namespace Common
 
 	static int ProductForceNumber = 5;
 
-	const int TreesNumber = 1;
+	const int TreesInstanceNumber = 1;
+
+	const int TreesNumber=2;
 
 	static int MaxTimeStep = 60;
 
@@ -183,7 +185,7 @@ namespace Common
 	{
 		unsigned int FrameIndex;
 		bool FileDeformationExist = false;
-		//原始u
+		//原始deltaU
 		std::vector<glm::vec3> BaseFileDeformations;
 		//按照面顶点顺序排列的u
 		std::vector<SFileDataGroup> FileDeformation;

@@ -34,7 +34,7 @@ public:
 	//根据文件的绝对路径取文件名字,如：positionthe0phi0force500,500,500
 	std::string getFileName(const std::string & vFileDirectory);
 	//返回一个形变文件
-	Common::SFileFrames getFileFrames(int vIndex) { return m_FilesData[vIndex]; }
+	Common::SFileFrames* getFileFrames(int vIndex) { return &m_FilesData[vIndex]; }
 	std::vector<std::vector<int>> getMultipleFramesIndex() { return m_MultipleFramesIndex; }
 	void setDeformationStateFromFileName();
 	CModelDeformationTransform*  getModelTransformStruct() { return m_ModelTransformStruct;}

@@ -205,8 +205,12 @@ int main()
 	ourModel.setGroupsIndex(vFem);
 	ourModel.setVerticesNumber(vFem);
 	ourModel.setMeshGroupAndAssimpIndex();
-	
+	ourModel.setMeshTreeAndFrameIndex();
+	ourModel.initSSBODeformationDeltaU(vFem, numbercounter);
+	ourModel.initSSBODeformationU();
 
+	ourTreeShader.use();
+	ourModel.setSSBO4UDeformation(ourTreeShader);
 
 	//查找帧段
 	//std::vector<std::vector<glm::vec3>> matchedFramesSequences;
@@ -215,45 +219,22 @@ int main()
 	//bool flag = true;
 	//vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
 
-	std::vector<std::vector<int>> vMultipleExtraForces;
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 1, 0, 4));
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 125, 1, 1, 0, 4));
+	//个数等于
+	std::vector<std::vector<int>> vMultipleExtraForces(Common::TreesNumber);
+	vMultipleExtraForces[0]=GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 1, 0, 4);
+	vMultipleExtraForces[1]=GenerateSamplingForce(Common::ProductFrameNumber, 125, 1, 1, 0, 4);
+
 	/*vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
 	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 110, 1, 0, 0, 4));*/
 
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
 
 	//在while循环里初始化
-	int Size=vMultipleExtraForces[0].size() / 5;
-	int step = 0;
-	while (1)
+	
+	/*while (1)
 	{
-		if (step == Size)
-			break;
-
-		std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
-		for (int i = 0; i < vMultipleExtraForces.size(); i++)
-		{
-			for (int k = (step)*5; k < (step+1)*5; k++)
-			{
-				tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
-			}
-		}
-		vFem.searchMatchedFrameSequences(tempMultipleFiveForces);
-		std::vector<std::vector<int>> temp=vFem.getMultipleFramesIndex();
-			
-		std::cout << "Each Froce connect Frame" << std::endl;
-		for (int i = 0; i < vMultipleExtraForces.size(); i++)
-		{
-			for (int k = 0; k < temp[i].size(); k++)
-				std::cout << temp[i][k] / Common::SamplingFrameNumber << "--" << temp[i][k] % Common::SamplingFrameNumber << " ";
-
-			std::cout << "||";
-		}
-		std::cout<<std::endl;
-		tempMultipleFiveForces.clear();
-		step++;
-	}
+		
+	}*/
 
 	//std::vector<glm::vec3> tempUDeformations(matchedFramesSequences[0].size(), glm::vec3(0, 0, 0));
 	//for (int i = 0; i < matchedFramesSequences.size(); i++)
@@ -284,67 +265,14 @@ int main()
 	//}
 
 
-	////帧数
-	//int frameNums = vFem.getFileFrames(0).Frames.size();
-	////obj模型的顶点数
-	//int vertexNums = vFem.getFileFrames(0).Frames[0].BaseFileDeformations.size();
-
-	//std::cout << frameNums << " " << vertexNums << std::endl;
-	//glm::vec4* deformU = new glm::vec4[frameNums*vertexNums*numbercounter];
- 	//int count = 0;
-	//for (int j = 0; j < numbercounter; j++)
-	//{
-	//	for (int i = 0; i < vFem.getFileFrames(j).Frames.size(); i++)
-	//	{
-	//		Common::SFileData frame = vFem.getFileFrames(j).Frames[i];
-	//		for (int k = 0; k < frame.BaseFileDeformations.size(); k++)
-	//		{
-	//			deformU[j*frameNums*vertexNums + i * vertexNums + k] = glm::vec4(frame.BaseFileDeformations[k], 0.0f);
-	//			count++;
-	//		}
-	//	}
-	//}
-	//std::cout << deformU[numbercounter*frameNums*vertexNums - 1].x << " " << count << std::endl;
-
-	GLuint shader_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
-	GLint SSBOBinding = 0, BlockDataSize = 0;
-	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding);
-	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize);
-
-	//初始化SSBO
-	unsigned int SSBO;
-	//glGenBuffers(1, &SSBO);
-	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
-	//glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*frameNums*vertexNums, deformU, GL_STATIC_DRAW);
-	////glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*frameNums*vertexNums*numbercounter, deformU, GL_STATIC_DRAW);
-
-	//shader和点连接
-	GLuint ssbo_binding_point_index = 1;
-	//点和SSBO的连接
-	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, SSBO);
-	////点和shader的连接
-	//glShaderStorageBlockBinding(ourTreeShader.getID(), shader_index, ssbo_binding_point_index);
-
-
-	glm::vec4* deltaU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
-	GLuint shader_delta_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaDeformationArray");
-	GLint SSBOBinding1 = 0, BlockDataSize1 = 0;
-	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding1);
-	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize1);
-
-	unsigned int deltaSSBO;
-	glGenBuffers(1, &deltaSSBO);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(ourModel.getAssimpVerticesNumber()), deltaU, GL_DYNAMIC_DRAW);
-	GLuint deltassbo_binding_point_index = 2;
-	//点和SSBO的连接
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_index, deltaSSBO);
-	//点和shader的连接
-	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_delta_index, deltassbo_binding_point_index);
-
+	//帧数
+	int frameNums = vFem.getFileFrames(0)->Frames.size();
+	//obj模型的顶点数
+	int vertexNums = vFem.getFileFrames(0)->Frames[0].BaseFileDeformations.size();
 	ourTreeShader.use();
-	//ourTreeShader.setInt("frameNums", frameNums);
-	//ourTreeShader.setInt("vertexNums", vertexNums);
+	ourTreeShader.setInt("frameNums", frameNums);
+	ourTreeShader.setInt("vertexNums", vertexNums);
+	ourTreeShader.setInt("assimpvertexNums", ourModel.getAssimpVerticesNumber());
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
 	glm::mat4 view;
@@ -354,6 +282,8 @@ int main()
 	//ourShader.setMat4("model", model);
 
 	int i = 0;
+	int Size = vMultipleExtraForces[0].size() / 5;
+	int step = 0;
 	while (!glfwWindowShouldClose(Window))
 	{
 		// per-frame time logic
@@ -380,42 +310,6 @@ int main()
 		ourPlaneShader.setMat4("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		//tree
-		ourTreeShader.use();
-		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		view = Camera.getViewMatrix();
-		ourTreeShader.setMat4("projection", projection);
-		ourTreeShader.setMat4("view", view);	
-		ourTreeShader.setInt("frameIndex", i);
-
-	/*	if (i >= Common::CorrectuDeformationFrame)
-		{
-			glm::vec4* tempU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
-			glGetBufferSubData(deltaSSBO, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), tempU);
-
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
-		}*/
-
-		/*if (i >= frameNums)
-		{
-			i = i % frameNums;
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
-		}*/
-		for (int j = 0; j < 1; j++)
-		{
-
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(1.0f*j, -0.5f, -5.0f));// translate it down so it's at the center of the scene
-			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-			ourTreeShader.setMat4("model", model);
-			ourTreeShader.setInt("treeIndex", j);
-			ourModel.draw(ourTreeShader);
-		}
-		//ourModel.draw(ourShader)
-		i++;
-
 		//skybox
 		glDepthFunc(GL_LEQUAL);
 		ourSkyBoxShader.use();
@@ -430,10 +324,105 @@ int main()
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
 
+		//获取5个帧段号索引
+		if (step == Size)
+			break;
+		std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
+		for (int i = 0; i < vMultipleExtraForces.size(); i++)
+		{
+			for (int k = (step) * 5; k < (step + 1) * 5; k++)
+			{
+				tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
+			}
+		}
+		vFem.searchMatchedFrameSequences(tempMultipleFiveForces);
+		std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
+
+		std::cout << "Each Froce connect Frame" << std::endl;
+		//每棵树包含的5个帧段
+		std::vector<std::vector<int>> TreeIndex(Common::TreesNumber);
+		std::vector<std::vector<int>> FrameIndex(Common::TreesNumber);
+		for (int i = 0; i < vMultipleExtraForces.size(); i++)
+		{
+			for (int k = 0; k < temp[i].size(); k++)
+			{
+				TreeIndex[i].push_back(temp[i][k] / Common::SamplingFrameNumber);
+				FrameIndex[i].push_back(temp[i][k] % Common::SamplingFrameNumber);
+				std::cout << temp[i][k] / Common::SamplingFrameNumber << "--" << temp[i][k] % Common::SamplingFrameNumber << " ";
+			}
+			std::cout << "||";
+		}
+		std::cout << std::endl;
+		tempMultipleFiveForces.clear();
+		step++;
+
+		//tree
+		ourTreeShader.use();
+		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		view = Camera.getViewMatrix();
+		ourTreeShader.setMat4("projection", projection);
+		ourTreeShader.setMat4("view", view);
+
+
+		//5帧
+		for (int frameindex = 0; frameindex < temp[0].size(); frameindex++)
+		{
+			std::vector<int> tempTreeIndex;
+			std::vector<int> tempTreeFrame;
+			for (int treenumber = 0; treenumber < Common::TreesNumber; treenumber++)
+			{
+				tempTreeIndex.push_back(TreeIndex[treenumber][frameindex]);
+				tempTreeFrame.push_back(FrameIndex[treenumber][frameindex]);
+			}
+
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(1.0f, -0.5f, -5.0f));// translate it down so it's at the center of the scene
+			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+			ourTreeShader.setMat4("model", model);
+
+			ourModel.UpdataMeshTreeAndFrameIndex(tempTreeIndex, tempTreeFrame);
+			ourModel.draw(ourTreeShader);
+
+			Sleep(200);
+
+			tempTreeIndex.clear();
+			tempTreeFrame.clear();
+			//ourTreeShader.setInt("frameIndex", i);
+		}
+	
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 
-		Sleep(100);
+		
+
+		/*	if (i >= Common::CorrectuDeformationFrame)
+			{
+				glm::vec4* tempU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
+				glGetBufferSubData(deltaSSBO, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), tempU);
+
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
+				glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
+			}*/
+
+		/*if (i >= frameNums)
+		{
+			i = i % frameNums;
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
+		}*/
+		//for (int j = 0; j < 1; j++)
+		//{
+
+		//	glm::mat4 model = glm::mat4(1.0f);
+		//	model = glm::translate(model, glm::vec3(1.0f*j, -0.5f, -5.0f));// translate it down so it's at the center of the scene
+		//	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+		//	ourTreeShader.setMat4("model", model);
+		//	ourTreeShader.setInt("treeIndex", j);
+		//	ourModel.draw(ourTreeShader);
+		//}
+		////ourModel.draw(ourShader)
+		//i++;
+		
 
 	}
 
@@ -441,7 +430,8 @@ int main()
 	glDeleteVertexArrays(1, &planeVAO);
 	glDeleteBuffers(1, &planeVBO);
 	glDeleteBuffers(1, &skyboxVBO);
-	glDeleteBuffers(1, &SSBO);
+	//glDeleteBuffers(1, &SSBO);
+	ourModel.Clear();
 	glfwTerminate();
 	return 0;
 }

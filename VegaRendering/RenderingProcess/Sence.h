@@ -31,12 +31,15 @@ public:
 	CSence(const CMesh& vMesh);
 	~CSence() = default;
 
+	void Clear() { glDeleteBuffers(1, &m_SSBO);   glDeleteBuffers(1, &m_deltaSSBO);};
 	std::vector<std::vector<glm::vec3>>& getGroupDeformationData() { return m_EachFrameOfGroupData; };
 	void SetParaMesh();
 	void setGroupsIndex(CVegaFemFactory& vfemFactoryObject);
 	void setVerticesNumber(CVegaFemFactory& vfemFactoryObject);
 	void setAssimpVerticesNumber();
-
+	void initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber);
+	void setSSBO4UDeformation(const CShader& vShader);
+	void initSSBODeformationU();
 
 	std::vector<std::vector<int>> getGroupsIndex() { return m_GroupsIndex; }
 	std::vector<CMesh> getMeshes() { return m_Meshes; }
@@ -47,6 +50,8 @@ public:
 	void setMeshRotation();
 	glm::mat4* randomRotation();
 	void setMeshGroupAndAssimpIndex();
+	void setMeshTreeAndFrameIndex();
+	void UpdataMeshTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);
 	bool gammaCorrection;
 
 private:
@@ -69,6 +74,19 @@ private:
 	std::vector<std::vector<glm::vec3>> m_EachFrameOfGroupData;
 	//所有的group中面的顶点索引
 	std::vector<std::vector<int>> m_GroupsIndex;
+
+	CVegaFemFactory* m_VegaFactory;
+	glm::vec4 * m_DeltaDeformationU;
+
+	glm::vec4 * m_DeformationU;
+
+	unsigned int m_SSBO;
+	unsigned int m_deltaSSBO;
+
+	int m_FrameNums;
+	int m_VertexNums;
+	int m_FileNumber;
+
 	int m_VerticesNumber;
 
 	int m_AssimpVerticesNumber;

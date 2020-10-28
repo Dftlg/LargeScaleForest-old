@@ -26,12 +26,30 @@ void CSence::setMeshRotation()
 	}
 }
 
+void CSence::setMeshTreeAndFrameIndex()
+{
+	std::vector<int>tempTreeFileIndex(Common::TreesNumber);
+	std::vector<int>tempTreeFrameIndex(Common::TreesNumber);
+	for (auto& Mesh : m_Meshes)
+	{
+		Mesh.setTreeAndFrameIndex(tempTreeFileIndex, tempTreeFrameIndex);
+	}
+}
+
+void CSence::UpdataMeshTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex)
+{
+	for (auto& Mesh : m_Meshes)
+	{
+		Mesh.UpdataInstanceTreeFileIndexMesh(vTreeFileIndex, vFrameIndex);
+	}
+}
+
 glm::mat4* CSence::randomRotation()
 {
-	glm::mat4* modelMatrices = new glm::mat4[Common::TreesNumber];
+	glm::mat4* modelMatrices = new glm::mat4[Common::TreesInstanceNumber];
 
 	float x = -1.75f;
-	int Size = sqrt(Common::TreesNumber);
+	int Size = sqrt(Common::TreesInstanceNumber);
 	//srand(time(0));
 	for (int i = 0; i < Size; i++)
 	{
@@ -388,4 +406,72 @@ std::vector<Common::STexture> CSence::loadMaterialTextures(aiMaterial *vMat, aiT
 		}
 	}
 	return Textures;
+}
+
+void CSence::initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber)
+{
+	//帧数
+	m_FrameNums = vFem.getFileFrames(0)->Frames.size();
+	//obj模型的顶点数
+	m_VertexNums = vFem.getFileFrames(0)->Frames[0].BaseFileDeformations.size();
+
+	m_FileNumber = vFileNumber;
+
+	std::cout << m_FrameNums << " " << m_VertexNums << std::endl;
+	m_DeltaDeformationU = new glm::vec4[m_FrameNums*m_VertexNums*vFileNumber];
+	//int count = 0;
+	for (int fileIndex = 0; fileIndex < vFileNumber; fileIndex++)
+		for (int frameIndex = 0; frameIndex < vFem.getFileFrames(fileIndex)->Frames.size(); frameIndex++)
+		{
+			Common::SFileData* tempFrame = &(vFem.getFileFrames(fileIndex)->Frames[frameIndex]);
+			for (int k = 0; k < tempFrame->BaseFileDeformations.size(); k++)
+			{
+				m_DeltaDeformationU[fileIndex*m_FrameNums*m_VertexNums + frameIndex * m_VertexNums + k] = glm::vec4(tempFrame->BaseFileDeformations[k], 0.0f);
+				//count++;
+			}
+		}
+}
+
+void CSence::initSSBODeformationU()
+{
+	setMeshGroupAndAssimpIndex();
+	m_DeformationU = new glm::vec4[Common::TreesNumber*m_AssimpVerticesNumber];
+}
+
+void CSence::setSSBO4UDeformation(const CShader& vShader)
+{
+	//设置所有DeltaU数据
+	GLuint shader_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaDeformationArray");
+	GLint SSBOBinding = 0, BlockDataSize = 0;
+	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding);
+	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize);
+
+	//初始化SSBO
+	glGenBuffers(1, &m_SSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_SSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*m_FrameNums*m_VertexNums*m_FileNumber, m_DeltaDeformationU, GL_STATIC_DRAW);
+
+	//shader和点连接
+	GLuint ssbo_binding_point_index = 1;
+	//点和SSBO的连接
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, m_SSBO);
+	//点和shader的连接
+	glShaderStorageBlockBinding(vShader.getID(), shader_index, ssbo_binding_point_index);
+
+	//设置DelataU用来存储生成树的当前型变量
+	//shader和点连接
+	GLuint shader_delta_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
+	GLint SSBOBinding1 = 0, BlockDataSize1 = 0;
+	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding1);
+	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize1);
+
+	glGenBuffers(1, &m_deltaSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_deltaSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(m_AssimpVerticesNumber*Common::TreesNumber), m_DeformationU, GL_DYNAMIC_DRAW);
+	GLuint deltassbo_binding_point_index = 2;
+	//点和SSBO的连接
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_index, m_deltaSSBO);
+	//点和shader的连接
+	glShaderStorageBlockBinding(vShader.getID(), shader_delta_index, deltassbo_binding_point_index);
+	
 }
