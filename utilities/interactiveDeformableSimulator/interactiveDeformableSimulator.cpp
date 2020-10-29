@@ -240,7 +240,10 @@ int enableTextures = 0;
 int staticSolver = 0;
 int graphicFrame = 0;
 int lockAt30Hz = 0;
-int pulledVertex = -1;
+int forceNum = 2;
+int* pulledVertex = (int*)calloc(forceNum, sizeof(int));
+double vForce[3];
+int* constantpulledVertex = (int*)calloc(forceNum, sizeof(int));
 int forceNeighborhoodSize = 5;
 int dragStartX, dragStartY;
 int explosionFlag = 0;
@@ -314,8 +317,7 @@ double * deltau = nullptr;
 double * preu = nullptr;
 double * deltaSecondaryu = nullptr;
 
-double vForce[3];
-int constantpulledVertex = -1;
+
 
 // interpolation to secondary mesh
 int secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices;
@@ -485,29 +487,36 @@ void displayFunction(void)
 	 
   }
 
-  if (constantpulledVertex >= 0)
+  if (constantpulledVertex!=nullptr)
   {
-	  double constantpulledVertexPos[3];
-	  deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(constantpulledVertex,
-		  &constantpulledVertexPos[0], &constantpulledVertexPos[1], &constantpulledVertexPos[2]);
+	  for (int i = 0; i < _msize(constantpulledVertex) / 4; i++)
+	  {
+		  double constantpulledVertexPos[3];
+		  deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(constantpulledVertex[i],
+			  &constantpulledVertexPos[0], &constantpulledVertexPos[1], &constantpulledVertexPos[2]);
 
-	  drawForceDirection(constantpulledVertexPos, vForce, 1);
+		  drawForceDirection(constantpulledVertexPos, vForce, 1);
+	  }
+	  
   }
 
   // render the currently pulled vertex
-  if (pulledVertex >= 0)
+  if (pulledVertex != nullptr)
   {
 	  glColor3f(0, 1, 0);
 	  double pulledVertexPos[3];
-	  deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(pulledVertex,
-	  &pulledVertexPos[0], &pulledVertexPos[1], &pulledVertexPos[2]);
-	  glEnable(GL_POLYGON_OFFSET_POINT);
-	  glPolygonOffset(-1.0, -1.0);
-	  glPointSize(8.0);
-      glBegin(GL_POINTS);
-      glVertex3f(pulledVertexPos[0], pulledVertexPos[1], pulledVertexPos[2]);
-      glEnd();
-      glDisable(GL_POLYGON_OFFSET_FILL);
+	  for (int i = 0; i < _msize(pulledVertex) / 4; i++)
+	  {
+		  deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(pulledVertex[i],
+			  &pulledVertexPos[0], &pulledVertexPos[1], &pulledVertexPos[2]);
+		  glEnable(GL_POLYGON_OFFSET_POINT);
+		  glPolygonOffset(-1.0, -1.0);
+		  glPointSize(8.0);
+		  glBegin(GL_POINTS);
+		  glVertex3f(pulledVertexPos[0], pulledVertexPos[1], pulledVertexPos[2]);
+		  glEnd();
+		  glDisable(GL_POLYGON_OFFSET_FILL);
+	  }
   }
 
   // render model fixed vertices
@@ -574,6 +583,55 @@ void displayFunction(void)
   glutSwapBuffers();
 }
 
+void distributeForce(int vPullVertex, double * f_ext, double* externalForce)
+{
+	// distribute force over the neighboring vertices
+	set<int> affectedVertices;
+	set<int> lastLayerVertices;
+
+	affectedVertices.insert(vPullVertex);
+	lastLayerVertices.insert(vPullVertex);
+
+	//力影响周围的点数量
+	for (int j = 1; j < forceNeighborhoodSize; j++)
+	{
+		// linear kernel
+		  //对外围点的影响力，对外围每层受力每次递减百分之20
+		double forceMagnitude = 1.0 * (forceNeighborhoodSize - j) / forceNeighborhoodSize;
+
+		set<int> newAffectedVertices;
+		for (set<int> ::iterator iter = lastLayerVertices.begin(); iter != lastLayerVertices.end(); iter++)
+		{
+			// traverse all neighbors and check if they were already previously inserted
+			int vtx = *iter;
+			int deg = meshGraph->GetNumNeighbors(vtx);
+			for (int k = 0; k < deg; k++)
+			{
+				int vtxNeighbor = meshGraph->GetNeighbor(vtx, k);
+
+				if (affectedVertices.find(vtxNeighbor) == affectedVertices.end())
+				{
+					// discovered new vertex
+					newAffectedVertices.insert(vtxNeighbor);
+				}
+			}
+		}
+
+		lastLayerVertices.clear();
+		for (set<int> ::iterator iter = newAffectedVertices.begin(); iter != newAffectedVertices.end(); iter++)
+		{
+			// apply force
+			f_ext[3 * *iter + 0] += forceMagnitude * externalForce[0];
+			f_ext[3 * *iter + 1] += forceMagnitude * externalForce[1];
+			f_ext[3 * *iter + 2] += forceMagnitude * externalForce[2];
+
+			// generate new layers
+			lastLayerVertices.insert(*iter);
+			affectedVertices.insert(*iter);
+		}
+	}
+}
+
 // called periodically by GLUT:
 void idleFunction(void)
 {
@@ -599,12 +657,16 @@ void idleFunction(void)
     {
       if (pulledVertex != -1)
       {*/
-		 pulledVertex = 6339;
+		 pulledVertex[0] = 9511;
+		 pulledVertex[1] = 6614;
 		/* double forceX =99;
 		 double forceY = -49;*/
       /*double forceX = (g_vMousePos[0] - dragStartX);
         double forceY = -(g_vMousePos[1] - dragStartY);*/
-		constantpulledVertex = pulledVertex;
+		 for (int i = 0; i < forceNum; i++)
+		 {
+			 constantpulledVertex[i] = pulledVertex[i];
+		 }
         double externalForce[3];
 
 		//计算外力
@@ -620,56 +682,18 @@ void idleFunction(void)
         //printf("%d fx: %G fy: %G | %G %G %G\n", pulledVertex, forceX, forceY, externalForce[0], externalForce[1], externalForce[2]);
 
         // register force on the pulled vertex
-        f_ext[3*pulledVertex+0] += externalForce[0];
-        f_ext[3*pulledVertex+1] += externalForce[1];
-        f_ext[3*pulledVertex+2] += externalForce[2];
+		for (int i = 0; i < forceNum; i++)
+		{
+			for (int k = 0; k < 3; k++)
+			{
+				f_ext[3 * pulledVertex[i] + k] += externalForce[k];
+			}
+		}
 
         // distribute force over the neighboring vertices
-		//将力分配给周围节点
-        set<int> affectedVertices;
-        set<int> lastLayerVertices;
-
-        affectedVertices.insert(pulledVertex);
-        lastLayerVertices.insert(pulledVertex);
-
-		//力影响周围的点数量
-        for(int j=1; j<forceNeighborhoodSize; j++)
-        {
-          // linear kernel
-			//对外围点的影响力，对外围每层受力每次递减百分之20
-          double forceMagnitude = 1.0 * (forceNeighborhoodSize - j) / forceNeighborhoodSize;
-
-          set<int> newAffectedVertices;
-          for(set<int> :: iterator iter = lastLayerVertices.begin(); iter != lastLayerVertices.end(); iter++)
-          {
-            // traverse all neighbors and check if they were already previously inserted
-            int vtx = *iter;
-            int deg = meshGraph->GetNumNeighbors(vtx);
-            for(int k=0; k<deg; k++)
-            {
-              int vtxNeighbor = meshGraph->GetNeighbor(vtx, k);
-
-              if (affectedVertices.find(vtxNeighbor) == affectedVertices.end())
-              {
-                // discovered new vertex
-                newAffectedVertices.insert(vtxNeighbor);
-              }
-            }
-          }
-
-          lastLayerVertices.clear();
-          for(set<int> :: iterator iter = newAffectedVertices.begin(); iter != newAffectedVertices.end(); iter++)
-          {
-            // apply force
-            f_ext[3* *iter + 0] += forceMagnitude * externalForce[0];
-            f_ext[3* *iter + 1] += forceMagnitude * externalForce[1];
-            f_ext[3* *iter + 2] += forceMagnitude * externalForce[2];
-
-            // generate new layers
-            lastLayerVertices.insert(*iter);
-            affectedVertices.insert(*iter);
-          }
-        }
+		for (int i = 0; i < forceNum; i++)
+			distributeForce(pulledVertex[i], f_ext, externalForce);
+		
       /*}
     }*/
 
@@ -1186,7 +1210,7 @@ void mouseButtonActivityFunction(int button, int state, int x, int y)
           dragStartX = x;
           dragStartY = y;
           Vec3d pos(worldX, worldY, worldZ);
-          pulledVertex = deformableObjectRenderingMesh->GetClosestVertex(pos);
+          pulledVertex[0] = deformableObjectRenderingMesh->GetClosestVertex(pos);
           printf("Clicked on vertex: %d (0-indexed)\n", pulledVertex);
         }
         else
@@ -1197,7 +1221,7 @@ void mouseButtonActivityFunction(int button, int state, int x, int y)
 
       if (!g_iLeftMouseButton)
       {
-        pulledVertex = -1;
+        pulledVertex[0] = -1;
       }
 
       break;

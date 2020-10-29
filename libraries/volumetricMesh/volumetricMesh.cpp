@@ -178,7 +178,7 @@ void VolumetricMesh::loadFromAscii(const char * filename, elementType * elementT
   numRegions = 0;
   *elementType_ = INVALID;
   int parseState = 0;
-  char lineBuffer[1024];
+  char lineBuffer[8192];
 
   int oneIndexedVertices = 1;
   int oneIndexedElements = 1;
