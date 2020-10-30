@@ -31,24 +31,6 @@ void CMesh::setRotation(glm::mat4 * temp)
 	__setupInstanceMesh();
 }
 
-void CMesh::setTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex)
-{
-	m_TreeFileIndex = vTreeFileIndex.data();
-	m_FrameIndex = vFrameIndex.data();
-	__setupInstanceTreeFileIndexMesh();
-}
-
-void CMesh::UpdataInstanceTreeFileIndexMesh(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex)
-{
-	m_TreeFileIndex = vTreeFileIndex.data();
-	m_FrameIndex = vFrameIndex.data();
-	glBindBuffer(GL_ARRAY_BUFFER, m_InstanceTreeFileVBO);
-	glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(int)*Common::TreesNumber, m_TreeFileIndex);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_InstanceTreeFrameVBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(int)*Common::TreesNumber, m_FrameIndex);
-}
-
 void CMesh::setGroupAndAssimpIndex(std::vector<int>& vGroupIndex, int vLastCapacity, int vNextCapacity)
 {
 	m_GroupIndex = vGroupIndex;
@@ -150,7 +132,7 @@ void CMesh::__setupInstanceMesh()
 
 	glGenBuffers(1, &m_InstanceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
-	glBufferData(GL_ARRAY_BUFFER, Common::TreesInstanceNumber * sizeof(glm::mat4), &m_modelMatrices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, Common::TreesNumber * sizeof(glm::mat4), &m_modelMatrices[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(4);
 	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)0);
@@ -168,25 +150,6 @@ void CMesh::__setupInstanceMesh()
 
 	glBindVertexArray(0);
 
-}
-
-void CMesh::__setupInstanceTreeFileIndexMesh()
-{
-	glBindVertexArray(m_VAO);
-
-	glGenBuffers(1, &m_InstanceTreeFileVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_InstanceTreeFileVBO);
-	glBufferData(GL_ARRAY_BUFFER, Common::TreesNumber * sizeof(int), &m_TreeFileIndex[0], GL_STATIC_DRAW); 
-	glEnableVertexAttribArray(9);
-	glVertexAttribIPointer(9, 1, GL_INT, sizeof(int), (void*)0);
-
-	glGenBuffers(1, &m_InstanceTreeFrameVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_InstanceTreeFrameVBO);
-	glBufferData(GL_ARRAY_BUFFER, Common::TreesNumber * sizeof(int), &m_FrameIndex[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(10);
-	glVertexAttribIPointer(10, 1, GL_INT, sizeof(int), (void*)0);
-
-	glBindVertexArray(0);
 }
 
 void CMesh::__setupGroupIndexMesh()

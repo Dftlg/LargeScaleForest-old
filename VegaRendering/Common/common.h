@@ -34,7 +34,7 @@ namespace Common
 
 	static int ProductForceNumber = 5;
 
-	const int TreesInstanceNumber = 1;
+	//const int TreesInstanceNumber = 1;
 
 	const int TreesNumber=2;
 

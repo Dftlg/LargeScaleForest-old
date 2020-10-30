@@ -50,7 +50,7 @@ int main()
 	CVegaFemFactory vFem("../../models/8.10/test6", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 8;
+	int numbercounter = 1;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -205,12 +205,12 @@ int main()
 	ourModel.setGroupsIndex(vFem);
 	ourModel.setVerticesNumber(vFem);
 	ourModel.setMeshGroupAndAssimpIndex();
-	ourModel.setMeshTreeAndFrameIndex();
 	ourModel.initSSBODeformationDeltaU(vFem, numbercounter);
 	ourModel.initSSBODeformationU();
+	ourModel.initSSBOTreeFileAndFrameIndex(Common::TreesNumber);
 
 	ourTreeShader.use();
-	ourModel.setSSBO4UDeformation(ourTreeShader);
+	ourModel.setSSBO4UDeformationAndIndex(ourTreeShader);
 
 	//查找帧段
 	//std::vector<std::vector<glm::vec3>> matchedFramesSequences;
@@ -223,18 +223,18 @@ int main()
 	std::vector<std::vector<int>> vMultipleExtraForces(Common::TreesNumber);
 	vMultipleExtraForces[0]=GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 1, 0, 4);
 	vMultipleExtraForces[1]=GenerateSamplingForce(Common::ProductFrameNumber, 125, 1, 1, 0, 4);
-
-	/*vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 110, 1, 0, 0, 4));*/
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 110, 1, 0, 0, 4));
+	//for (int i = 0; i < 96; i++)
+	//{
+	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
+	//}
 
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
 
 	//在while循环里初始化
 	
-	/*while (1)
-	{
-		
-	}*/
+
 
 	//std::vector<glm::vec3> tempUDeformations(matchedFramesSequences[0].size(), glm::vec3(0, 0, 0));
 	//for (int i = 0; i < matchedFramesSequences.size(); i++)
@@ -284,6 +284,7 @@ int main()
 	int i = 0;
 	int Size = vMultipleExtraForces[0].size() / 5;
 	int step = 0;
+	int FrameNumber = 0;
 	while (!glfwWindowShouldClose(Window))
 	{
 		// per-frame time logic
@@ -322,39 +323,30 @@ int main()
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
-		glDepthFunc(GL_LESS); // set depth function back to default
+		
 
-		//获取5个帧段号索引
+		//当前12个帧段进行一次重置获取5个帧段号索引
 		if (step == Size)
-			break;
-		std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
-		for (int i = 0; i < vMultipleExtraForces.size(); i++)
 		{
-			for (int k = (step) * 5; k < (step + 1) * 5; k++)
-			{
-				tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
-			}
+			step = 0;
+			vFem.initTempMultipleTreeData(vMultipleExtraForces.size());
+			ourModel.resetSSBO4UDeformation();
 		}
-		vFem.searchMatchedFrameSequences(tempMultipleFiveForces);
-		std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
-
-		std::cout << "Each Froce connect Frame" << std::endl;
-		//每棵树包含的5个帧段
-		std::vector<std::vector<int>> TreeIndex(Common::TreesNumber);
-		std::vector<std::vector<int>> FrameIndex(Common::TreesNumber);
-		for (int i = 0; i < vMultipleExtraForces.size(); i++)
+		if (FrameNumber % 5 == 0)
 		{
-			for (int k = 0; k < temp[i].size(); k++)
+			std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
+			for (int i = 0; i < vMultipleExtraForces.size(); i++)
 			{
-				TreeIndex[i].push_back(temp[i][k] / Common::SamplingFrameNumber);
-				FrameIndex[i].push_back(temp[i][k] % Common::SamplingFrameNumber);
-				std::cout << temp[i][k] / Common::SamplingFrameNumber << "--" << temp[i][k] % Common::SamplingFrameNumber << " ";
+				for (int k = (step) * 5; k < (step + 1) * 5; k++)
+				{
+					tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
+				}
 			}
-			std::cout << "||";
+			vFem.searchMatchedFrameSequences(tempMultipleFiveForces);
+			tempMultipleFiveForces.clear();
+			step++;
+			//std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
 		}
-		std::cout << std::endl;
-		tempMultipleFiveForces.clear();
-		step++;
 
 		//tree
 		ourTreeShader.use();
@@ -364,32 +356,45 @@ int main()
 		ourTreeShader.setMat4("view", view);
 
 
-		//5帧
-		for (int frameindex = 0; frameindex < temp[0].size(); frameindex++)
+		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
+		for (int treenumber = 0; treenumber < Common::TreesNumber; treenumber++)
 		{
-			std::vector<int> tempTreeIndex;
-			std::vector<int> tempTreeFrame;
-			for (int treenumber = 0; treenumber < Common::TreesNumber; treenumber++)
-			{
-				tempTreeIndex.push_back(TreeIndex[treenumber][frameindex]);
-				tempTreeFrame.push_back(FrameIndex[treenumber][frameindex]);
-			}
+			tempTreeFileAndFrameIndex.push_back(vFem.getFileAndFrameIndex(treenumber, FrameNumber % 5));
 
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(1.0f, -0.5f, -5.0f));// translate it down so it's at the center of the scene
-			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-			ourTreeShader.setMat4("model", model);
-
-			ourModel.UpdataMeshTreeAndFrameIndex(tempTreeIndex, tempTreeFrame);
-			ourModel.draw(ourTreeShader);
-
-			Sleep(200);
-
-			tempTreeIndex.clear();
-			tempTreeFrame.clear();
-			//ourTreeShader.setInt("frameIndex", i);
+			std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
 		}
-	
+		std::cout<<std::endl;
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(1.0f, -0.5f, -5.0f));// translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+		ourTreeShader.setMat4("model", model);
+
+		ourModel.UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
+		Sleep(100);
+		ourModel.draw(ourTreeShader);
+		tempTreeFileAndFrameIndex.clear();
+		
+		FrameNumber++;
+
+		//std::cout << "Each Froce connect Frame" << std::endl;
+		////每棵树包含的5个帧段
+		//std::vector<std::vector<int>> TreeIndex(Common::TreesNumber);
+		//std::vector<std::vector<int>> FrameIndex(Common::TreesNumber);
+		//for (int i = 0; i < vMultipleExtraForces.size(); i++)
+		//{
+		//	for (int k = 0; k < temp[i].size(); k++)
+		//	{
+		//		TreeIndex[i].push_back(temp[i][k] / Common::SamplingFrameNumber);
+		//		FrameIndex[i].push_back(temp[i][k] % Common::SamplingFrameNumber);
+		//		std::cout << temp[i][k] / Common::SamplingFrameNumber << "--" << temp[i][k] % Common::SamplingFrameNumber << " ";
+		//	}
+		//	std::cout << "||";
+		//}
+		//std::cout << std::endl;
+		//tempMultipleFiveForces.clear();
+		
+
+		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 

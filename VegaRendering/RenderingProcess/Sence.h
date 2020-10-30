@@ -31,15 +31,17 @@ public:
 	CSence(const CMesh& vMesh);
 	~CSence() = default;
 
-	void Clear() { glDeleteBuffers(1, &m_SSBO);   glDeleteBuffers(1, &m_deltaSSBO);};
+	void Clear() { glDeleteBuffers(1, &m_DeltaUSSBO);   glDeleteBuffers(1, &m_UdeformationSSBO);};
 	std::vector<std::vector<glm::vec3>>& getGroupDeformationData() { return m_EachFrameOfGroupData; };
 	void SetParaMesh();
 	void setGroupsIndex(CVegaFemFactory& vfemFactoryObject);
 	void setVerticesNumber(CVegaFemFactory& vfemFactoryObject);
 	void setAssimpVerticesNumber();
 	void initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber);
-	void setSSBO4UDeformation(const CShader& vShader);
+	void setSSBO4UDeformationAndIndex(const CShader& vShader);
 	void initSSBODeformationU();
+	void initSSBOTreeFileAndFrameIndex(const int vTreeNumber);
+	void resetSSBO4UDeformation();
 
 	std::vector<std::vector<int>> getGroupsIndex() { return m_GroupsIndex; }
 	std::vector<CMesh> getMeshes() { return m_Meshes; }
@@ -50,8 +52,9 @@ public:
 	void setMeshRotation();
 	glm::mat4* randomRotation();
 	void setMeshGroupAndAssimpIndex();
-	void setMeshTreeAndFrameIndex();
-	void UpdataMeshTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);
+
+	void UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int,int>>& vTreeFileAndFrameIndex);
+	/*void UpdataMeshTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);*/
 	bool gammaCorrection;
 
 private:
@@ -80,8 +83,11 @@ private:
 
 	glm::vec4 * m_DeformationU;
 
-	unsigned int m_SSBO;
-	unsigned int m_deltaSSBO;
+	glm::ivec2 * m_TreeFileAndFrameIndex;
+
+	unsigned int m_DeltaUSSBO;
+	unsigned int m_UdeformationSSBO;
+	unsigned int m_TreeFileAndFrameSSBO;
 
 	int m_FrameNums;
 	int m_VertexNums;

@@ -1063,10 +1063,20 @@ void CVegaFemFactory::initMatchedFrameStruct(int vTreeSize)
 		m_InternalForcesSequence.push_back(std::make_pair(m_reorderSpKVFSegmentIndexSequence[i], tempInternalForces));
 	}
 
+	initTempMultipleTreeData(vTreeSize);
+}
+
+void CVegaFemFactory::initTempMultipleTreeData(int vTreeSize)
+{
 	m_MultipleFramesIndex.resize(vTreeSize);
+	m_MultipleFileAndFramesIndex.resize(vTreeSize);
+	for (int i = 0; i < vTreeSize; i++)
+	{
+		m_MultipleFileAndFramesIndex[i].resize(5);
+	}
 	m_TempSpKVFData.resize(vTreeSize);
 	m_CurrentFrameIndex.resize(vTreeSize);
-	m_Flag.resize(vTreeSize,1);
+	m_Flag.resize(vTreeSize, 1);
 }
 
 //以5帧为单位进行帧段的查找匹配操作,对于多棵树同时进行查找操作
@@ -1084,7 +1094,11 @@ void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> 
 
 		//可以并行
 		searchMatchedOneTreeFrameSequences(m_MultipleFramesIndex[treeIndex], m_TempSpKVFData[treeIndex], voExtraForces[treeIndex], m_CurrentFrameIndex[treeIndex], m_Flag[treeIndex]);
-
+		for (int j = 0; j < 5; j++)
+		{
+			m_MultipleFileAndFramesIndex[treeIndex][j].first = m_MultipleFramesIndex[treeIndex][j] / Common::SamplingFrameNumber;
+			m_MultipleFileAndFramesIndex[treeIndex][j].second = m_MultipleFramesIndex[treeIndex][j] % Common::SamplingFrameNumber;
+		}
 	}	
 }
 
@@ -1113,6 +1127,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 	//第一段直接默认使用相似力的帧段
 	if (vIsFirstFrame == 1)
 	{
+		voMatchedFrameSequenceIndex.clear();
 		std::vector<std::pair<int, double>>tempSortedForceSequence = tempForceErrorSequence;
 		sort(tempSortedForceSequence.begin(), tempSortedForceSequence.end(), [](const std::pair<int, int>&x, const std::pair<int, int>&y)->int {return x.second < y.second; });
 		voCurrentFrameIndex = tempSortedForceSequence[0].first;
@@ -1124,6 +1139,10 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 	else
 	{
 		voMatchedFrameSequenceIndex.clear();
+		for (int i = 0; i < Common::TreesNumber; i++)
+		{
+			m_MultipleFileAndFramesIndex[i].resize(5);
+		}
 		//k
 	//compare K Martix
 		for (int i = 0; i < m_KMartixSequence.size(); i++)

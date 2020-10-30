@@ -21,8 +21,8 @@ public:
 	void setRotation(glm::mat4* temp);
 	void setGroupAndAssimpIndex(std::vector<int>& vGroupIndex,int vLastCapacity, int vNextCapacity);
 	//每个vector中size个数为需要渲染出的树的数量
-	void setTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);
-	void UpdataInstanceTreeFileIndexMesh(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);
+	/*void setTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);
+	void UpdataInstanceTreeFileIndexMesh(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);*/
 
 private:
 	unsigned int m_InstanceVBO;

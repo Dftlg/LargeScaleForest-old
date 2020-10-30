@@ -47,10 +47,10 @@ float grasstime = 0.0f;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/8.10/test", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
+	CVegaFemFactory vFem("../../models/8.10/test6", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
 	std::vector<int> b{ 500, 500, 500 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 5;
+	int numbercounter = 1;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{

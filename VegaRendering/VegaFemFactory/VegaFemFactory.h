@@ -34,8 +34,15 @@ public:
 	//根据文件的绝对路径取文件名字,如：positionthe0phi0force500,500,500
 	std::string getFileName(const std::string & vFileDirectory);
 	//返回一个形变文件
+	//Common::SFileFrames getFileFrames(int vIndex) { return m_FilesData[vIndex]; }
+
 	Common::SFileFrames* getFileFrames(int vIndex) { return &m_FilesData[vIndex]; }
 	std::vector<std::vector<int>> getMultipleFramesIndex() { return m_MultipleFramesIndex; }
+
+	std::pair<int, int> getFileAndFrameIndex(int vTreeIndex, int vFrameIndex) { return m_MultipleFileAndFramesIndex[vTreeIndex][vFrameIndex]; };
+	int getSearchFileIndex(int vTreeIndex, int vFrameIndex) { return m_MultipleFileAndFramesIndex[vTreeIndex][vFrameIndex].first; };
+	int getSearchFrameIndex(int vTreeIndex, int vFrameIndex) { return m_MultipleFileAndFramesIndex[vTreeIndex][vFrameIndex].second; };
+
 	void setDeformationStateFromFileName();
 	CModelDeformationTransform*  getModelTransformStruct() { return m_ModelTransformStruct;}
 	std::vector<Common::SFileFrames> searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<double> & vForceFluctuationSequence);
@@ -56,6 +63,8 @@ public:
 	void cleanSFileDataGroup(int vConnectionIndex, int vTimestep);
 
 	void initMatchedFrameStruct(int vTreeSize);
+
+	void initTempMultipleTreeData(int vTreeSize);
 	//查找检索标准
 	void searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>>& voMatchedFramesSequences, Common::SpKVFData& voSpKVData, std::vector<int> &vExtraForces, bool vIsFirstFrame);
 	
@@ -138,6 +147,7 @@ private:
 	std::vector<int> m_CurrentFrameIndex;
 	std::vector<int> m_Flag;
 
+	std::vector<std::vector<std::pair<int, int>>> m_MultipleFileAndFramesIndex;
 
 	int CurrentFrameIndex = 0;
 
