@@ -15,19 +15,16 @@ uniform mat4 view;
 uniform mat4 model;
 uniform int frameIndex;
 uniform int treeIndex;
+uniform int time;
 
 layout (std430, binding=1) buffer DeformationArray
 {
 	vec4 u[];
 };
 
-layout (std430, binding=2) buffer DeltaDeformationArray
-{
-	vec4 sum_u[];
-};
-
 void main()
 {
+	double M_PI = 3.1415926;
 	vec4 tempPos=vec4(aPos,1.0)+u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId];
 //	vec4 tempPos;
 //	if(gl_InstanceID<5)
@@ -39,6 +36,13 @@ void main()
 //		int tempInstanceIndex= gl_InstanceID / 100;
 //		tempPos=vec4(aPos,1.0)+u[tempInstanceIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId];
 //	}
-	gl_Position = projection * view * model * instanceMatrix * tempPos;
+
+	//when use gpuInstance
+	//gl_Position = projection * view * model * instanceMatrix * tempPos;
+//	if(faceId>=7422)
+//	{
+//		tempPos=tempPos*sin((2*M_PI/60)*time);
+//	}
+	gl_Position = projection * view * model * tempPos;
 	TexCoords = aTexCoords;  
 }

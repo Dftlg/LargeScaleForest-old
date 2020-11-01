@@ -79,6 +79,9 @@ artifacts/
 *.bou
 *.veg
 *.interp
+*.jpg
+*.png
+*.bmp
 
 # Chutzpah Test files
 _Chutzpah*

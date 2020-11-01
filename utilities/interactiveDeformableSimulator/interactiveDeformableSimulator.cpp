@@ -503,7 +503,7 @@ void displayFunction(void)
   // render the currently pulled vertex
   if (pulledVertex != nullptr)
   {
-	  glColor3f(0, 1, 0);
+	  glColor3f(1, 0.8, 0);
 	  double pulledVertexPos[3];
 	  for (int i = 0; i < _msize(pulledVertex) / 4; i++)
 	  {
@@ -754,7 +754,7 @@ void idleFunction(void)
       }
 	  subTimestepCounter++;
     }
-	if (subTimestepCounter > 180)
+	if (subTimestepCounter > 60)
 	{
 		exit(1);
 	}
@@ -816,15 +816,15 @@ void idleFunction(void)
 	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
 
 	//每uDeformationSampling帧存储最终的形变数据U
-	if (subTimestepCounter % Common::uDeformationSampling == 0)
-	{
+	//if (subTimestepCounter % Common::uDeformationSampling == 0)
+	//{
 		//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);
-		TempExtraForces.clear();
-	}
+		//TempExtraForces.clear();
+	//}
 	//存储deltaU的形变数据
 	//deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
 	//存储U的形变数据
-	deformationsave.SaveDeformationVertexFromBaseModel(u, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter - 1);
+	deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter - 1);
 
 
 	//mesh->saveToAscii("D:/GraduationProject/Vega/models/8.10/position/1.obj",1);
@@ -1581,7 +1581,7 @@ void initSimulation()
 
   std::vector<double> tempConfig = GetForceConfigurate(outputFilename);
  
-  ExtraForces=GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2],tempConfig[3],6);
+  ExtraForces=GenerateSamplingForce(60, tempConfig[0], tempConfig[1], tempConfig[2],tempConfig[3],6);
 
 
   // load initial condition
@@ -2249,7 +2249,7 @@ int main(int argc, char* argv[])
 
   //configFilename = string("D:/GraduationProject/Vega/examples/simpleBridge_vox/simpleBridge_vox.config");
  /* configFilename = string("D:/GraduationProject/Vega/models/newgrass/voxelizegrass/voxelizegrass.config");*/
-  configFilename = string("../../models/10.20/tree.config");
+  configFilename = string("../../models/mapleTree/tree.config");
   printf("Loading scene configuration from %s.\n", configFilename.c_str());
 
   initConfigurations(); // parse the config file同时输出到cmd

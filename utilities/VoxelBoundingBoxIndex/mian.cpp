@@ -244,14 +244,14 @@ int main()
 	std::vector<int> elementIndexForObjVertices2;
 	std::vector<int> elementIndexForObjVertices3;
 	std::vector<int> findedElementVertices;
-	std::string vegFilePath = "D:/GraduationProject/Vega/models/10.20/tree.veg";
-	std::string objFilePath = "D:/GraduationProject/Vega/models/10.20/stem.obj";
+	std::string vegFilePath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/tree.veg";
+	std::string objFilePath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/fibrous_first.obj";
 	//std::string skeletonFilePath = "D:/GraduationProject/Vega/models/extract skeleton/1.skel";
 	//std::string cubicIndexFilePath1 = "D:/GraduationProject/Vega/models/10.20/fibrous_all_cubic_index.txt";
 	//std::string cubicIndexFilePath2 = "D:/GraduationProject/Vega/models/10.20/stem_cubic_index.txt";
 	//std::string cubicIndexFilePath3 = "D:/GraduationProject/Vega/models/10.20/fibrous_all_cubic_index1.txt";
-	std::string cubicIndexOutputPath = "D:/GraduationProject/Vega/models/10.20/stem_cubic_index.txt";
-	std::string cubicVerticesOputputPath = "D:/GraduationProject/Vega/models/10.20/stem_vertices_index.bou";
+	std::string cubicIndexOutputPath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/fibrous_first_cubic_index.txt";
+	std::string cubicVerticesOputputPath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/fibrous_first_vertices_index.bou";
 
 #pragma region findCubicIndex
 	readDataFromVegFile(vegFilePath, elementVertices, elementIndex);

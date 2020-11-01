@@ -47,10 +47,10 @@ float grasstime = 0.0f;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/8.10/test", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
-	std::vector<int> b{ 500, 500, 500 };
+	CVegaFemFactory vFem("../../models/mapleTree/data/temp", "../../models/mapleTree/trianglesTree.obj", "../../models/8.10/ObjectVertexIndex.txt");
+	std::vector<double> b{ 500,1,0,0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 5;
+	int numbercounter = 1;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -97,8 +97,8 @@ int main()
 
 
 
-	//plane vertices
-	float planeVertices[] = {
+	#pragma region plane vertices data
+		float planeVertices[] = {
 		// positions          // texture Coords 
 		 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
 		-5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
@@ -108,8 +108,9 @@ int main()
 		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
 		 5.0f, -0.5f, -5.0f,  2.0f, 2.0f
 	};
+	#pragma endregion
 
-	//skybox vertices
+	#pragma region skybox vertices data
 	float skyboxVertices[] = {
 		// positions          
 		-1.0f,  1.0f, -1.0f,
@@ -154,6 +155,7 @@ int main()
 		-1.0f, -1.0f,  1.0f,
 		 1.0f, -1.0f,  1.0f
 	};
+	#pragma endregion
 
 	// plane VAO
 	unsigned int planeVAO, planeVBO;
@@ -196,7 +198,7 @@ int main()
 	ourSkyBoxShader.use();
 	ourSkyBoxShader.setInt("skybox", 0);
 
-	CSence ourModel("../../models/8.10/1.obj");
+	CSence ourModel("../../models/mapleTree/trianglesTree.obj");
 
 	ourModel.setMeshRotation();
 	ourModel.setGroupsIndex(vFem);
@@ -235,6 +237,7 @@ int main()
 	unsigned int SSBO;
 	glGenBuffers(1, &SSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+	std::cout << sizeof(glm::vec4)*frameNums*vertexNums*numbercounter << std::endl;
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*frameNums*vertexNums*numbercounter, deformU, GL_STATIC_DRAW);
 
 	//shader和点连接
@@ -244,22 +247,6 @@ int main()
 	//点和shader的连接
 	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_index, ssbo_binding_point_index);
 
-
-	glm::vec4* deltaU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
-	GLuint shader_delta_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaDeformationArray");
-	GLint SSBOBinding1 = 0, BlockDataSize1 = 0;
-	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding1);
-	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize1);
-
-	unsigned int deltaSSBO;
-	glGenBuffers(1, &deltaSSBO);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(ourModel.getAssimpVerticesNumber()), deltaU, GL_DYNAMIC_DRAW);
-	GLuint deltassbo_binding_point_index = 2;
-	//点和SSBO的连接
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_index, deltaSSBO);
-	//点和shader的连接
-	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_delta_index, deltassbo_binding_point_index);
 
 	ourTreeShader.use();
 	ourTreeShader.setInt("frameNums", frameNums);
@@ -273,6 +260,7 @@ int main()
 	//ourShader.setMat4("model", model);
 
 	int i = 0;
+	int time = 0;
 	while (!glfwWindowShouldClose(Window))
 	{
 		// per-frame time logic
@@ -306,26 +294,26 @@ int main()
 		ourTreeShader.setMat4("projection", projection);
 		ourTreeShader.setMat4("view", view);
 		ourTreeShader.setInt("frameIndex", i);
+		ourTreeShader.setInt("time", time);
 
 
 		if (i >= frameNums)
 		{
 			i = i % frameNums;
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
 		}
 		for (int j = 0; j < numbercounter; j++)
 		{
 
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, glm::vec3(1.0f*j, -0.5f, -5.0f));// translate it down so it's at the center of the scene
-			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+			model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
 			ourTreeShader.setMat4("model", model);
 			ourTreeShader.setInt("treeIndex", j);
 			ourModel.draw(ourTreeShader);
 		}
 		//ourModel.draw(ourShader)
 		i++;
+		time++;
 
 		//skybox
 		glDepthFunc(GL_LEQUAL);
@@ -344,7 +332,7 @@ int main()
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 
-		//Sleep(50);
+		Sleep(100);
 
 	}
 

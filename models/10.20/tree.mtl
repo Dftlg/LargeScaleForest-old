@@ -12,8 +12,8 @@ newmtl bark
 	Kd 0.4275 0.3569 0.2196
 	Ks 0.3500 0.3500 0.3500
 	Ke 0.0000 0.0000 0.0000
-	map_Ka D:\GraduationProject\Vega\models\10.20\colorbark.jpg
-	map_Kd D:\GraduationProject\Vega\models\10.20\colorbark.jpg
+	map_Ka colorbark.jpg
+	map_Kd colorbark.jpg
 
 newmtl wire
 	Ns 32.0000
@@ -26,6 +26,6 @@ newmtl wire
 	Kd 0.4275 0.3569 0.2196
 	Ks 0.3500 0.3500 0.3500
 	Ke 0.0000 0.0000 0.0000
-	map_Ka D:\GraduationProject\Vega\models\10.20\colorleaf1.jpg
-	map_Kd D:\GraduationProject\Vega\models\10.20\colorleaf1.jpg
-	map_d D:\GraduationProject\Vega\models\10.20\opacityleaf.jpg
+	map_Ka colorleaf1.jpg
+	map_Kd colorleaf1.jpg
+	map_d opacityleaf.jpg

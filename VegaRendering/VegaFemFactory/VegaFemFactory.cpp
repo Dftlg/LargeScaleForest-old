@@ -88,9 +88,8 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 				}
 				int Frameindex = 1;
 				int stop = 0;
-				while (stop==1)
+				while (getline(positionFile, lineString))
 				{
-					getline(positionFile, lineString);
 					//getline(positionFile, lineString);
 					sprintf(s, "Position%d", timeStepCount);
 					std::istringstream sin(lineString);
@@ -117,7 +116,7 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 						Frameindex++;
 						m_FilesData[fileIndex].Frames.push_back(tempFileData);
 					}
-					stop++;
+					//stop++;
 				}
 				m_FilesData[fileIndex].isLoadDataSet = true;
 				tempConnectedFile.FemDataset.push_back(&m_FilesData[fileIndex]);

@@ -68,7 +68,7 @@ void CMesh::draw(const CShader& vShader) const
 												 // now set the sampler to the correct texture unit
 
 		auto temp = glGetUniformLocation(vShader.getID(), (Name + Number).c_str());
-		glUniform1i(-1, i);
+		glUniform1i(temp, i);
 		// and finally bind the texture
 		glBindTexture(GL_TEXTURE_2D, m_Textures[i].id);
 	}
