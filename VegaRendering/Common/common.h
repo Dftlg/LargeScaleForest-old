@@ -36,7 +36,7 @@ namespace Common
 
 	//const int TreesInstanceNumber = 1;
 
-	const int TreesNumber=2;
+	const int TreesNumber=100;
 
 	static int MaxTimeStep = 60;
 

@@ -220,15 +220,15 @@ int main()
 	//vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
 
 	//个数等于
-	std::vector<std::vector<int>> vMultipleExtraForces(Common::TreesNumber);
-	vMultipleExtraForces[0]=GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 1, 0, 4);
-	vMultipleExtraForces[1]=GenerateSamplingForce(Common::ProductFrameNumber, 125, 1, 1, 0, 4);
+	std::vector<std::vector<int>> vMultipleExtraForces;
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 1, 0, 4));
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 125, 1, 1, 0, 4));
 	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
 	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 110, 1, 0, 0, 4));
-	//for (int i = 0; i < 96; i++)
-	//{
-	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
-	//}
+	for (int i = 0; i < 96; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
+	}
 
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
 
@@ -361,16 +361,18 @@ int main()
 		{
 			tempTreeFileAndFrameIndex.push_back(vFem.getFileAndFrameIndex(treenumber, FrameNumber % 5));
 
-			std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
+			//std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
 		}
-		std::cout<<std::endl;
+		//std::cout<<std::endl;
+
+
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(1.0f, -0.5f, -5.0f));// translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 		ourTreeShader.setMat4("model", model);
 
 		ourModel.UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
-		Sleep(100);
+		//Sleep(100);
 		ourModel.draw(ourTreeShader);
 		tempTreeFileAndFrameIndex.clear();
 		
