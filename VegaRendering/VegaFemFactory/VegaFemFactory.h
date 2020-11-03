@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 #include <iostream>
 #include <fstream>
 #include<sstream>
@@ -11,6 +13,8 @@
 #include "common.h"
 #include "ExtraTool.h"
 #include "ModelDeformationTransform.h"
+#include <omp.h>
+
 
 class CVegaFemFactory
 {
@@ -47,7 +51,7 @@ public:
 	CModelDeformationTransform*  getModelTransformStruct() { return m_ModelTransformStruct;}
 	std::vector<Common::SFileFrames> searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<double> & vForceFluctuationSequence);
 	std::vector<Common::SFileFrames> searchFileFrameOnAttribute();
-	
+
 	double getKMatrixSumNumber()
 	{
 		double Sum = 0;
@@ -150,5 +154,5 @@ private:
 	std::vector<std::vector<std::pair<int, int>>> m_MultipleFileAndFramesIndex;
 
 	int CurrentFrameIndex = 0;
-
+	
 };

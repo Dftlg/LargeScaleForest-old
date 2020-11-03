@@ -1,4 +1,5 @@
 #include "VegaFemFactory.h"
+#include <time.h>
 
 CVegaFemFactory::CVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile,const std::string &vCorrectDeformationUVertexIndex)
 {
@@ -1085,21 +1086,49 @@ void CVegaFemFactory::initTempMultipleTreeData(int vTreeSize)
 void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces)
 {
 	std::vector<int> FrameIndexSequence;
-	for (auto treeIndex = 0; treeIndex < m_TempSpKVFData.size(); treeIndex++)
-	{
-		m_TempSpKVFData[treeIndex].Forces.clear();
-		//每棵树的当前5个力的段
-		for (int k = 0; k < 5; k++)
-			m_TempSpKVFData[treeIndex].Forces.push_back(voExtraForces[treeIndex][k]);
 
-		//可以并行
-		searchMatchedOneTreeFrameSequences(m_MultipleFramesIndex[treeIndex], m_TempSpKVFData[treeIndex], voExtraForces[treeIndex], m_CurrentFrameIndex[treeIndex], m_Flag[treeIndex]);
-		for (int j = 0; j < 5; j++)
+	std::clock_t start = clock();
+#pragma omp parallel for
+		for (int treeIndex = 0; treeIndex < m_TempSpKVFData.size(); treeIndex++)
 		{
-			m_MultipleFileAndFramesIndex[treeIndex][j].first = m_MultipleFramesIndex[treeIndex][j] / Common::SamplingFrameNumber;
-			m_MultipleFileAndFramesIndex[treeIndex][j].second = m_MultipleFramesIndex[treeIndex][j] % Common::SamplingFrameNumber;
+			m_TempSpKVFData[treeIndex].Forces.clear();
+			//每棵树的当前5个力的段
+			for (int k = 0; k < 5; k++)
+				m_TempSpKVFData[treeIndex].Forces.push_back(voExtraForces[treeIndex][k]);
+
+			//可以并行
+			searchMatchedOneTreeFrameSequences(m_MultipleFramesIndex[treeIndex], m_TempSpKVFData[treeIndex], voExtraForces[treeIndex], m_CurrentFrameIndex[treeIndex], m_Flag[treeIndex]);
+			for (int j = 0; j < 5; j++)
+			{
+				m_MultipleFileAndFramesIndex[treeIndex][j].first = m_MultipleFramesIndex[treeIndex][j] / Common::SamplingFrameNumber;
+				m_MultipleFileAndFramesIndex[treeIndex][j].second = m_MultipleFramesIndex[treeIndex][j] % Common::SamplingFrameNumber;
+			}
 		}
-	}	
+	std::clock_t end = clock();
+	std::cout << (end - start) << std::endl;
+	//for (auto treeIndex = 0; treeIndex < m_TempSpKVFData.size(); treeIndex++)
+	//{
+	//	m_TempSpKVFData[treeIndex].Forces.clear();
+	//	//每棵树的当前5个力的段
+	//	for (int k = 0; k < 5; k++)
+	//		m_TempSpKVFData[treeIndex].Forces.push_back(voExtraForces[treeIndex][k]);
+	//}
+	//	//可以并行
+	//for (auto treeIndex = 0; treeIndex < m_TempSpKVFData.size(); treeIndex++)
+	//{
+	//	vThreads[treeIndex](&CVegaFemFactory::searchMatchedOneTreeFrameSequences, m_MultipleFramesIndex[treeIndex], m_TempSpKVFData[treeIndex], voExtraForces[treeIndex], m_CurrentFrameIndex[treeIndex], m_Flag[treeIndex]);
+	//}
+	//	/*m_ioService.post
+	//		searchMatchedOneTreeFrameSequences(m_MultipleFramesIndex[treeIndex], m_TempSpKVFData[treeIndex], voExtraForces[treeIndex], m_CurrentFrameIndex[treeIndex], m_Flag[treeIndex]);*/
+	//for (auto treeIndex = 0; treeIndex < m_TempSpKVFData.size(); treeIndex++)
+	//{
+	//	for (int j = 0; j < 5; j++)
+	//	{
+	//		m_MultipleFileAndFramesIndex[treeIndex][j].first = m_MultipleFramesIndex[treeIndex][j] / Common::SamplingFrameNumber;
+	//		m_MultipleFileAndFramesIndex[treeIndex][j].second = m_MultipleFramesIndex[treeIndex][j] % Common::SamplingFrameNumber;
+	//	}
+	//}
+	
 }
 
 //voExtraForces需要当前的力以及下一段的力
