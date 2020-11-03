@@ -104,7 +104,7 @@ int main()
 	CVegaFemFactory vFem("../../models/8.10/test6", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 2;
+	int numbercounter = 5;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -279,7 +279,7 @@ int main()
 	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 125, 1, 1, 0, 4));
 	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
 	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 110, 1, 0, 0, 4));
-	for (int i = 0; i < 96; i++)
+	for (int i = 0; i < 46; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
 	}
