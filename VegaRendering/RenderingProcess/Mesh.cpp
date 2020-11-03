@@ -62,7 +62,7 @@ void CMesh::draw(const CShader& vShader) const
 			Number = std::to_string(specularNr++); // transfer unsigned int to stream
 		else if (Name == "texture_normal")
 			Number = std::to_string(normalNr++); // transfer unsigned int to stream
-		else if (Name == "texture_opcity")
+		else if (Name == "texture_opacity")
 			Number = std::to_string(heightNr++); // transfer unsigned int to stream
 
 												 // now set the sampler to the correct texture unit

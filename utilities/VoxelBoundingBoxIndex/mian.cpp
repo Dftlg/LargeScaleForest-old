@@ -245,19 +245,19 @@ int main()
 	std::vector<int> elementIndexForObjVertices3;
 	std::vector<int> findedElementVertices;
 	std::string vegFilePath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/tree.veg";
-	std::string objFilePath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/fibrous_first.obj";
-	//std::string skeletonFilePath = "D:/GraduationProject/Vega/models/extract skeleton/1.skel";
-	//std::string cubicIndexFilePath1 = "D:/GraduationProject/Vega/models/10.20/fibrous_all_cubic_index.txt";
+	//std::string objFilePath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/fibrous_first.obj";
+	std::string skeletonFilePath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/branch.skel";
+	std::string cubicIndexFilePath1 = "D:/GraduationProject/LargeScaleForest/models/mapleTree/branch_cubic_index.txt";
 	//std::string cubicIndexFilePath2 = "D:/GraduationProject/Vega/models/10.20/stem_cubic_index.txt";
 	//std::string cubicIndexFilePath3 = "D:/GraduationProject/Vega/models/10.20/fibrous_all_cubic_index1.txt";
-	std::string cubicIndexOutputPath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/fibrous_first_cubic_index.txt";
-	std::string cubicVerticesOputputPath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/fibrous_first_vertices_index.bou";
+	std::string cubicIndexOutputPath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/branch_cubic_index.txt";
+	std::string cubicVerticesOputputPath = "D:/GraduationProject/LargeScaleForest/models/mapleTree/branch_vertices_index.bou";
 
 #pragma region findCubicIndex
 	readDataFromVegFile(vegFilePath, elementVertices, elementIndex);
 	//readDataFromSkeleronFile(skeletonFilePath, objVertices);
-	readDataFromObjFile(objFilePath, objVertices);
-	findCubicIndexForVertices(objVertices, elementVertices, elementIndex, elementIndexForObjVertices);
+	//readDataFromObjFile(objFilePath, objVertices);
+	//findCubicIndexForVertices(objVertices, elementVertices, elementIndex, elementIndexForObjVertices);
 #pragma endregion
 	
 #pragma region removeDuplicatedIndex
@@ -267,12 +267,12 @@ int main()
 #pragma endregion
 	
 #pragma region findCubicVertices
-	//readDataFromTxt(cubicIndexFilePath1, elementIndexForObjVertices);
-	//findCubicVertices(elementIndex, elementIndexForObjVertices, findedElementVertices);
+	readDataFromTxt(cubicIndexFilePath1, elementIndexForObjVertices);
+	findCubicVertices(elementIndex, elementIndexForObjVertices, findedElementVertices);
 #pragma endregion
 
 #pragma region write2File
-	write2File(cubicIndexOutputPath, elementIndexForObjVertices);
+	//write2File(cubicIndexOutputPath, elementIndexForObjVertices);
 	write2File(cubicVerticesOputputPath, findedElementVertices);
 #pragma 
 

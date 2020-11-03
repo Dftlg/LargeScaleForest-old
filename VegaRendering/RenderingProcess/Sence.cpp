@@ -308,8 +308,8 @@ CMesh CSence::__processMesh(const aiMesh* vMesh, const aiScene* vScene)
 	std::vector<Common::STexture> NormalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
 	Textures.insert(Textures.end(), NormalMaps.begin(), NormalMaps.end());
 	////// 4. height maps
-	std::vector<Common::STexture> HeightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_opcity");
-	Textures.insert(Textures.end(), HeightMaps.begin(), HeightMaps.end());
+	std::vector<Common::STexture> OpacityMaps = loadMaterialTextures(material, aiTextureType_OPACITY, "texture_opacity");
+	Textures.insert(Textures.end(), OpacityMaps.begin(), OpacityMaps.end());
 
 	return CMesh(Vertices, Indices, Textures);
 }
