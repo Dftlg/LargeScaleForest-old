@@ -178,4 +178,6 @@ void CMesh::__setupAssimpGroupIndex()
 	glVertexAttribIPointer(8, 1, GL_INT, sizeof(int), (void*)0);
 	glBindVertexArray(0);
 }
+
+
  

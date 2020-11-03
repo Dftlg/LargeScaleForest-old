@@ -13,6 +13,36 @@ int RandomGenerate()
 	return (randomNumber % 90)*-1;
 }
 
+std::vector<std::pair<double,double>> RandomTreePositionGenerate(int vTreeNumber)
+{
+	std::vector<std::pair<int, int>> tempTreePosition;
+	std::vector<std::pair<double, double>> tempTreedoublePosition(vTreeNumber);
+	while (tempTreePosition.size()!=vTreeNumber)
+	{
+		LARGE_INTEGER seed;
+		QueryPerformanceFrequency(&seed);
+		QueryPerformanceCounter(&seed);
+		srand(seed.QuadPart);
+		std::pair<int, int> temppair(rand() % vTreeNumber, rand() % vTreeNumber);
+		tempTreePosition.push_back(temppair);
+
+		std::sort(tempTreePosition.begin(), tempTreePosition.end());
+		tempTreePosition.erase(std::unique(tempTreePosition.begin(), tempTreePosition.end()), tempTreePosition.end());
+	}
+	for (auto i = 0; i < tempTreePosition.size(); i++)
+	{
+		std::default_random_engine e;
+		LARGE_INTEGER seed;
+		QueryPerformanceFrequency(&seed);
+		QueryPerformanceCounter(&seed);
+		e.seed(seed.QuadPart);
+		std::uniform_real_distribution<double> u(0, 1);
+		tempTreedoublePosition[i].first = tempTreePosition[i].first + u(e);
+		tempTreedoublePosition[i].second = tempTreePosition[i].second + u(e);
+	}
+	return tempTreedoublePosition;
+}
+
 //采样频率，振幅，频率，相位，偏距
 std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency, double vPhase,int vYpluse,int wavelength)
 {

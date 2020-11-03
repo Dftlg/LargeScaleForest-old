@@ -32,7 +32,11 @@ namespace Common
 
 	static bool InstanceTrees = true;
 
-	const int TreesNumber = 1;
+	static int ProductForceNumber = 5;
+
+	//const int TreesInstanceNumber = 1;
+
+	const int TreesNumber=50;
 
 	static int MaxTimeStep = 60;
 
@@ -46,10 +50,12 @@ namespace Common
 
 	static int CorrectuDeformationFrame = 20;
 
+	//一个文件中存多少帧
 	static int SamplingFrameNumber = 180;
 
 	static int ProductFrameNumber = 120;
 
+	//static int KErrorRange = 10;
 	static int ExpandForceError = 1;
 	static int KErrorRange = 20;
 	static double VelocityErrorRange = 0.07;
@@ -179,7 +185,7 @@ namespace Common
 	{
 		unsigned int FrameIndex;
 		bool FileDeformationExist = false;
-		//原始u
+		//原始deltaU
 		std::vector<glm::vec3> BaseFileDeformations;
 		//按照面顶点顺序排列的u
 		std::vector<SFileDataGroup> FileDeformation;
