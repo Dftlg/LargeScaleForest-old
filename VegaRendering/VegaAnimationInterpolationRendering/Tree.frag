@@ -11,8 +11,8 @@ void main()
     //FragColor = texture(texture_diffuse1, TexCoords);
 	vec4  texColor1 = texture(texture_diffuse1, TexCoords);
 	vec4  texColor2 = texture(texture_height1, TexCoords);
-	if(texColor2.r == 0.0 && texColor2.g == 0.0 && texColor2.b == 0.0)
-	      discard;		
+	if(texColor2.rgb == vec3(0.0,0.0,0.0))
+		discard;	
     FragColor = texColor1;
 }
 

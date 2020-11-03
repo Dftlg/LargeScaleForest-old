@@ -82,6 +82,7 @@ artifacts/
 *.jpg
 *.png
 *.bmp
+*.mp4
 
 # Chutzpah Test files
 _Chutzpah*

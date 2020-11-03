@@ -88,6 +88,7 @@ int main()
 	// configure global opengl state
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 	// build and compile shaders
 	// -------------------------
 
@@ -283,6 +284,7 @@ int main()
 		ourPlaneShader.setMat4("projection", projection);
 		ourPlaneShader.setMat4("view", view);
 		glBindVertexArray(planeVAO);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, floorTexture);
 		ourPlaneShader.setMat4("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -318,6 +320,7 @@ int main()
 		//skybox
 		glDepthFunc(GL_LEQUAL);
 		ourSkyBoxShader.use();
+		//view = Camera.getViewMatrix();//stop move skybox
 		view = glm::mat4(glm::mat3(Camera.getViewMatrix()));
 		ourSkyBoxShader.setMat4("view", view);
 		ourSkyBoxShader.setMat4("projection", projection);
