@@ -101,10 +101,10 @@ int main()
 {
 	//std::thread Thread[Common::TreesNumber];
 
-	CVegaFemFactory vFem("../../models/8.10/test6", "../../models/8.10/1.obj", "../../models/8.10/ObjectVertexIndex.txt");
+	CVegaFemFactory vFem("../../models/mapleTree/data/temp", "../../models/mapleTree/trianglesTree.obj", "../../models/mapleTree/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 5;
+	int numbercounter = 1;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -253,7 +253,7 @@ int main()
 	ourSkyBoxShader.use();
 	ourSkyBoxShader.setInt("skybox", 0);
 
-	CSence ourModel("../../models/8.10/1.obj");
+	CSence ourModel("../../models/mapleTree/trianglesTree.obj");
 
 	ourModel.setMeshRotation();
 	ourModel.setGroupsIndex(vFem);
@@ -275,13 +275,13 @@ int main()
 
 	//个数等于
 	std::vector<std::vector<int>> vMultipleExtraForces;
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 1, 0, 4));
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 125, 1, 1, 0, 4));
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 110, 1, 0, 0, 4));
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 500, 1, 0, 0, 4));
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 1, 0, 4));
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
+	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
 	for (int i = 0; i < 46; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 115, 1, 0, 0, 4));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
 	}
 
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
@@ -421,7 +421,7 @@ int main()
 		
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(1.0f, -0.5f, -5.0f));// translate it down so it's at the center of the scene
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
 		ourTreeShader.setMat4("model", model);
 
 		ourModel.UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);

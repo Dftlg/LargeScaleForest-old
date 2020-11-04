@@ -6,10 +6,7 @@ layout (location = 3) in int faceId;
 layout (location = 4) in mat4 instanceMatrix;
 layout (location = 8 ) in int positionIndex;
 
-//layout(location =9) in int treeIndex;
-//layout(location =10) in int frameIndex;
-//layout(location =9)  in float treeIndex;
-//layout(location =10) in float frameIndex;
+
 
 out vec2 TexCoords;
 out float ourColor;
@@ -45,15 +42,8 @@ void main()
 	sum_u[gl_InstanceID*assimpvertexNums+positionIndex]=u[treeFrameIndex[gl_InstanceID][0]*frameNums*vertexNums+treeFrameIndex[gl_InstanceID][1]*vertexNums+faceId]+sum_u[gl_InstanceID*assimpvertexNums+positionIndex];
 
 	vec4 tempPos=vec4(aPos,1.0)+sum_u[positionIndex];
-	//gl_Position =projection * view*tempPos;
 
-//	sum_u[positionIndex]=u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId]+sum_u[positionIndex];
-	//sum_u[positionIndex]=u[tempTreeIndex*frameNums*vertexNums+tempFrameIndex*vertexNums+faceId]+sum_u[positionIndex];
-	
-//	
-//	//vec4 tempPos=vec4(aPos,1.0)+sum_u[gl_InstanceID*assimpvertexNums+positionIndex];
-	
 	
 	gl_Position = projection * view * model * instanceMatrix * tempPos;
-//	TexCoords = aTexCoords;  
+	TexCoords = aTexCoords;  
 }
