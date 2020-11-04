@@ -454,37 +454,6 @@ int main()
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 
-		
-
-		/*	if (i >= Common::CorrectuDeformationFrame)
-			{
-				glm::vec4* tempU = new glm::vec4[ourModel.getAssimpVerticesNumber()];
-				glGetBufferSubData(deltaSSBO, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), tempU);
-
-				glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-				glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
-			}*/
-
-		/*if (i >= frameNums)
-		{
-			i = i % frameNums;
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, deltaSSBO);
-			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*ourModel.getAssimpVerticesNumber(), deltaU);
-		}*/
-		//for (int j = 0; j < 1; j++)
-		//{
-
-		//	glm::mat4 model = glm::mat4(1.0f);
-		//	model = glm::translate(model, glm::vec3(1.0f*j, -0.5f, -5.0f));// translate it down so it's at the center of the scene
-		//	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-		//	ourTreeShader.setMat4("model", model);
-		//	ourTreeShader.setInt("treeIndex", j);
-		//	ourModel.draw(ourTreeShader);
-		//}
-		////ourModel.draw(ourShader)
-		//i++;
-		
-
 	}
 
 	glDeleteVertexArrays(1, &skyboxVAO);

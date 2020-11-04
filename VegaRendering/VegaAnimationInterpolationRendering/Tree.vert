@@ -6,7 +6,9 @@ layout (location = 3) in int faceId;
 layout (location = 4) in mat4 instanceMatrix;
 layout (location = 8 ) in int positionIndex;
 
-out vec2 TexCoords;
+out vec2 v2f_TexCoords;
+out vec3 v2f_WorldPos;
+out vec3 v2f_Normal;
 
 uniform int frameNums;
 uniform int vertexNums;
@@ -17,6 +19,8 @@ uniform int frameIndex;
 uniform int treeIndex;
 uniform int time;
 
+const float PI = 3.14159265359;
+
 layout (std430, binding=1) buffer DeformationArray
 {
 	vec4 u[];
@@ -24,8 +28,11 @@ layout (std430, binding=1) buffer DeformationArray
 
 void main()
 {
-	double M_PI = 3.1415926;
-	vec4 tempPos=vec4(aPos,1.0)+u[treeIndex*frameNums*vertexNums+frameIndex*vertexNums+faceId];
+	v2f_TexCoords = aTexCoords; 
+	v2f_WorldPos = vec3(model * vec4(aPos,1.0));
+	v2f_Normal = mat3(model) * aNormal;
+
+	vec4 tempPos = vec4(aPos,1.0)+u[treeIndex * frameNums * vertexNums + frameIndex * vertexNums+faceId];
 //	vec4 tempPos;
 //	if(gl_InstanceID<5)
 //	{
@@ -43,6 +50,7 @@ void main()
 //	{
 //		tempPos=tempPos*sin((2*M_PI/60)*time);
 //	}
-	gl_Position = projection * view * model * tempPos;
-	TexCoords = aTexCoords;  
+//
+	//多棵树的法向量
+	gl_Position = projection * view * model * instanceMatrix * tempPos; 
 }

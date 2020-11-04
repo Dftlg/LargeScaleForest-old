@@ -38,7 +38,7 @@ glm::mat4* CSence::randomRotation()
 	for (int i = 0; i < Common::TreesNumber; i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(TreesPosition[i].first*15, -0.5f, TreesPosition[i].second*15));
+		model = glm::translate(model, glm::vec3(TreesPosition[i].first*10, -0.5f, TreesPosition[i].second*10));
 		srand(time(0));
 		float tempRandom = (float)RandomGenerate();
 		model = glm::rotate(model, glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
@@ -308,8 +308,8 @@ CMesh CSence::__processMesh(const aiMesh* vMesh, const aiScene* vScene)
 	std::vector<Common::STexture> NormalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
 	Textures.insert(Textures.end(), NormalMaps.begin(), NormalMaps.end());
 	////// 4. height maps
-	std::vector<Common::STexture> HeightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_opcity");
-	Textures.insert(Textures.end(), HeightMaps.begin(), HeightMaps.end());
+	std::vector<Common::STexture> OpacityMaps = loadMaterialTextures(material, aiTextureType_OPACITY, "texture_opacity");
+	Textures.insert(Textures.end(), OpacityMaps.begin(), OpacityMaps.end());
 
 	return CMesh(Vertices, Indices, Textures);
 }

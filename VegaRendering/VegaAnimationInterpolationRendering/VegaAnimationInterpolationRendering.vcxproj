@@ -137,6 +137,8 @@
     <ClCompile Include="VegaAnimationInterpolationRendering.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="light.frag" />
+    <None Include="light.vert" />
     <None Include="packages.config" />
     <None Include="Plane.frag" />
     <None Include="Plane.vert" />

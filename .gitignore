@@ -83,6 +83,9 @@ artifacts/
 *.png
 *.bmp
 *.mp4
+*.ply
+*.skel
+*.View
 
 # Chutzpah Test files
 _Chutzpah*

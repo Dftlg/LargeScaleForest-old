@@ -49,7 +49,7 @@ void CMesh::draw(const CShader& vShader) const
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 	unsigned int normalNr = 1;
-	unsigned int heightNr = 1;
+	unsigned int OpacityNr = 1;
 	for (unsigned int i = 0; i < m_Textures.size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
@@ -62,8 +62,8 @@ void CMesh::draw(const CShader& vShader) const
 			Number = std::to_string(specularNr++); // transfer unsigned int to stream
 		else if (Name == "texture_normal")
 			Number = std::to_string(normalNr++); // transfer unsigned int to stream
-		else if (Name == "texture_opcity")
-			Number = std::to_string(heightNr++); // transfer unsigned int to stream
+		else if (Name == "texture_opacity")
+			Number = std::to_string(OpacityNr++); // transfer unsigned int to stream
 
 												 // now set the sampler to the correct texture unit
 

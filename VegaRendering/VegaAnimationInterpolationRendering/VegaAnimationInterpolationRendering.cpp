@@ -64,7 +64,7 @@ int main()
 		vFem.readFramesDeformationData(vtemp, i);//i本来应该是vtemp.size()
 	}
 
-	// glfw: initialize and configure
+	#pragma region glfw: initialize and configure
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -84,19 +84,18 @@ int main()
 
 	// tell GLFW to capture our mouse
 	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	#pragma endregion
 
 	// configure global opengl state
-	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	// build and compile shaders
-	// -------------------------
 
+	#pragma region build and compile shaders
 	CShader ourTreeShader("Tree.vert", "Tree.frag");
 	CShader ourPlaneShader("Plane.vert", "Plane.frag");
 	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
-
-
+	CShader ourLightShader("light.vert", "light.frag");
+	#pragma endregion
 
 	#pragma region plane vertices data
 		float planeVertices[] = {
@@ -158,6 +157,46 @@ int main()
 	};
 	#pragma endregion
 
+	#pragma region lights data
+	glm::vec3 lightVertices[] = {
+		glm::vec3(-10.0f,  10.0f, 10.0f),
+		glm::vec3(10.0f,  10.0f, 10.0f),
+		glm::vec3(-10.0f, -10.0f, 10.0f),
+		glm::vec3(10.0f, -10.0f, 10.0f),
+	};
+
+	glm::vec3 lightColors[] = {
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f)
+	};
+
+	float lightPositionsData[] = {
+		-10.0f,  10.0f, 10.0f,  1.0f, 1.0f, 1.0f,
+		 10.0f,  10.0f, 10.0f,	1.0f, 1.0f, 1.0f,
+		-10.0f, -10.0f, 10.0f,	1.0f, 1.0f, 1.0f,
+		 10.0f,  10.0f, 10.0f,	1.0f, 1.0f, 1.0f,
+		 10.0f, -10.0f, 10.0f,	1.0f, 1.0f, 1.0f,
+		-10.0f, -10.0f, 10.0f,	1.0f, 1.0f, 1.0f
+	};
+	#pragma endregion 
+
+	#pragma region bind light VAO and VBO
+	unsigned int lightVAO, lightPotionVBO;
+	glGenVertexArrays(1, &lightVAO);
+	glGenBuffers(1, &lightPotionVBO);
+	glBindVertexArray(lightVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, lightPotionVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lightPositionsData), &lightPositionsData, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glBindVertexArray(0);
+	#pragma endregion
+
+	#pragma region bind plane VAO and VBO
 	// plane VAO
 	unsigned int planeVAO, planeVBO;
 	glGenVertexArrays(1, &planeVAO);
@@ -174,7 +213,9 @@ int main()
 	unsigned int floorTexture = loadTexture("resources/textures/metal.png");
 	ourPlaneShader.use();
 	ourPlaneShader.setInt("texture1", 0);
+	#pragma endregion
 
+	#pragma region bind light VAO and VBO
 	// skybox VAO
 	unsigned int skyboxVAO, skyboxVBO;
 	glGenVertexArrays(1, &skyboxVAO);
@@ -198,17 +239,18 @@ int main()
 	unsigned int cubemapTexture = loadCubemap(faces);
 	ourSkyBoxShader.use();
 	ourSkyBoxShader.setInt("skybox", 0);
-
-	CSence ourModel("../../models/mapleTree/trianglesTree.obj");
-
-	ourModel.setMeshRotation();
-	ourModel.setGroupsIndex(vFem);
-	ourModel.setVerticesNumber(vFem);
-	ourModel.setMeshGroupAndAssimpIndex();
-
-
-	//帧数
+	#pragma endregion
 	
+	#pragma region load model
+		CSence ourModel("../../models/mapleTree/trianglesTree.obj");
+		ourModel.setMeshRotation();
+		ourModel.setGroupsIndex(vFem);
+		ourModel.setVerticesNumber(vFem);
+		ourModel.setMeshGroupAndAssimpIndex();
+	#pragma endregion
+
+	#pragma region set deltaU ssbo
+	//帧数
 	int frameNums = vFem.getFileFrames(0)->Frames.size();
 	//obj模型的顶点数
 	int vertexNums = vFem.getFileFrames(0)->Frames[0].BaseFileDeformations.size();
@@ -248,7 +290,7 @@ int main()
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, SSBO);
 	//点和shader的连接
 	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_index, ssbo_binding_point_index);
-
+	#pragma endregion
 
 	ourTreeShader.use();
 	ourTreeShader.setInt("frameNums", frameNums);
@@ -256,10 +298,20 @@ int main()
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
 	glm::mat4 view;
-	//glm::mat4 model = glm::mat4(1.0f);
-	//model = glm::translate(model, glm::vec3(1.0f, -0.5f, 0.0f));// translate it down so it's at the center of the scene
-	//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-	//ourShader.setMat4("model", model);
+
+#pragma region set light to fragment
+	for (unsigned int i = 0; i < sizeof(lightVertices) / sizeof(lightVertices[0]); ++i)
+	{
+		glm::vec3 newPos = lightVertices[i];
+		ourTreeShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+		ourTreeShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
+	}
+	ourTreeShader.setFloat("metallic", 0.04);
+	ourTreeShader.setFloat("roughness", 0.8);
+	//ourTreeShader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
+	ourTreeShader.setFloat("ao", 1.0f);
+
+#pragma endregion
 
 	int i = 0;
 	int time = 0;
@@ -298,7 +350,7 @@ int main()
 		ourTreeShader.setMat4("view", view);
 		ourTreeShader.setInt("frameIndex", i);
 		ourTreeShader.setInt("time", time);
-
+		ourTreeShader.setVec3("camPos", Camera.getPosition());
 
 		if (i >= frameNums)
 		{
@@ -317,6 +369,16 @@ int main()
 		//ourModel.draw(ourShader)
 		i++;
 		time++;
+
+		//light
+		ourLightShader.use();
+		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		view = Camera.getViewMatrix();
+		ourLightShader.setMat4("projection", projection);
+		ourLightShader.setMat4("view", view);
+		ourLightShader.setMat4("model", model);
+		glBindVertexArray(lightVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		//skybox
 		glDepthFunc(GL_LEQUAL);
