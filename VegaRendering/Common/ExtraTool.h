@@ -10,6 +10,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include<sstream>
 #include<algorithm>
+#include <glm/glm.hpp>
 
 #define M_PI 3.1415926
 
@@ -20,3 +21,5 @@ std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency
 std::vector<double> GetForceConfigurate(const std::string & vFilePath);
 
 std::vector<std::pair<double, double>> RandomTreePositionGenerate(int vTreeNumber);
+
+glm::vec3 GenerateRamdomScale();

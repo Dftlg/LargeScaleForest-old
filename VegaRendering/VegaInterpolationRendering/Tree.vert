@@ -7,9 +7,9 @@ layout (location = 4) in mat4 instanceMatrix;
 layout (location = 8 ) in int positionIndex;
 
 
-
-out vec2 TexCoords;
-out float ourColor;
+out vec2 v2f_TexCoords;
+out vec3 v3f_WorldPos;
+out vec3 v3f_Normal;
 
 uniform int frameNums;
 uniform int vertexNums;
@@ -17,9 +17,7 @@ uniform int assimpvertexNums;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
-//uniform int frameIndex;
-//uniform int treeIndex;
-//
+
 layout (std430, binding=1) buffer DeltaDeformationArray
 {
 	vec4 u[];
@@ -38,12 +36,12 @@ layout (std430, binding=3) buffer IndexArray
 void main()
 {
 
-	
+	v2f_TexCoords = aTexCoords; 
+	v3f_WorldPos = vec3(model * vec4(aPos,1.0));
+	v3f_Normal = mat3(model) *mat3(instanceMatrix)* aNormal;
+
 	sum_u[gl_InstanceID*assimpvertexNums+positionIndex]=u[treeFrameIndex[gl_InstanceID][0]*frameNums*vertexNums+treeFrameIndex[gl_InstanceID][1]*vertexNums+faceId]+sum_u[gl_InstanceID*assimpvertexNums+positionIndex];
 
-	vec4 tempPos=vec4(aPos,1.0)+sum_u[positionIndex];
-
-	
+	vec4 tempPos=vec4(aPos,1.0)+sum_u[gl_InstanceID*assimpvertexNums+positionIndex];
 	gl_Position = projection * view * model * instanceMatrix * tempPos;
-	TexCoords = aTexCoords;  
 }

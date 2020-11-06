@@ -48,51 +48,49 @@ float grasstime = 0.0f;
 
 SynchronisedQueue<std::vector<std::pair<int, int>>> SearchQueue;
 
+int i = 0;
+int Size = 0;
+int FrameNumber = 0;
+int SearchFrameNumber = 0;
+int SearchFrameStep = 0;
+
 void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces)
 {
-	int i = 0;
-	int Size = vMultipleExtraForces[0].size() / 5;
-	int step = 0;
-	int FrameNumber = 0;
-
 	while (true)
 	{
 		//当前12个帧段进行一次重置获取5个帧段号索引
-		if (step == Size)
+		if (SearchFrameNumber %Size==0)
 		{
-			step = 0;
-			vVFF.initTempMultipleTreeData(vMultipleExtraForces.size());
-			vSence.resetSSBO4UDeformation();
-
-			std::cout << "//////////////////////////////////////" << std::endl;
-			std::cout << "Reset" << std::endl;
+			//std::cout << "search reset" << std::endl;
+			vVFF.resetTempMultipleTreeData(vMultipleExtraForces.size());
+			SearchFrameStep = 0;
 		}
-		if (FrameNumber % 5 == 0)
+		if (SearchFrameNumber % 5 == 0)
 		{
 			//每5个力计算一次匹配的5帧
 			std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
 			for (int i = 0; i < vMultipleExtraForces.size(); i++)
 			{
-				for (int k = (step) * 5; k < (step + 1) * 5; k++)
+				for (int k = (SearchFrameStep) * 5; k < (SearchFrameStep + 1) * 5; k++)
 				{
 					tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
 				}
 			}
 			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces);
 			tempMultipleFiveForces.clear();
-			step++;
+			SearchFrameStep++;
 			//std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
 		}
 		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
 		for (int treenumber = 0; treenumber < Common::TreesNumber; treenumber++)
 		{
-			tempTreeFileAndFrameIndex.push_back(vVFF.getFileAndFrameIndex(treenumber, FrameNumber % 5));
+			tempTreeFileAndFrameIndex.push_back(vVFF.getFileAndFrameIndex(treenumber, SearchFrameNumber % 5));
 
 			//std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
 		}
 		//std::cout << std::endl;
 		SearchQueue.Enqueue(tempTreeFileAndFrameIndex);
-		FrameNumber++;
+		SearchFrameNumber++;
 		tempTreeFileAndFrameIndex.clear();
 	}
 }
@@ -104,7 +102,7 @@ int main()
 	CVegaFemFactory vFem("../../models/mapleTree/data/temp", "../../models/mapleTree/trianglesTree.obj", "../../models/mapleTree/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 1;
+	int numbercounter =9;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -212,6 +210,22 @@ int main()
 		 1.0f, -1.0f,  1.0f
 	};
 
+#pragma region lights data
+	glm::vec3 lightVertices[] = {
+		glm::vec3(-10.0f,  10.0f, 10.0f),
+		glm::vec3(10.0f,  10.0f, 10.0f),
+		glm::vec3(-10.0f, -10.0f, 10.0f),
+		glm::vec3(10.0f, -10.0f, 10.0f),
+	};
+
+	glm::vec3 lightColors[] = {
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f)
+	};
+#pragma endregion 
+
 	// plane VAO
 	unsigned int planeVAO, planeVBO;
 	glGenVertexArrays(1, &planeVAO);
@@ -271,52 +285,62 @@ int main()
 	//std::vector<int>vExtraForces = GenerateSamplingForce(Common::ProductFrameNumber,130, 1, 0, 0,4);
 	//Common::SpKVFData voSpKVData;
 	//bool flag = true;
-	//vFem.searchMatchedFrameSegment(matchedFramesSequences,voSpKVData,vExtraForces, flag);
 
 	//个数等于
 	std::vector<std::vector<int>> vMultipleExtraForces;
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 500, 1, 0, 0, 4));
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 1, 0, 4));
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
-	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
-	for (int i = 0; i < 46; i++)
+	for (int i = 0; i < 25; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3000, 1, 0, 0, 4));
 	}
 
+	for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 490, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3500, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4000, 1, 0, 0, 4));
+	}
+	/*for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3200, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3300, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4100, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3700, 1, 0, 0, 4));
+	}*/
+	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 500, 1, 0, 0, 4));
+	////vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2000, 1, 0, 0, 4));
+	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4000, 1, 0, 0, 4));
+	////vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
+	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
+	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
+	//for (int i = 0; i < 46; i++)
+	//{
+	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
+	//}
+	Size = Common::ProductFrameNumber;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
-
-	//在while循环里初始化
-	
-
-
-	//std::vector<glm::vec3> tempUDeformations(matchedFramesSequences[0].size(), glm::vec3(0, 0, 0));
-	//for (int i = 0; i < matchedFramesSequences.size(); i++)
-	//{
-	//	for (int k = 0; k < matchedFramesSequences[i].size(); k++)
-	//	{
-	//		tempUDeformations[k] += matchedFramesSequences[i][k];
-	//	}
-	//	if (i % 20 == 0 && i != 0)
-	//		vFem.searchMatchedDeformationFrames(matchedFramesSequences[i], tempUDeformations);
-	//}
-	//帧数
-
-	//int frameNums = matchedFramesSequences.size();
-	////obj模型的顶点数
-	//int vertexNums = matchedFramesSequences[0].size();
-	//std::cout << frameNums << " " << vertexNums << std::endl;
-	//glm::vec4* deformU = new glm::vec4[frameNums*vertexNums];
-
-	//
-	//
-	//for (int i = 0; i < frameNums; i++)
-	//{
-	//	for (int k = 0; k < vertexNums; k++)
-	//	{
-	//		deformU[i * vertexNums + k] = glm::vec4(matchedFramesSequences[i][k] , 0.0f);
-	//	}
-	//}
 
 
 	//帧数
@@ -331,13 +355,27 @@ int main()
 	glm::mat4 projection;
 	glm::mat4 view;
 
+#pragma region set light to fragment
+	for (unsigned int i = 0; i < sizeof(lightVertices) / sizeof(lightVertices[0]); ++i)
+	{
+		glm::vec3 newPos = lightVertices[i];
+		ourTreeShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+		ourTreeShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
+	}
+	ourTreeShader.setFloat("metallic", 0.04);
+	ourTreeShader.setFloat("roughness", 0.8);
+	//ourTreeShader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
+	ourTreeShader.setFloat("ao", 1.0f);
+
+#pragma endregion
+
+
 	//开启线程进行读取Tree索引
 	boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex,vFem, ourModel, vMultipleExtraForces);
 
-	int i = 0;
-	int Size = vMultipleExtraForces[0].size() / 5;
-	int step = 0;
-	int FrameNumber = 0;
+	//int Size = vMultipleExtraForces[0].size() / 5;
+	int tempFrame = 0;
+
 	while (!glfwWindowShouldClose(Window))
 	{
 		// per-frame time logic
@@ -377,31 +415,6 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 		
-
-		////当前12个帧段进行一次重置获取5个帧段号索引
-		//if (step == Size)
-		//{
-		//	step = 0;
-		//	vFem.initTempMultipleTreeData(vMultipleExtraForces.size());
-		//	ourModel.resetSSBO4UDeformation();
-		//}
-		//if (FrameNumber % 5 == 0)
-		//{
-		//	//每5个力计算一次匹配的5帧
-		//	std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
-		//	for (int i = 0; i < vMultipleExtraForces.size(); i++)
-		//	{
-		//		for (int k = (step) * 5; k < (step + 1) * 5; k++)
-		//		{
-		//			tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
-		//		}
-		//	}
-		//	vFem.searchMatchedFrameSequences(tempMultipleFiveForces);
-		//	tempMultipleFiveForces.clear();
-		//	step++;
-		//	//std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
-		//}
-
 		//tree
 		ourTreeShader.use();
 		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -409,16 +422,24 @@ int main()
 		ourTreeShader.setMat4("projection", projection);
 		ourTreeShader.setMat4("view", view);
 
+		//每给定的总力段进行一次渲染时的帧D_sum reset
+		if (FrameNumber%Common::ProductFrameNumber==0)
+		{
+			ourModel.resetSSBO4UDeformation();
+
+			std::cout << "//////////////////////////////////////" << std::endl;
+			std::cout << "Reset" << std::endl;
+		}
 
 		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
 		bool Success= SearchQueue.TryDequeue(tempTreeFileAndFrameIndex);
-		//for (int treenumber = 0; treenumber < Common::TreesNumber; treenumber++)
-		//{
-		//	tempTreeFileAndFrameIndex.push_back(vFem.getFileAndFrameIndex(treenumber, FrameNumber % 5));
 
-		//	//std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
-		//}
-		
+	/*	for (int i = 0; i < tempTreeFileAndFrameIndex.size(); i++)
+		{
+			std::cout << tempTreeFileAndFrameIndex[i].first << "--" << tempTreeFileAndFrameIndex[i].second << "||";
+		}
+		std::cout << std::endl;*/
+
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(1.0f, -0.5f, -5.0f));// translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
@@ -431,25 +452,7 @@ int main()
 		tempTreeFileAndFrameIndex.clear();
 		
 		FrameNumber++;
-
-		//std::cout << "Each Froce connect Frame" << std::endl;
-		////每棵树包含的5个帧段
-		//std::vector<std::vector<int>> TreeIndex(Common::TreesNumber);
-		//std::vector<std::vector<int>> FrameIndex(Common::TreesNumber);
-		//for (int i = 0; i < vMultipleExtraForces.size(); i++)
-		//{
-		//	for (int k = 0; k < temp[i].size(); k++)
-		//	{
-		//		TreeIndex[i].push_back(temp[i][k] / Common::SamplingFrameNumber);
-		//		FrameIndex[i].push_back(temp[i][k] % Common::SamplingFrameNumber);
-		//		std::cout << temp[i][k] / Common::SamplingFrameNumber << "--" << temp[i][k] % Common::SamplingFrameNumber << " ";
-		//	}
-		//	std::cout << "||";
-		//}
-		//std::cout << std::endl;
-		//tempMultipleFiveForces.clear();
-		
-
+	
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);
 		glfwPollEvents();

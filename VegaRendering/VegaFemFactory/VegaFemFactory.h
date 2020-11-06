@@ -69,8 +69,8 @@ public:
 	void initMatchedFrameStruct(int vTreeSize);
 
 	void initTempMultipleTreeData(int vTreeSize);
-	//²éÕÒ¼ìË÷±ê×¼
-	void searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>>& voMatchedFramesSequences, Common::SpKVFData& voSpKVData, std::vector<int> &vExtraForces, bool vIsFirstFrame);
+
+	void resetTempMultipleTreeData(int vTreeSize);
 	
 	void searchMatchedDeformationFrames(std::vector<glm::vec3> & vUdeltaDeformation,std::vector<glm::vec3> & vFrameUDeformationData);
 
@@ -148,6 +148,7 @@ private:
 	
 	std::vector<std::vector<int>> m_MultipleFramesIndex;
 	std::vector<Common::SpKVFData> m_TempSpKVFData;
+	std::vector<Common::SpKVFData> m_ZeroKVFData;
 	std::vector<int> m_CurrentFrameIndex;
 	std::vector<int> m_Flag;
 
