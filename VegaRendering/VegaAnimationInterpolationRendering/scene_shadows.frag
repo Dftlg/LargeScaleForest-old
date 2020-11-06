@@ -109,7 +109,7 @@ void main()
     // reflectance equation
     vec3 Lo = vec3(0.0);
 	float shadow = 0.0;
-	 for(int i = 0; i < 1; ++i) 
+	 for(int i = 0; i < 4; ++i) 
     {
         // calculate per-light radiance
         vec3 L = normalize(lightPositions[i] - v2f_WorldPos);
@@ -154,7 +154,7 @@ void main()
 
     //vec3 color = ambient + Lo;
 
-	vec3 color = Lo * shadow + ambient;
+	vec3 color = Lo * (1.0 - shadow) + ambient;
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));

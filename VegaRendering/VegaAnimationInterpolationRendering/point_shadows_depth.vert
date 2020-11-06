@@ -15,7 +15,7 @@ layout (std430, binding=1) buffer DeformationArray
 
 void main()
 {
-	if(treeIndex==-1)
+	if(treeIndex < 0)
 	{
 		gl_Position = model * vec4(aPos, 1.0);
 	}

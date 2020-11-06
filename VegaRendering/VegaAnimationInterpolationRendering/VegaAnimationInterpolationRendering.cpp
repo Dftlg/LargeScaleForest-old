@@ -99,14 +99,14 @@ int main()
 
 	#pragma region plane vertices data
 		float planeVertices[] = {
-		// positions          // texture Coords     // normals       
-		 5.0f, -0.5f,  5.0f,   2.0f, 0.0f,       0.0f, 1.0f, 0.0f,
-		-5.0f, -0.5f,  5.0f,   0.0f, 0.0f,	     0.0f, 1.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f,   0.0f, 2.0f,	     0.0f, 1.0f, 0.0f,
+		// positions              // normals       // texture Coords  
+		 5.0f, -0.5f,  5.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
+		-5.0f, -0.5f,  5.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+		-5.0f, -0.5f, -5.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
 
-		 5.0f, -0.5f,  5.0f,   2.0f, 0.0f,	     0.0f, 1.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f,   0.0f, 2.0f,	     0.0f, 1.0f, 0.0f,
-		 5.0f, -0.5f, -5.0f,   2.0f, 2.0f,	     0.0f, 1.0f, 0.0f
+		 5.0f, -0.5f,  5.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
+		-5.0f, -0.5f, -5.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
+		 5.0f, -0.5f, -5.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
 	};
 	#pragma endregion
 
@@ -207,9 +207,9 @@ int main()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glBindVertexArray(0);
 	// plane load textures
 	unsigned int floorTexture = loadTexture("resources/textures/metal.png");
@@ -332,25 +332,21 @@ int main()
 	float near_plane = 1.0f;
 	float far_plane = 25.0f;
 	glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
-	std::vector<std::vector<glm::mat4>> lightsShadowTransforms;
 	std::vector < glm::mat4> shadowTransforms;
 	for (unsigned int i = 0; i < 1; ++i)
 	{
-		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(1.0f, 0.0f, 0.0f),  glm::vec3(0.0f, -1.0f, 0.0f)));
 		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 1.0f, 0.0f),  glm::vec3(0.0f, 0.0f, 1.0f)));
 		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
-		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, 1.0f),  glm::vec3(0.0f, -1.0f, 0.0f)));
 		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-		lightsShadowTransforms.push_back(shadowTransforms);
-		shadowTransforms.clear();
 	}
 	ourSceneDepthShader.use();
 	ourSceneDepthShader.setFloat("far_plane", far_plane);
 	ourSceneDepthShader.setVec3("lightPos", lightVertices[0]);
 	for (unsigned int i = 0; i < 6; ++i)
 	{
-		ourSceneDepthShader.use();
 		ourSceneDepthShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
 	}
 
@@ -368,10 +364,7 @@ int main()
 	ourSceneShadowShader.setFloat("roughness", 0.8);
 	//ourTreeShader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
 	ourSceneShadowShader.setFloat("ao", 1.0f);
-	ourSceneShadowShader.setInt("shadows", shadows); 
 	ourSceneShadowShader.setInt("depthMap", 8);
-
-
 
 	#pragma endregion
 
@@ -396,14 +389,14 @@ int main()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		//plane
 		ourSceneDepthShader.use();
-		ourSceneDepthShader.setInt("treeIndex", -1);
-		renderPlane(ourSceneDepthShader, planeVAO, floorTexture, opacityTexture);
+		//ourSceneDepthShader.setInt("treeIndex", -1);
+		//renderPlane(ourSceneDepthShader, planeVAO, floorTexture, opacityTexture);
 		//tree
-		ourSceneDepthShader.use();
+		//ourSceneDepthShader.use();
 		renderTree(ourSceneDepthShader,ourModel, i, frameNums);
 		//skybox	
-		ourSkyBoxShader.use();
-		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
+		//ourSkyBoxShader.use();
+		//renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		//2.render scene as normal 
@@ -411,6 +404,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 		//plane
 		ourSceneShadowShader.use();
+		ourSceneShadowShader.setInt("shadows", shadows);
 		glActiveTexture(GL_TEXTURE8);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 		ourSceneShadowShader.setInt("treeIndex", -1);
@@ -426,6 +420,8 @@ int main()
 		//skybox	
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
+
+		i++;
 
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
@@ -485,7 +481,6 @@ void renderTree(CShader & vShader, CSence& vModel, int & vFrameIndex, const int 
 		vShader.setInt("treeIndex", j);
 		vModel.draw(vShader);
 	}
-	vFrameIndex++;
 }
 
 //*********************************************************************
