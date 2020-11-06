@@ -32,7 +32,19 @@ void main()
 	v2f_WorldPos = vec3(model * vec4(aPos,1.0));
 	v2f_Normal = mat3(model) * aNormal;
 
-	vec4 tempPos = vec4(aPos,1.0)+u[treeIndex * frameNums * vertexNums + frameIndex * vertexNums+faceId];
+	vec4 tempPos;
+
+	if(treeIndex==-1)
+	{
+		 gl_Position = projection * view * model * vec4(aPos, 1.0);
+	}
+	else
+	{
+		tempPos = vec4(aPos,1.0)+u[treeIndex * frameNums * vertexNums + frameIndex * vertexNums+faceId];
+		//多棵树的法向量
+	    gl_Position = projection * view * model * instanceMatrix * tempPos; 
+	}
+
 //	vec4 tempPos;
 //	if(gl_InstanceID<5)
 //	{
@@ -51,6 +63,5 @@ void main()
 //		tempPos=tempPos*sin((2*M_PI/60)*time);
 //	}
 //
-	//多棵树的法向量
-	gl_Position = projection * view * model * instanceMatrix * tempPos; 
+	
 }

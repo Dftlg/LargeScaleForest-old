@@ -142,10 +142,13 @@
     <None Include="packages.config" />
     <None Include="Plane.frag" />
     <None Include="Plane.vert" />
+    <None Include="point_shadows_depth.frag" />
+    <None Include="point_shadows_depth.gs" />
+    <None Include="point_shadows_depth.vert" />
     <None Include="skybox.frag" />
     <None Include="skybox.vert" />
-    <None Include="Tree.frag" />
-    <None Include="Tree.vert" />
+    <None Include="scene_shadows.frag" />
+    <None Include="scene_shadows.vert" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
@@ -157,6 +160,9 @@
     <ProjectReference Include="..\VegaFemFactory\VegaFemFactory.vcxproj">
       <Project>{4d8480d7-7834-40a2-97ea-e34a72da8a63}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Other_point_shadows_depth.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

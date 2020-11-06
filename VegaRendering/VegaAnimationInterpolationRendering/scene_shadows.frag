@@ -16,11 +16,36 @@ uniform vec3 lightPositions[4];
 uniform vec3 lightColors[4];
 
 uniform vec3 camPos;
+uniform vec3 viewPos;
+
+uniform float far_plane;
+uniform bool shadows;
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_opacity1;
+uniform samplerCube depthMap;
 
 const float PI = 3.14159265359;
+
+// ----------------------------------------------------------------------------
+float ShadowCalculation(vec3 fragPos,vec3 lightPos)
+{
+    // get vector between fragment position and light position
+    vec3 fragToLight = fragPos - lightPos;
+    // ise the fragment to light vector to sample from the depth map    
+    float closestDepth = texture(depthMap, fragToLight).r;
+    // it is currently in linear range between [0,1], let's re-transform it back to original depth value
+    closestDepth *= far_plane;
+    // now get current linear depth as the length between the fragment and light position
+    float currentDepth = length(fragToLight);
+    // test for shadows
+    float bias = 0.05; // we use a much larger bias since depth is now in [near_plane, far_plane] range
+    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;        
+    // display closestDepth as debug (to visualize depth cubemap)
+    // FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
+        
+    return shadow;
+}
 
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -83,7 +108,8 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-	 for(int i = 0; i < 4; ++i) 
+	float shadow = 0.0;
+	 for(int i = 0; i < 1; ++i) 
     {
         // calculate per-light radiance
         vec3 L = normalize(lightPositions[i] - v2f_WorldPos);
@@ -118,16 +144,20 @@ void main()
 
         // add to outgoing radiance Lo
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+
+		
     }   
-    
+    shadow = shadows ? ShadowCalculation(v2f_WorldPos,lightPositions[0]) : 0.0;
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
     vec3 ambient = vec3(0.03) * albedo * ao;
 
-    vec3 color = ambient + Lo;
+    //vec3 color = ambient + Lo;
+
+	vec3 color = Lo * shadow + ambient;
 
     // HDR tonemapping
-    //color = color / (color + vec3(1.0));
+    color = color / (color + vec3(1.0));
     // gamma correct
     color = pow(color, vec3(1.0/2.2)); 
 

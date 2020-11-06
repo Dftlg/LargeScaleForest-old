@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-CCamera::CCamera(glm::vec3 vPosition, glm::vec3 vUp, float vYaw, float vPitch) : m_Front(glm::vec3(0.0f, 0.0f, -1.0f)), m_MovementSpeed(0.2f), m_MouseSensitivity(0.02f), m_Zoom(45.0f)
+CCamera::CCamera(glm::vec3 vPosition, glm::vec3 vUp, float vYaw, float vPitch) : m_Front(glm::vec3(0.0f, 0.0f, -1.0f)), m_MovementSpeed(0.05f), m_MouseSensitivity(0.02f), m_Zoom(45.0f)
 {
 	m_Position = vPosition;
 	m_WorldUp = vUp;
