@@ -362,9 +362,9 @@ int main()
 	}
 	ourSceneShadowShader.setFloat("metallic", 0.04);
 	ourSceneShadowShader.setFloat("roughness", 0.8);
-	//ourTreeShader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
 	ourSceneShadowShader.setFloat("ao", 1.0f);
 	ourSceneShadowShader.setInt("depthMap", 8);
+	ourSceneShadowShader.setFloat("far_plane", far_plane);
 
 	#pragma endregion
 
@@ -389,14 +389,12 @@ int main()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		//plane
 		ourSceneDepthShader.use();
-		//ourSceneDepthShader.setInt("treeIndex", -1);
-		//renderPlane(ourSceneDepthShader, planeVAO, floorTexture, opacityTexture);
+		ourSceneDepthShader.setInt("treeIndex", -1);
+		renderPlane(ourSceneDepthShader, planeVAO, floorTexture, opacityTexture);
 		//tree
-		//ourSceneDepthShader.use();
 		renderTree(ourSceneDepthShader,ourModel, i, frameNums);
 		//skybox	
-		//ourSkyBoxShader.use();
-		//renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
+		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		//2.render scene as normal 

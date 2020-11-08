@@ -30,20 +30,14 @@ const float PI = 3.14159265359;
 // ----------------------------------------------------------------------------
 float ShadowCalculation(vec3 fragPos,vec3 lightPos)
 {
-    // get vector between fragment position and light position
     vec3 fragToLight = fragPos - lightPos;
-    // ise the fragment to light vector to sample from the depth map    
     float closestDepth = texture(depthMap, fragToLight).r;
-    // it is currently in linear range between [0,1], let's re-transform it back to original depth value
     closestDepth *= far_plane;
-    // now get current linear depth as the length between the fragment and light position
     float currentDepth = length(fragToLight);
-    // test for shadows
-    float bias = 0.05; // we use a much larger bias since depth is now in [near_plane, far_plane] range
-    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;        
-    // display closestDepth as debug (to visualize depth cubemap)
-    // FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
-        
+    float bias = 0.1;
+    float shadow = (currentDepth -  bias > closestDepth) ? 1.0 : 0.0;  
+	
+	// FragColor = vec4(vec3(closestDepth / far_plane), 1.0);       
     return shadow;
 }
 
