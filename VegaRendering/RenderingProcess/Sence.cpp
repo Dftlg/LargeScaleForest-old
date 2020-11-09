@@ -38,10 +38,12 @@ glm::mat4* CSence::randomRotation()
 	for (int i = 0; i < Common::TreesNumber; i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(TreesPosition[i].first * 20 * i + 150.0f, -0.5f, TreesPosition[i].second * 10));
+		model = glm::translate(model, glm::vec3(TreesPosition[i].first*25, -0.5f, TreesPosition[i].second*25));
 		srand(time(0));
-		float tempRandom = (float)RandomGenerate();
+		float tempRandom = (float)RandomGenerate();	
 		model = glm::rotate(model, glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
+		glm::vec3 tempScale = GenerateRamdomScale();
+		model = glm::scale(model, tempScale);
 		modelMatrices[i] = model;
 	}
 
@@ -507,5 +509,6 @@ void CSence::UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int, int>>& v
 void CSence::resetSSBO4UDeformation()
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_UdeformationSSBO);
+	m_DeformationU = new glm::vec4[Common::TreesNumber*m_AssimpVerticesNumber];
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*(m_AssimpVerticesNumber*Common::TreesNumber), m_DeformationU);
 }

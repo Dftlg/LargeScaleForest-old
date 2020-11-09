@@ -717,7 +717,7 @@ void idleFunction(void)
 		TempExtraForces.push_back(ExtraForces[subTimestepCounter]);
 		if ((subTimestepCounter+1) % Common::ForcesSampling == 0)
 		{
-			//integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
+			integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
 			TempExtraForces.clear();
 		}
 		//计算由力产生的结点位移形变
@@ -754,7 +754,7 @@ void idleFunction(void)
       }
 	  subTimestepCounter++;
     }
-	if (subTimestepCounter > 60)
+	if (subTimestepCounter > 120)
 	{
 		exit(1);
 	}
@@ -816,15 +816,15 @@ void idleFunction(void)
 	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
 
 	//每uDeformationSampling帧存储最终的形变数据U
-	//if (subTimestepCounter % Common::uDeformationSampling == 0)
-	//{
-		//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);
-		//TempExtraForces.clear();
-	//}
+	if (subTimestepCounter % Common::uDeformationSampling == 0)
+	{
+		deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);
+		TempExtraForces.clear();
+	}
 	//存储deltaU的形变数据
-	//deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
+	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
 	//存储U的形变数据
-	deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter - 1);
+	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter - 1);
 
 
 	//mesh->saveToAscii("D:/GraduationProject/Vega/models/8.10/position/1.obj",1);
@@ -1581,7 +1581,7 @@ void initSimulation()
 
   std::vector<double> tempConfig = GetForceConfigurate(outputFilename);
  
-  ExtraForces=GenerateSamplingForce(60, tempConfig[0], tempConfig[1], tempConfig[2],tempConfig[3],6);
+  ExtraForces=GenerateSamplingForce(120, tempConfig[0], tempConfig[1], tempConfig[2],tempConfig[3],4);
 
 
   // load initial condition

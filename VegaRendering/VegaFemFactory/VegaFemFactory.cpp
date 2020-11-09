@@ -498,295 +498,6 @@ void CVegaFemFactory::cleanSFileDataGroup(int vConnectionIndex, int vTimestep)
 	}
 }
 
-//以5帧为单位进行帧段的查找匹配操作，组成一个匹配好的序列
-//参数输出的60帧Udelta,初始状态下或者最后状态下的KVF矩阵数据只保存当前5帧数据，需要输入的外力大小共60个
-void CVegaFemFactory::searchMatchedFrameSegment(std::vector<std::vector<glm::vec3>>& voMatchedFramesSequences, Common::SpKVFData & voSpKVData, std::vector<int>& vExtraForces, bool vIsFirstFrame)
-{
-	/*std::vector<int>vExtraForces = GenerateSamplingForce(60,130, 1, 0, 0);
-	Common::SpKVFData voSpKVData;*/
-	for (int i = 0; i < 5; i++)
-		voSpKVData.Forces.push_back(vExtraForces[i]);
-	//int sampleFrameNum = m_AllReallyLoadConnectedFem[0].FemDataset[0]->Frames.size();
-	//int sampleFrameNum = 60;
-	std::vector<int> FrameIndexSequence;
-	
-	//第一个是文件的SpKVF的段索引号4，9，14，19，第二个值是当前索引下力的序列
-	std::vector<std::pair<int, std::vector<int>>> tempForceSequence;	
-	//SpKVF的段索引号，当前索引下K矩阵
-	std::vector<std::pair<int, std::vector<std::vector<double>>>>tempKMartixSequence;
-	//SpKVF的段索引号，当前索引下v矩阵
-	std::vector<std::pair<int, std::vector<glm::vec3>>>tempVelocitySequence;
-	//SpKVF的段索引号，当前索引下f内矩阵
-	std::vector<std::pair<int, std::vector<glm::vec3>>>tempInternalForcesSequence;
-	//所有文件的SpKVF数据索引
-	std::vector<int> reorderSpKVFSegmentIndexSequence;
-
-	double gaussianForceErrrorSum = 0;
-	double kMartixErrorSum = getKMatrixSumNumber();
-	double velocityErrorSum = getVeocitySumNumber();
-	double internalForcesSum = getInternalForceSumNuber();
-	std::cout << kMartixErrorSum << "    " << velocityErrorSum << "    " << internalForcesSum << std::endl;
-	for (int i = 0; i < m_AllReallyLoadConnectedFem.size(); i++)
-	{
-		for (int k = 0; k < m_AllReallyLoadConnectedFem[i].FemDataset[0]->KVFFrameDatas.size(); k++)
-		{
-			std::vector<int> tempExternalForces = m_AllReallyLoadConnectedFem[i].FemDataset[0]->KVFFrameDatas[k].Forces;
-			reorderSpKVFSegmentIndexSequence.push_back(m_AllReallyLoadConnectedFem[i].FemDataset[0]->KVFFrameDatas[k].FrameIndex + Common::SamplingFrameNumber * i);
-			tempForceSequence.push_back(std::make_pair(reorderSpKVFSegmentIndexSequence.back(), tempExternalForces));
-		}
-
-	}
-	std::vector<std::vector<double>> tempKMartix;
-	std::vector<glm::vec3>tempVelocity;
-	std::vector<glm::vec3>tempInternalForces;
-	for (int i = 0; i < reorderSpKVFSegmentIndexSequence.size(); i++)
-	{
-		tempKMartix = m_AllReallyLoadConnectedFem[reorderSpKVFSegmentIndexSequence[i] / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(reorderSpKVFSegmentIndexSequence[i] % Common::SamplingFrameNumber) / 5].Kmatrix;
-		tempKMartixSequence.push_back(std::make_pair(reorderSpKVFSegmentIndexSequence[i], tempKMartix));
-		tempVelocity = m_AllReallyLoadConnectedFem[reorderSpKVFSegmentIndexSequence[i] / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(reorderSpKVFSegmentIndexSequence[i] % Common::SamplingFrameNumber) / 5].Velocity;
-		tempVelocitySequence.push_back(std::make_pair(reorderSpKVFSegmentIndexSequence[i], tempVelocity));
-		tempInternalForces = m_AllReallyLoadConnectedFem[reorderSpKVFSegmentIndexSequence[i] / 60].FemDataset[0]->KVFFrameDatas[(reorderSpKVFSegmentIndexSequence[i] % 60) / 5].InternalForces;
-		tempInternalForcesSequence.push_back(std::make_pair(reorderSpKVFSegmentIndexSequence[i], tempInternalForces));
-		tempKMartix.clear();
-		tempVelocity.clear();
-		tempInternalForces.clear();
-	}
-	std::vector<std::vector<double>>().swap(tempKMartix);
-	std::vector<glm::vec3>().swap(tempVelocity);
-	std::vector<glm::vec3>().swap(tempInternalForces);
-
-	std::vector<int> rangeTogether;
-	//需要查找出结果的12段
-	while (FrameIndexSequence.size()< Common::ProductFrameNumber/5)
-	{
-		//所有段的力误差
-		std::vector<std::pair<int, double>>tempForceErrorSequence;
-		std::vector<std::pair<int, double>> tempKErrorSequence;
-		std::vector<std::pair<int, double>>tempVelocityErrorSequence;
-		std::vector<std::pair<int, double>>tempInternalForcesErrorSequence;
-		//compare forces
-		//给定段与所有的F进行判断比较
-		for (int i = 0; i < tempForceSequence.size(); i++)
-		{
-			int forceError = 0;
-			int currentForceIndex = FrameIndexSequence.size();
-			for (auto k = 0; k < 5;)
-			{
-				forceError += AbsError(voSpKVData.Forces[k], tempForceSequence[i].second[k]);
-				k = k + 2;
-			}
-			forceError /= Common::ExpandForceError;
-			tempForceErrorSequence.push_back(std::make_pair(tempForceSequence[i].first, forceError));
-		}
-
-		//initial tempSpKVData just based on Forces when find the first section
-		if (vIsFirstFrame==true)
-		{
-			std::vector<std::pair<int, double>>tempSortedForceSequence = tempForceErrorSequence;
-			sort(tempSortedForceSequence.begin(), tempSortedForceSequence.end(), [](const std::pair<int, int>&x, const std::pair<int, int>&y)->int {return x.second < y.second; });
-			CurrentFrameIndex = tempSortedForceSequence[0].first;
-			voSpKVData = m_AllReallyLoadConnectedFem[tempSortedForceSequence[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(tempSortedForceSequence[0].first % Common::SamplingFrameNumber) / 5];
-			std::vector<int>tempForces;
-			//存储生成的下一段的外力
-		
-			for (int i = 5; i < 10; i++)
-			{
-				tempForces.push_back(vExtraForces[i]);
-			}
-			voSpKVData.Forces = tempForces;
-			FrameIndexSequence.push_back(tempSortedForceSequence[0].first);
-			vIsFirstFrame = false;
-			continue;
-		}
-		//k
-		//compare K Martix
-		for (int i = 0; i < tempKMartixSequence.size(); i++)
-		{
-			int count = 0;
-			if (tempKMartixSequence[i].first % Common::SamplingFrameNumber == 4)
-			{
-				for (int k = 0; k < tempKMartixSequence[i].second.size(); k++)
-				{
-					for (int j = 0; j < tempKMartixSequence[i].second[k].size(); j++)
-					{
-						if (AbsError(voSpKVData.Kmatrix[k][j],0,Common::KErrorRange))
-							count++;
-					}
-				}
-				tempKErrorSequence.push_back(std::make_pair(tempKMartixSequence[i].first, count));
-				continue;
-			}
-			for (int k = 0; k < tempKMartixSequence[i].second.size(); k++)
-			{
-				for (int j = 0; j < tempKMartixSequence[i].second[k].size(); j++)
-				{
-					if (AbsError(tempKMartixSequence[i - 1].second[k][j], voSpKVData.Kmatrix[k][j], Common::KErrorRange))
-						count++;
-				}
-			}
-			tempKErrorSequence.push_back(std::make_pair(tempKMartixSequence[i].first, count));
-		}
-
-		//velocity
-		//compare velocity
-		for (int i = 0; i < tempVelocitySequence.size(); i++)
-		{
-			int count = 0;
-			if (tempVelocitySequence[i].first % Common::SamplingFrameNumber == 4)
-			{
-				for (int k = 0; k < tempVelocitySequence[i].second.size(); k++)
-				{
-					if (AbsError(voSpKVData.Velocity[k],glm::vec3(0,0,0),Common::VelocityErrorRange))
-						count++;
-				}
-				tempVelocityErrorSequence.push_back(std::make_pair(tempVelocitySequence[i].first, count));
-				continue;
-			}
-			for (int k = 0; k < tempVelocitySequence[i].second.size(); k++)
-			{
-				if (AbsError(tempVelocitySequence[i - 1].second[k] , voSpKVData.Velocity[k], Common::VelocityErrorRange))
-					count++;
-			}
-			tempVelocityErrorSequence.push_back(std::make_pair(tempVelocitySequence[i].first, count));
-		}
-		//sort(tempVelocityErrorSequence.begin(), tempVelocityErrorSequence.end(), [](const std::pair<int, int>&x, const std::pair<int, int>&y)->int {return x.second > y.second;	});
-
-		//internalForces
-
-
-		
-		//compare internalForces
-		//double CommoninternalForceErrorRange = 50;
-		for (int i = 0; i < tempInternalForcesSequence.size(); i++)
-		{
-			int count = 0;
-			if (tempInternalForcesSequence[i].first % Common::SamplingFrameNumber == 4)
-			{
-				for (int k = 0; k < tempInternalForcesSequence[i].second.size(); k++)
-				{
-					if (AbsError(voSpKVData.InternalForces[k],glm::vec3(0,0,0), Common::internalForceErrorRange))
-						count++;
-				}
-				tempInternalForcesErrorSequence.push_back(std::make_pair(tempInternalForcesSequence[i].first, count));
-				continue;
-			}
-			for (int k = 0; k < tempInternalForcesSequence[i].second.size(); k++)
-			{
-				if (AbsError(tempInternalForcesSequence[i - 1].second[k], voSpKVData.InternalForces[k], Common::internalForceErrorRange))
-					count++;
-			}
-			tempInternalForcesErrorSequence.push_back(std::make_pair(tempInternalForcesSequence[i].first, count));
-		}
-		//sort(tempInternalForcesErrorSequence.begin(), tempInternalForcesErrorSequence.end(), [](const std::pair<int, int>&x, const std::pair<int, int>&y)->int {return x.second > y.second;	});
-
-		
-		std::vector <std::pair<int, double>> gaussianForceErrrorSequence;
-		for (int i = 0; i < tempForceErrorSequence.size(); i++)
-		{
-			gaussianForceErrrorSequence.push_back(std::make_pair(tempForceErrorSequence[i].first, GaussianFunction(tempForceErrorSequence[i].second/double(100), sqrt(0.2), 0,0.001)));
-			gaussianForceErrrorSum += gaussianForceErrrorSequence[i].second;
-		}
-		//std::vector <std::pair<int, double>>reorderKMartixError = tempKErrorSequence;
-		/*std::vector <std::pair<int, double>>reorderVelocityError = tempVelocityErrorSequence;
-		std::vector <std::pair<int, double>>reorderInternalForceError = tempInternalForcesErrorSequence;*/
-		/*sort(gaussianForceErrror.begin(), gaussianForceErrror.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second > y.second;	});
-		for (int i = 0; i < tempForceErrorSequence.size(); i++)
-		{
-			std::cout << gaussianForceErrror[i].second << " ";
-		}*/
-		//sort(reorderForcesError.begin(), reorderForcesError.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second < y.second;	});
-		//ort(reorderKMartixError.begin(), reorderKMartixError.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second > y.second;	});
-		//ort(reorderVelocityError.begin(), reorderVelocityError.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second > y.second;	});
-		//ort(reorderInternalForceError.begin(), reorderInternalForceError.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second > y.second;	});
-		//find weight for forces、kMartix、V、internalForce
-		//double forcesErrorSum = 0;
-	    for (int i = 0; i < reorderSpKVFSegmentIndexSequence.size(); i++)
-	    {
-			//externalF weight
-			/*if (tempForceErrorSequence[i].second - reorderForcesError[0].second > 200)
-			{
-				tempForceErrorSequence[i].second = 0;
-			}
-			else
-			{
-				tempForceErrorSequence[i].second = 1 - (tempForceErrorSequence[i].second / forcesErrorSum);
-			}*/
-			//gaussianForceErrrorSequence[i].second = (gaussianForceErrrorSequence[i].second / gaussianForceErrrorSum);
-			//KMartix weight
-			tempKErrorSequence[i].second = tempKErrorSequence[i].second / kMartixErrorSum;
-			//velocity weight
-			tempVelocityErrorSequence[i].second = tempVelocityErrorSequence[i].second / velocityErrorSum;
-			//internalForce weight
-			tempInternalForcesErrorSequence[i].second = tempInternalForcesErrorSequence[i].second / internalForcesSum;
-	    }
-
-		/*std::vector <std::pair<int, double>>reordergaussianForceErrrorSequence = gaussianForceErrrorSequence;
-		sort(reordergaussianForceErrrorSequence.begin(), reordergaussianForceErrrorSequence.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->double {return x.second > y.second;	});
-		write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization.txt", reordergaussianForceErrrorSequence);*/
-		/*std::vector <std::pair<int, double>> reorderForcesErrorT = tempForceErrorSequence;
-		std::vector <std::pair<int, double>> reorderKMartixErrorT = tempKErrorSequence;
-		sort(reorderForcesErrorT.begin(), reorderForcesErrorT.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second; });
-		sort(reorderKMartixErrorT.begin(), reorderKMartixErrorT.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second; });*/
-
-		//当选择了某一个文件的一帧时会应用该帧对下一帧段的KVF导致下一帧段判断的kvf值一定等于1*kvf权重，特殊判定将这以帧权重比更改
-		int NextFrameIndex = CurrentFrameIndex + 5;
-
-		std::vector<std::pair<int, double>> allWeightsSumResults;
-
-		std::vector<std::pair<int, double>> tempKVfResults(tempKErrorSequence.size());
-		double forcesWeight = 0.35;
-		//double kMartixWeight =0.2;
-		//double velocityWeight = 0.1;
-		//double internalForceWeight = 0.1;
-		double KVfWeight = 0.65;
-		for (int i = 0; i < reorderSpKVFSegmentIndexSequence.size(); i++)
-		{
-			double tempResult = 0;
-			if (NextFrameIndex == tempVelocityErrorSequence[i].first)
-			{
-				//tempKVfResults[i].second = (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second  + tempInternalForcesErrorSequence[i].second) / 3;
-				tempResult = (gaussianForceErrrorSequence[i].second)*0.7 + 0.3 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
-			}
-			else
-			{
-				//tempKVfResults[i].second = (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second  + tempInternalForcesErrorSequence[i].second) / 3;
-				tempResult = (gaussianForceErrrorSequence[i].second)*forcesWeight + KVfWeight * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
-			}	
-			allWeightsSumResults.push_back(std::make_pair(reorderSpKVFSegmentIndexSequence[i], tempResult));
-		}
-		//write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization.txt", allWeightsSumResults, gaussianForceErrrorSequence, tempKVfResults, CurrentFrameIndex);
-		sort(allWeightsSumResults.begin(), allWeightsSumResults.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second;});
-		//write2File("D:/GraduationProject/LargeScaleForest/models/8.10/testForceError//normalization1.txt", allWeightsSumResults, gaussianForceErrrorSequence,tempKVfResults,CurrentFrameIndex);
-		FrameIndexSequence.push_back(allWeightsSumResults[0].first);
-		//std::cout << "seleted:" << allWeightsSumResults[0].first << std::endl;
-		voSpKVData = m_AllReallyLoadConnectedFem[allWeightsSumResults[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(allWeightsSumResults[0].first % Common::SamplingFrameNumber) / 5];
-		voSpKVData.Forces.clear();
-		CurrentFrameIndex = allWeightsSumResults[0].first;
-		for (int i = 0; i < 5; i++)
-		{
-			voSpKVData.Forces.push_back(vExtraForces[FrameIndexSequence.size() * 5 + i]);
-		}
-		std::vector<std::pair<int, double>>().swap(tempForceErrorSequence);
-		std::vector<std::pair<int, double>>().swap(tempKErrorSequence);
-		std::vector<std::pair<int, double>>().swap(tempVelocityErrorSequence);
-		std::vector<std::pair<int, double>>().swap(tempInternalForcesErrorSequence);		
-	}
-
-
-	for (int i = 0; i < FrameIndexSequence.size(); i++)
-	{
-		std::cout << FrameIndexSequence[i] / Common::SamplingFrameNumber << "--" << FrameIndexSequence[i] % Common::SamplingFrameNumber << " ";
-	}
-	std::cout << std::endl;
-	std::vector<std::pair<int, int>>fileAndFrameIndexSequence;
-	
-	for (int i = 0; i < FrameIndexSequence.size(); i++)
-	{	
-		fileAndFrameIndexSequence.push_back(std::make_pair(FrameIndexSequence[i] / Common::SamplingFrameNumber, FrameIndexSequence[i] % Common::SamplingFrameNumber));
-	}
-	readFramesDeformationDataBasedFilesIndex(fileAndFrameIndexSequence, voMatchedFramesSequences);
-}
-
 void CVegaFemFactory::__getFileSeekDirOfEachBlock(const std::string & vFilePath, std::vector<long long>& vBlock)
 {
 	const size_t last_slash_idx = vFilePath.rfind('.txt');
@@ -1065,6 +776,7 @@ void CVegaFemFactory::initMatchedFrameStruct(int vTreeSize)
 	}
 
 	initTempMultipleTreeData(vTreeSize);
+	/*std::fill_n(std::back_inserter(m_Flag), vTreeSize, 1);*/
 }
 
 void CVegaFemFactory::initTempMultipleTreeData(int vTreeSize)
@@ -1076,8 +788,21 @@ void CVegaFemFactory::initTempMultipleTreeData(int vTreeSize)
 		m_MultipleFileAndFramesIndex[i].resize(5);
 	}
 	m_TempSpKVFData.resize(vTreeSize);
+	m_ZeroKVFData.resize(vTreeSize);
 	m_CurrentFrameIndex.resize(vTreeSize);
 	m_Flag.resize(vTreeSize, 1);
+}
+
+void CVegaFemFactory::resetTempMultipleTreeData(int vTreeSize)
+{
+	for (int i = 0; i < vTreeSize; i++)
+	{
+		m_MultipleFramesIndex[i].assign(5, 0);
+		m_MultipleFileAndFramesIndex[i].assign(5, std::pair<int,int>(0,0));
+		m_TempSpKVFData[i] = m_ZeroKVFData[i];
+		m_CurrentFrameIndex[i] = 0;
+		m_Flag[i] = 1;
+	}
 }
 
 //以5帧为单位进行帧段的查找匹配操作,对于多棵树同时进行查找操作
@@ -1105,7 +830,7 @@ void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> 
 			}
 		}
 	std::clock_t end = clock();
-	std::cout << (end - start) << std::endl;
+	//std::cout << (end - start) << std::endl;
 	//for (auto treeIndex = 0; treeIndex < m_TempSpKVFData.size(); treeIndex++)
 	//{
 	//	m_TempSpKVFData[treeIndex].Forces.clear();
@@ -1131,6 +856,9 @@ void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> 
 	
 }
 
+static int number = 0;
+static int a;
+
 //voExtraForces需要当前的力以及下一段的力
 void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMatchedFrameSequenceIndex, Common::SpKVFData& voSpKVData, std::vector<int>&voExtraForces,int &voCurrentFrameIndex, int& vIsFirstFrame)
 {
@@ -1139,6 +867,8 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 	std::vector<std::pair<int, double>> tempVelocityErrorSequence;
 	std::vector<std::pair<int, double>> tempInternalForcesErrorSequence;
 	std::vector <std::pair<int, double>> gaussianForceErrrorSequence;
+	
+	
 
 	//f内
 	for (int i = 0; i < m_ForceSequence.size(); i++)
@@ -1154,6 +884,11 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 	}
 	//initial tempSpKVData just based on Forces when find the first section
 	//第一段直接默认使用相似力的帧段
+	//for (int i = 0; i < m_ForceSequence.size(); i++)
+	//{
+	//	std::cout << tempForceErrorSequence[i].first<<"--"<< tempForceErrorSequence[i].second<< std::endl;
+	//}
+
 	if (vIsFirstFrame == 1)
 	{
 		voMatchedFrameSequenceIndex.clear();
@@ -1168,17 +903,20 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 	else
 	{
 		voMatchedFrameSequenceIndex.clear();
-		for (int i = 0; i < Common::TreesNumber; i++)
+		/*for (int i = 0; i < Common::TreesNumber; i++)
 		{
 			m_MultipleFileAndFramesIndex[i].resize(5);
-		}
+		}*/
 		//将力权重用高斯权重表示
 		double gaussianForceErrrorSum = 0;
 		for (int i = 0; i < tempForceErrorSequence.size(); i++)
 		{
-			gaussianForceErrrorSequence.push_back(std::make_pair(tempForceErrorSequence[i].first, GaussianFunction(tempForceErrorSequence[i].second / double(100), sqrt(0.2), 0, 0.001)));
+			//std::cout << tempForceErrorSequence[i].second << std::endl;
+			gaussianForceErrrorSequence.push_back(std::make_pair(tempForceErrorSequence[i].first, GaussianFunction(tempForceErrorSequence[i].second / double(2000), sqrt(0.2), 0, 0.001)));
 			gaussianForceErrrorSum += gaussianForceErrrorSequence[i].second;
 		}
+
+		//sort(gaussianForceErrrorSequence.begin(), gaussianForceErrrorSequence.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second; });
 
 		/*velocity
 		compare velocity*/
@@ -1315,8 +1053,10 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		std::vector<std::pair<int, double>>().swap(tempVelocityErrorSequence);
 		std::vector<std::pair<int, double>>().swap(tempInternalForcesErrorSequence);
 
+		number++;
 		/*std::cout << allWeightsSumResults[0].first / Common::SamplingFrameNumber << "--" << allWeightsSumResults[0].first % Common::SamplingFrameNumber << " ";
 		std::cout << std::endl;*/
+
 		for(int k=4;k>=0;k--)
 			voMatchedFrameSequenceIndex.push_back(allWeightsSumResults[0].first -k);
 

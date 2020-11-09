@@ -9,8 +9,27 @@ int RandomGenerate()
 	srand(seed.QuadPart);
 	int randomNumber = rand();
 	//return (randomNumber % 360);
-	if (randomNumber % 2 == 0) return (randomNumber % 90) * 1;
-	return (randomNumber % 90)*-1;
+	if (randomNumber % 2 == 0) return (randomNumber % 60) * 1;
+	return (randomNumber % 60)*-1;
+}
+
+glm::vec3 GenerateRamdomScale()
+{
+	LARGE_INTEGER seed;
+	QueryPerformanceFrequency(&seed);
+	QueryPerformanceCounter(&seed);
+	srand(seed.QuadPart);
+	int randomNumber = rand();
+	float scalenumber = randomNumber % 1000 / (float)1000;
+	while (scalenumber < 0.6)
+	{
+		QueryPerformanceFrequency(&seed);
+		QueryPerformanceCounter(&seed);
+		srand(seed.QuadPart);
+		int randomNumber = rand();
+		scalenumber = randomNumber % 1000 / (float)1000;
+	}
+	return glm::vec3(scalenumber, scalenumber, scalenumber);
 }
 
 std::vector<std::pair<double,double>> RandomTreePositionGenerate(int vTreeNumber)
