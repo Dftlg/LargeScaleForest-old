@@ -21,6 +21,10 @@
 //#include <float.h>
 //#include "sceneObjectDeformable.h"
 
+void renderPlane(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId);
+void renderTree(CShader& vShader, CSence& vModel);
+void renderLight(CShader& vShader, const unsigned int& VAOId);
+void renderSkybox(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId);
 bool initWindow(GLFWwindow*& vWindow, int vScreenWidth, int vScreenHeight);
 void scrollCallback(GLFWwindow* vWindow, double vXOffset, double vYOffset);
 void mouseCallback(GLFWwindow* vWindow, double vXPos, double vYPos);
@@ -31,6 +35,8 @@ unsigned int loadCubemap(std::vector<std::string> faces);
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+bool shadows = true;
+bool shadowsKeyPressed = false;
 
 // camera
 CCamera Camera(glm::vec3(0, 0, 0));
@@ -102,7 +108,7 @@ int main()
 	CVegaFemFactory vFem("../../models/mapleTree/data/temp", "../../models/mapleTree/trianglesTree.obj", "../../models/mapleTree/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter =9;
+	int numbercounter =7;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -125,6 +131,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	// ------------------------------
 	GLFWwindow* Window = nullptr;
@@ -142,29 +149,33 @@ int main()
 
 	// configure global opengl state
 	// -----------------------------
+	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 	// build and compile shaders
 	// -------------------------
 
-	CShader ourTreeShader("Tree.vert", "Tree.frag");
-	CShader ourPlaneShader("Plane.vert", "Plane.frag");
+#pragma region build and compile shaders
+	CShader ourSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
 	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
+	//CShader ourLightShader("light.vert", "light.frag");
+	CShader ourSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+#pragma endregion
 
-
-
-	//plane vertices
+#pragma region plane vertices data
 	float planeVertices[] = {
-		// positions          // texture Coords 
-		 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-		-5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+		// positions              // normals       // texture Coords  
+		 5.0f, -0.5f,  5.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
+		-5.0f, -0.5f,  5.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+		-5.0f, -0.5f, -5.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
 
-		 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-		 5.0f, -0.5f, -5.0f,  2.0f, 2.0f
+		 5.0f, -0.5f,  5.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
+		-5.0f, -0.5f, -5.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
+		 5.0f, -0.5f, -5.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
 	};
+#pragma endregion
 
-	//skybox vertices
+#pragma region skybox vertices data
 	float skyboxVertices[] = {
 		// positions          
 		-1.0f,  1.0f, -1.0f,
@@ -209,13 +220,14 @@ int main()
 		-1.0f, -1.0f,  1.0f,
 		 1.0f, -1.0f,  1.0f
 	};
+#pragma endregion
 
 #pragma region lights data
 	glm::vec3 lightVertices[] = {
-		glm::vec3(-10.0f,  10.0f, 10.0f),
-		glm::vec3(10.0f,  10.0f, 10.0f),
-		glm::vec3(-10.0f, -10.0f, 10.0f),
-		glm::vec3(10.0f, -10.0f, 10.0f),
+		glm::vec3(-1.5f,  2.5f, 1.0f),
+		glm::vec3(1.5f,  2.5f, 1.0f),
+		glm::vec3(-1.5f,  2.0f, 1.0f),
+		glm::vec3(1.5f,  2.0f, 1.0f),
 	};
 
 	glm::vec3 lightColors[] = {
@@ -224,8 +236,31 @@ int main()
 		glm::vec3(1.0f, 1.0f, 1.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f)
 	};
-#pragma endregion 
 
+	float lightPositionsData[] = {
+		-1.5f,  2.5f, 1.0f,  1.0f, 0.0f, 0.0f,
+		1.5f,  2.5f, 1.0f,	1.0f, 1.0f, 1.0f,
+		-1.5f,  2.0f, 1.0f,	1.0f, 1.0f, 1.0f,
+		1.5f,  2.5f, 1.0f,	1.0f, 1.0f, 1.0f,
+		1.5f,  2.0f, 1.0f,	1.0f, 1.0f, 1.0f,
+		-1.5f,  2.0f, 1.0f,	1.0f, 1.0f, 1.0f
+	};
+
+#pragma region bind light VAO and VBO
+	unsigned int lightVAO, lightPotionVBO;
+	glGenVertexArrays(1, &lightVAO);
+	glGenBuffers(1, &lightPotionVBO);
+	glBindVertexArray(lightVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, lightPotionVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lightPositionsData), &lightPositionsData, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glBindVertexArray(0);
+#pragma endregion
+
+#pragma region bind plane VAO and VBO
 	// plane VAO
 	unsigned int planeVAO, planeVBO;
 	glGenVertexArrays(1, &planeVAO);
@@ -234,14 +269,16 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glBindVertexArray(0);
 	// plane load textures
 	unsigned int floorTexture = loadTexture("resources/textures/metal.png");
-	ourPlaneShader.use();
-	ourPlaneShader.setInt("texture1", 0);
+	unsigned int opacityTexture = loadTexture("resources/textures/opacity.png");
+#pragma endregion
 
 	// skybox VAO
 	unsigned int skyboxVAO, skyboxVBO;
@@ -267,8 +304,8 @@ int main()
 	ourSkyBoxShader.use();
 	ourSkyBoxShader.setInt("skybox", 0);
 
+#pragma region load model
 	CSence ourModel("../../models/mapleTree/trianglesTree.obj");
-
 	ourModel.setMeshRotation();
 	ourModel.setGroupsIndex(vFem);
 	ourModel.setVerticesNumber(vFem);
@@ -276,9 +313,21 @@ int main()
 	ourModel.initSSBODeformationDeltaU(vFem, numbercounter);
 	ourModel.initSSBODeformationU();
 	ourModel.initSSBOTreeFileAndFrameIndex(Common::TreesNumber);
+	ourModel.setSSBO4UDeformationAndIndex(ourSceneShadowShader);
+	ourModel.setSSBOUdeformationAndIndx4ShadowMapShader(ourSceneDepthShader);
+#pragma endregion
 
-	ourTreeShader.use();
-	ourModel.setSSBO4UDeformationAndIndex(ourTreeShader);
+
+	//CSence ourModel("../../models/mapleTree/trianglesTree.obj");
+
+	//ourModel.setMeshRotation();
+	//ourModel.setGroupsIndex(vFem);
+	//ourModel.setVerticesNumber(vFem);
+	//ourModel.setMeshGroupAndAssimpIndex();
+	//
+
+	//ourTreeShader.use();
+
 
 	//查找帧段
 	//std::vector<std::vector<glm::vec3>> matchedFramesSequences;
@@ -347,25 +396,77 @@ int main()
 	int frameNums = vFem.getFileFrames(0)->Frames.size();
 	//obj模型的顶点数
 	int vertexNums = vFem.getFileFrames(0)->Frames[0].BaseFileDeformations.size();
-	ourTreeShader.use();
-	ourTreeShader.setInt("frameNums", frameNums);
-	ourTreeShader.setInt("vertexNums", vertexNums);
-	ourTreeShader.setInt("assimpvertexNums", ourModel.getAssimpVerticesNumber());
+	ourSceneShadowShader.use();
+	ourSceneShadowShader.setInt("frameNums", frameNums);
+	ourSceneShadowShader.setInt("vertexNums", vertexNums);
+	ourSceneShadowShader.setInt("assimpvertexNums", ourModel.getAssimpVerticesNumber());
+
+	ourSceneDepthShader.use();
+	ourSceneDepthShader.setInt("frameNums", frameNums);
+	ourSceneDepthShader.setInt("vertexNums", vertexNums);
+	ourSceneDepthShader.setInt("assimpvertexNums", ourModel.getAssimpVerticesNumber());
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
 	glm::mat4 view;
 
+#pragma region configure depth map FBO
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	unsigned int depthCubemap;
+	glGenTextures(1, &depthCubemap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+	for (unsigned int i = 0; i < 6; ++i)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#pragma endregion
+
+#pragma region create depth cubemap transformation matrices and some value
+	float near_plane = 1.0f;
+	float far_plane = 25.0f;
+	glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
+	std::vector < glm::mat4> shadowTransforms;
+	for (unsigned int i = 0; i < 1; ++i)
+	{
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	}
+	ourSceneDepthShader.use();
+	ourSceneDepthShader.setFloat("far_plane", far_plane);
+	ourSceneDepthShader.setVec3("lightPos", lightVertices[0]);
+	for (unsigned int i = 0; i < 6; ++i)
+	{
+		ourSceneDepthShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+	}
+
+#pragma endregion
+
 #pragma region set light to fragment
+	ourSceneShadowShader.use();
 	for (unsigned int i = 0; i < sizeof(lightVertices) / sizeof(lightVertices[0]); ++i)
 	{
 		glm::vec3 newPos = lightVertices[i];
-		ourTreeShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-		ourTreeShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
+		ourSceneShadowShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+		ourSceneShadowShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
 	}
-	ourTreeShader.setFloat("metallic", 0.04);
-	ourTreeShader.setFloat("roughness", 0.8);
-	//ourTreeShader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
-	ourTreeShader.setFloat("ao", 1.0f);
+	ourSceneShadowShader.setFloat("metallic", 0.04);
+	ourSceneShadowShader.setFloat("roughness", 0.8);
+	ourSceneShadowShader.setFloat("ao", 1.0f);
+	ourSceneShadowShader.setInt("depthMap", 8);
+	ourSceneShadowShader.setFloat("far_plane", far_plane);
 
 #pragma endregion
 
@@ -391,48 +492,58 @@ int main()
 		glClearColor(1.0f, 1.0f, 1.0f, 0.5f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//plane
-		ourPlaneShader.use();
-		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		view = Camera.getViewMatrix();
-		ourPlaneShader.setMat4("projection", projection);
-		ourPlaneShader.setMat4("view", view);
-		glBindVertexArray(planeVAO);
-		glBindTexture(GL_TEXTURE_2D, floorTexture);
-		ourPlaneShader.setMat4("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		//skybox
-		glDepthFunc(GL_LEQUAL);
-		ourSkyBoxShader.use();
-		view = glm::mat4(glm::mat3(Camera.getViewMatrix()));
-		ourSkyBoxShader.setMat4("view", view);
-		ourSkyBoxShader.setMat4("projection", projection);
-		//
-		glBindVertexArray(skyboxVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-		
-		//tree
-		ourTreeShader.use();
-		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		view = Camera.getViewMatrix();
-		ourTreeShader.setMat4("projection", projection);
-		ourTreeShader.setMat4("view", view);
-
 		//每给定的总力段进行一次渲染时的帧D_sum reset
-		if (FrameNumber%Common::ProductFrameNumber==0)
+		if (FrameNumber%Common::ProductFrameNumber == 0)
 		{
 			ourModel.resetSSBO4UDeformation();
 
 			std::cout << "//////////////////////////////////////" << std::endl;
 			std::cout << "Reset" << std::endl;
 		}
-
 		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
-		bool Success= SearchQueue.TryDequeue(tempTreeFileAndFrameIndex);
+		bool Success = SearchQueue.TryDequeue(tempTreeFileAndFrameIndex);
+		ourModel.UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
+		tempTreeFileAndFrameIndex.clear();
+		FrameNumber++;
+
+		// 1. render scene to depth cubemap
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		//plane
+		ourSceneDepthShader.use();
+		ourSceneDepthShader.setInt("planeOrTree", -1);
+		renderPlane(ourSceneDepthShader, planeVAO, floorTexture, opacityTexture);
+		//tree
+		ourSceneDepthShader.setInt("planeOrTree", 1);
+		renderTree(ourSceneDepthShader, ourModel);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
+		//2.render scene as normal 
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//plane
+		ourSceneShadowShader.use();
+		ourSceneShadowShader.setInt("shadows", shadows);
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+		ourSceneShadowShader.setInt("planeOrTree", -1);
+		renderPlane(ourSceneShadowShader, planeVAO, floorTexture, opacityTexture);
+		//tree
+		ourSceneShadowShader.use();
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+		ourSceneShadowShader.setInt("planeOrTree", 1);
+		renderTree(ourSceneShadowShader, ourModel);
+		//light
+		//ourLightShader.use();
+		//renderLight(ourLightShader, lightVAO);
+		//skybox	
+		ourSkyBoxShader.use();
+		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
+		
+
+	
 
 	/*	for (int i = 0; i < tempTreeFileAndFrameIndex.size(); i++)
 		{
@@ -440,18 +551,9 @@ int main()
 		}
 		std::cout << std::endl;*/
 
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(1.0f, -0.5f, -5.0f));// translate it down so it's at the center of the scene
-		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
-		ourTreeShader.setMat4("model", model);
-
-		ourModel.UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
 		//ourModel.UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
 		//Sleep(100);
-		ourModel.draw(ourTreeShader);
-		tempTreeFileAndFrameIndex.clear();
 		
-		FrameNumber++;
 	
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);
@@ -469,7 +571,73 @@ int main()
 	return 0;
 }
 
+//*********************************************************************
+//FUNCTION:
+void renderPlane(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId)
+{
+	glm::mat4 projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 view = Camera.getViewMatrix();
+	glm::mat4 model = glm::mat4(1.0f);
+	vShader.setMat4("projection", projection);
+	vShader.setMat4("view", view);
+	vShader.setInt("texture_diffuse1", 0);
+	vShader.setInt("texture_opacity1", 1);
+	glBindVertexArray(VAOId);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, vTextureId);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, vTextureOpacityId);
+	vShader.setMat4("model", model);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
 
+//*********************************************************************
+//FUNCTION:
+void renderTree(CShader & vShader, CSence& vModel)
+{
+	glm::mat4 projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 view = Camera.getViewMatrix();
+	vShader.setMat4("projection", projection);
+	vShader.setMat4("view", view);
+	vShader.setVec3("camPos", Camera.getPosition());
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(1.0f, -0.5f, -2.0f));// translate it down so it's at the center of the scene
+	model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
+	vShader.setMat4("model", model);
+	vModel.draw(vShader);
+
+}
+
+//*********************************************************************
+//FUNCTION:
+void renderLight(CShader & vShader, const unsigned int & VAOId)
+{
+	glm::mat4 projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 view = Camera.getViewMatrix();
+	glm::mat4 model = glm::mat4(1.0f);
+	vShader.setMat4("projection", projection);
+	vShader.setMat4("view", view);
+	vShader.setMat4("model", model);
+	glBindVertexArray(VAOId);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+//*********************************************************************
+//FUNCTION:
+void renderSkybox(CShader & vShader, const unsigned int & VAOId, const unsigned int & vTextureId)
+{
+	glDepthFunc(GL_LEQUAL);
+	//view = Camera.getViewMatrix();//stop move skybox
+	glm::mat4  view = glm::mat4(glm::mat3(Camera.getViewMatrix()));
+	glm::mat4 projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	vShader.setMat4("view", view);
+	vShader.setMat4("projection", projection);
+	glBindVertexArray(VAOId);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, vTextureId);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+}
 
 //*********************************************************************
 //FUNCTION:
@@ -524,6 +692,16 @@ void processInput(GLFWwindow* vWindow)
 		Camera.processKeyboard(LEFT, DeltaTime);
 	if (glfwGetKey(vWindow, GLFW_KEY_D) == GLFW_PRESS)
 		Camera.processKeyboard(RIGHT, DeltaTime);
+
+	if (glfwGetKey(vWindow, GLFW_KEY_SPACE) == GLFW_PRESS && !shadowsKeyPressed)
+	{
+		shadows = !shadows;
+		shadowsKeyPressed = true;
+	}
+	if (glfwGetKey(vWindow, GLFW_KEY_SPACE) == GLFW_RELEASE)
+	{
+		shadowsKeyPressed = false;
+	}
 }
 
 //*********************************************************************

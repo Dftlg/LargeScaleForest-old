@@ -495,6 +495,37 @@ void CSence::setSSBO4UDeformationAndIndex(const CShader& vShader)
 	
 }
 
+void CSence::setSSBOUdeformationAndIndx4ShadowMapShader(const CShader& vShader)
+{
+	//设置所有DeltaU数据
+	GLuint shader_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaDeformationArray");
+
+	//shader和点连接
+	GLuint ssbo_binding_point_index = 1;
+	//点和SSBO的连接
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, m_DeltaUSSBO);
+	//点和shader的连接
+	glShaderStorageBlockBinding(vShader.getID(), shader_index, ssbo_binding_point_index);
+
+	//设置DelataU用来存储生成树的当前型变量
+	//shader和点连接
+	GLuint shader_delta_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
+
+	GLuint deltassbo_binding_point_index = 2;
+	//点和SSBO的连接
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_index, m_UdeformationSSBO);
+	//点和shader的连接
+	glShaderStorageBlockBinding(vShader.getID(), shader_delta_index, deltassbo_binding_point_index);
+
+	//设置TreeFile和FrameIndex
+	GLuint shader_file_frame_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "IndexArray");
+	GLuint file_frame_ssbo_binding_point_index = 3;
+	//点和SSBO的连接
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, file_frame_ssbo_binding_point_index, m_TreeFileAndFrameSSBO);
+	//点和shader的连接
+	glShaderStorageBlockBinding(vShader.getID(), shader_file_frame_index, file_frame_ssbo_binding_point_index);
+}
+
 void CSence::UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int, int>>& vTreeFileAndFrameIndex)
 {
 	for (int i = 0; i < Common::TreesNumber; i++)

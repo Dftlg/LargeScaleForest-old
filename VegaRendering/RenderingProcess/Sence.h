@@ -43,6 +43,8 @@ public:
 	void initSSBOTreeFileAndFrameIndex(const int vTreeNumber);
 	void resetSSBO4UDeformation();
 
+	void setSSBOUdeformationAndIndx4ShadowMapShader(const CShader& vShader);
+
 	std::vector<std::vector<int>> getGroupsIndex() { return m_GroupsIndex; }
 	std::vector<CMesh> getMeshes() { return m_Meshes; }
 	void senceDraw(const CShader& vShader, std::vector<std::vector<glm::vec3>> deformationFrames);

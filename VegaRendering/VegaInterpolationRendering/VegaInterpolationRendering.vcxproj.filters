@@ -27,5 +27,10 @@
     <None Include="Plane.frag" />
     <None Include="skybox.vert" />
     <None Include="skybox.frag" />
+    <None Include="scene_shadows.vert" />
+    <None Include="scene_shadows.frag" />
+    <None Include="point_shadows_depth.frag" />
+    <None Include="point_shadows_depth.gs" />
+    <None Include="point_shadows_depth.vert" />
   </ItemGroup>
 </Project>
