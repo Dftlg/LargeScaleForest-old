@@ -69,7 +69,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	// ------------------------------
 	GLFWwindow* Window = nullptr;
 	if (!initWindow(Window, SCR_WIDTH, SCR_HEIGHT))
@@ -84,7 +84,8 @@ int main()
 	// tell GLFW to capture our mouse
 	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	#pragma endregion
-
+	
+	glEnable(GL_MULTISAMPLE);
 	// configure global opengl state
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
