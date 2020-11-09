@@ -21,6 +21,9 @@ uniform sampler2D texture_opacity1;
 
 const float PI = 3.14159265359;
 
+float near = 0.1; 
+float far  = 100.0; 
+
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -61,6 +64,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
+
 
 void main()
 {    
@@ -132,5 +136,5 @@ void main()
 
     FragColor = vec4(color, 1.0);
 
-	
+	//FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
 }
