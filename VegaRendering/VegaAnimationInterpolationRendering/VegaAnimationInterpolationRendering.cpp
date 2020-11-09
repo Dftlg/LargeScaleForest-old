@@ -10,16 +10,12 @@
 #include "Sence.h"
 #include "Mesh.h"
 #include "VegaFemFactory.h"
-//#include "TreeInstanceMesh.h"
-//#include "volumetricMeshLoader.h"
-//#include "tetMesh.h"
-//#include <vector>
-//#include <string>
-//#include <cstdio>
-//#include <cassert>
-//#include <float.h>
-//#include "sceneObjectDeformable.h"
 
+
+void renderPlane(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId);
+void renderTree(CShader& vShader, CSence& vModel, int& vFrameIndex, const int& vFrameNums);
+void renderLight(CShader& vShader, const unsigned int& VAOId);
+void renderSkybox(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId);
 bool initWindow(GLFWwindow*& vWindow, int vScreenWidth, int vScreenHeight);
 void scrollCallback(GLFWwindow* vWindow, double vXOffset, double vYOffset);
 void mouseCallback(GLFWwindow* vWindow, double vXPos, double vYPos);
@@ -30,6 +26,8 @@ unsigned int loadCubemap(std::vector<std::string> faces);
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+bool shadows = true;
+bool shadowsKeyPressed = false;
 
 // camera
 CCamera Camera(glm::vec3(0, 0, 0));
@@ -45,12 +43,13 @@ float LastFrame = 0.0f;
 int windactive = 0;
 float grasstime = 0.0f;
 
+int numbercounter = 1;
+
 int main()
 {
 	CVegaFemFactory vFem("../../models/mapleTree/data/temp", "../../models/mapleTree/trianglesTree.obj", "../../models/8.10/ObjectVertexIndex.txt");
 	std::vector<double> b{ 500,1,0,0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 1;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -70,7 +69,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	// ------------------------------
 	GLFWwindow* Window = nullptr;
 	if (!initWindow(Window, SCR_WIDTH, SCR_HEIGHT))
@@ -85,28 +84,30 @@ int main()
 	// tell GLFW to capture our mouse
 	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	#pragma endregion
-
+	
+	
 	// configure global opengl state
+	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
 	#pragma region build and compile shaders
-	CShader ourTreeShader("Tree.vert", "Tree.frag");
-	CShader ourPlaneShader("Plane.vert", "Plane.frag");
+	CShader ourSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
 	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
 	CShader ourLightShader("light.vert", "light.frag");
+	CShader ourSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
 	#pragma endregion
 
 	#pragma region plane vertices data
 		float planeVertices[] = {
-		// positions          // texture Coords 
-		 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-		-5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+		// positions              // normals       // texture Coords  
+		 5.0f, -0.5f,  5.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
+		-5.0f, -0.5f,  5.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+		-5.0f, -0.5f, -5.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
 
-		 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-		 5.0f, -0.5f, -5.0f,  2.0f, 2.0f
+		 5.0f, -0.5f,  5.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
+		-5.0f, -0.5f, -5.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
+		 5.0f, -0.5f, -5.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
 	};
 	#pragma endregion
 
@@ -159,10 +160,10 @@ int main()
 
 	#pragma region lights data
 	glm::vec3 lightVertices[] = {
-		glm::vec3(-10.0f,  10.0f, 10.0f),
-		glm::vec3(10.0f,  10.0f, 10.0f),
-		glm::vec3(-10.0f, -10.0f, 10.0f),
-		glm::vec3(10.0f, -10.0f, 10.0f),
+		glm::vec3(-1.5f,  2.5f, 1.0f),
+		glm::vec3(1.5f,  2.5f, 1.0f),
+		glm::vec3(-1.5f,  2.0f, 1.0f),
+		glm::vec3(1.5f,  2.0f, 1.0f),
 	};
 
 	glm::vec3 lightColors[] = {
@@ -173,12 +174,12 @@ int main()
 	};
 
 	float lightPositionsData[] = {
-		-10.0f,  10.0f, 10.0f,  1.0f, 1.0f, 1.0f,
-		 10.0f,  10.0f, 10.0f,	1.0f, 1.0f, 1.0f,
-		-10.0f, -10.0f, 10.0f,	1.0f, 1.0f, 1.0f,
-		 10.0f,  10.0f, 10.0f,	1.0f, 1.0f, 1.0f,
-		 10.0f, -10.0f, 10.0f,	1.0f, 1.0f, 1.0f,
-		-10.0f, -10.0f, 10.0f,	1.0f, 1.0f, 1.0f
+		-1.5f,  2.5f, 1.0f,  1.0f, 0.0f, 0.0f,
+		1.5f,  2.5f, 1.0f,	1.0f, 1.0f, 1.0f,
+		-1.5f,  2.0f, 1.0f,	1.0f, 1.0f, 1.0f,
+		1.5f,  2.5f, 1.0f,	1.0f, 1.0f, 1.0f,
+		1.5f,  2.0f, 1.0f,	1.0f, 1.0f, 1.0f,
+		-1.5f,  2.0f, 1.0f,	1.0f, 1.0f, 1.0f
 	};
 	#pragma endregion 
 
@@ -205,14 +206,15 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glBindVertexArray(0);
 	// plane load textures
 	unsigned int floorTexture = loadTexture("resources/textures/metal.png");
-	ourPlaneShader.use();
-	ourPlaneShader.setInt("texture1", 0);
+	unsigned int opacityTexture = loadTexture("resources/textures/opacity.png");
 	#pragma endregion
 
 	#pragma region bind light VAO and VBO
@@ -272,7 +274,8 @@ int main()
 	}
 	std::cout << deformU[numbercounter*frameNums*vertexNums - 1].x << " " << count << std::endl;
 
-	GLuint shader_index = glGetProgramResourceIndex(ourTreeShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
+	GLuint tree_shader_index = glGetProgramResourceIndex(ourSceneShadowShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
+	GLuint tree_depth_shader_index = glGetProgramResourceIndex(ourSceneDepthShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
 	GLint SSBOBinding = 0, BlockDataSize = 0;
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding);
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize);
@@ -289,36 +292,87 @@ int main()
 	//点和SSBO的连接
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, SSBO);
 	//点和shader的连接
-	glShaderStorageBlockBinding(ourTreeShader.getID(), shader_index, ssbo_binding_point_index);
+	glShaderStorageBlockBinding(ourSceneShadowShader.getID(), tree_shader_index, ssbo_binding_point_index);
+	glShaderStorageBlockBinding(ourSceneDepthShader.getID(), tree_depth_shader_index, ssbo_binding_point_index);
 	#pragma endregion
 
-	ourTreeShader.use();
-	ourTreeShader.setInt("frameNums", frameNums);
-	ourTreeShader.setInt("vertexNums", vertexNums);
+	ourSceneShadowShader.use();
+	ourSceneShadowShader.setInt("frameNums", frameNums);
+	ourSceneShadowShader.setInt("vertexNums", vertexNums);
+	ourSceneDepthShader.use();
+	ourSceneDepthShader.setInt("frameNums", frameNums);
+	ourSceneDepthShader.setInt("vertexNums", vertexNums);
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
 	glm::mat4 view;
 
-#pragma region set light to fragment
+	
+
+	#pragma region configure depth map FBO
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	unsigned int depthCubemap;
+	glGenTextures(1, &depthCubemap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+	for (unsigned int i = 0; i < 6; ++i)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	#pragma endregion
+
+	#pragma region create depth cubemap transformation matrices and some value
+	float near_plane = 1.0f;
+	float far_plane = 25.0f;
+	glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
+	std::vector < glm::mat4> shadowTransforms;
+	for (unsigned int i = 0; i < 1; ++i)
+	{
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(1.0f, 0.0f, 0.0f),  glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 1.0f, 0.0f),  glm::vec3(0.0f, 0.0f, 1.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, 1.0f),  glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	}
+	ourSceneDepthShader.use();
+	ourSceneDepthShader.setFloat("far_plane", far_plane);
+	ourSceneDepthShader.setVec3("lightPos", lightVertices[0]);
+	for (unsigned int i = 0; i < 6; ++i)
+	{
+		ourSceneDepthShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+	}
+
+	#pragma endregion
+
+	#pragma region set light to fragment
+	ourSceneShadowShader.use();
 	for (unsigned int i = 0; i < sizeof(lightVertices) / sizeof(lightVertices[0]); ++i)
 	{
 		glm::vec3 newPos = lightVertices[i];
-		ourTreeShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-		ourTreeShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
+		ourSceneShadowShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+		ourSceneShadowShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
 	}
-	ourTreeShader.setFloat("metallic", 0.04);
-	ourTreeShader.setFloat("roughness", 0.8);
-	//ourTreeShader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
-	ourTreeShader.setFloat("ao", 1.0f);
+	ourSceneShadowShader.setFloat("metallic", 0.04);
+	ourSceneShadowShader.setFloat("roughness", 0.8);
+	ourSceneShadowShader.setFloat("ao", 1.0f);
+	ourSceneShadowShader.setInt("depthMap", 8);
+	ourSceneShadowShader.setFloat("far_plane", far_plane);
 
-#pragma endregion
+	#pragma endregion
 
 	int i = 0;
-	int time = 0;
 	while (!glfwWindowShouldClose(Window))
 	{
 		// per-frame time logic
-		// --------------------
 		float currentFrame = glfwGetTime();
 		DeltaTime = (currentFrame - LastFrame);
 		LastFrame = currentFrame;
@@ -330,76 +384,47 @@ int main()
 		glClearColor(1.0f, 1.0f, 1.0f, 0.5f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// 1. render scene to depth cubemap
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
 		//plane
-		ourPlaneShader.use();
-		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		view = Camera.getViewMatrix();
-		ourPlaneShader.setMat4("projection", projection);
-		ourPlaneShader.setMat4("view", view);
-		glBindVertexArray(planeVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, floorTexture);
-		ourPlaneShader.setMat4("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
+		ourSceneDepthShader.use();
+		ourSceneDepthShader.setInt("treeIndex", -1);
+		renderPlane(ourSceneDepthShader, planeVAO, floorTexture, opacityTexture);
 		//tree
-		ourTreeShader.use();
-		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		view = Camera.getViewMatrix();
-		ourTreeShader.setMat4("projection", projection);
-		ourTreeShader.setMat4("view", view);
-		ourTreeShader.setInt("frameIndex", i);
-		ourTreeShader.setInt("time", time);
-		ourTreeShader.setVec3("camPos", Camera.getPosition());
+		renderTree(ourSceneDepthShader,ourModel, i, frameNums);
+		//skybox	
+		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		if (i >= frameNums)
-		{
-			i = i % frameNums;
-		}
-		for (int j = 0; j < numbercounter; j++)
-		{
-
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(1.0f*j, -0.5f, -5.0f));// translate it down so it's at the center of the scene
-			model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
-			ourTreeShader.setMat4("model", model);
-			ourTreeShader.setInt("treeIndex", j);
-			ourModel.draw(ourTreeShader);
-		}
-		//ourModel.draw(ourShader)
-		i++;
-		time++;
-
+		//2.render scene as normal 
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
+		//plane
+		ourSceneShadowShader.use();
+		ourSceneShadowShader.setInt("shadows", shadows);
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+		ourSceneShadowShader.setInt("treeIndex", -1);
+		renderPlane(ourSceneShadowShader, planeVAO, floorTexture, opacityTexture);
+		//tree
+		ourSceneShadowShader.use();
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+		renderTree(ourSceneShadowShader, ourModel, i, frameNums);
 		//light
 		ourLightShader.use();
-		projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		view = Camera.getViewMatrix();
-		ourLightShader.setMat4("projection", projection);
-		ourLightShader.setMat4("view", view);
-		ourLightShader.setMat4("model", model);
-		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		//skybox
-		glDepthFunc(GL_LEQUAL);
+		renderLight(ourLightShader, lightVAO);
+		//skybox	
 		ourSkyBoxShader.use();
-		//view = Camera.getViewMatrix();//stop move skybox
-		view = glm::mat4(glm::mat3(Camera.getViewMatrix()));
-		ourSkyBoxShader.setMat4("view", view);
-		ourSkyBoxShader.setMat4("projection", projection);
-		//
-		glBindVertexArray(skyboxVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-		glDepthFunc(GL_LESS); // set depth function back to default
+		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
+
+		i++;
 
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
-
 		Sleep(100);
-
 	}
 
 	glDeleteVertexArrays(1, &skyboxVAO);
@@ -409,6 +434,83 @@ int main()
 	glDeleteBuffers(1, &SSBO);
 	glfwTerminate();
 	return 0;
+}
+
+//*********************************************************************
+//FUNCTION:
+void renderPlane(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId)
+{
+	glm::mat4 projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 view = Camera.getViewMatrix();
+	glm::mat4 model = glm::mat4(1.0f);
+	vShader.setMat4("projection", projection);
+	vShader.setMat4("view", view);
+	vShader.setInt("texture_diffuse1", 0);
+	vShader.setInt("texture_opacity1", 1);
+	glBindVertexArray(VAOId);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, vTextureId);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, vTextureOpacityId);
+	vShader.setMat4("model", model);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+//*********************************************************************
+//FUNCTION:
+void renderTree(CShader & vShader, CSence& vModel, int & vFrameIndex, const int & vFrameNums)
+{
+	glm::mat4 projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 view = Camera.getViewMatrix();
+	vShader.setMat4("projection", projection);
+	vShader.setMat4("view", view);
+	vShader.setInt("frameIndex", vFrameIndex);
+	vShader.setVec3("camPos", Camera.getPosition());
+	if (vFrameIndex >= vFrameNums)
+	{
+		vFrameIndex = vFrameIndex % vFrameNums;
+	}
+	for (int j = 0; j < numbercounter; j++)
+	{
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(1.0f*j, -0.5f, -2.0f));// translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
+		vShader.setMat4("model", model);
+		vShader.setInt("treeIndex", j);
+		vModel.draw(vShader);
+	}
+}
+
+//*********************************************************************
+//FUNCTION:
+void renderLight(CShader & vShader, const unsigned int & VAOId)
+{
+	glm::mat4 projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 view = Camera.getViewMatrix();
+	glm::mat4 model = glm::mat4(1.0f);
+	vShader.setMat4("projection", projection);
+	vShader.setMat4("view", view);
+	vShader.setMat4("model", model);
+	glBindVertexArray(VAOId);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+//*********************************************************************
+//FUNCTION:
+void renderSkybox(CShader & vShader, const unsigned int & VAOId, const unsigned int & vTextureId)
+{
+	glDepthFunc(GL_LEQUAL);
+	//view = Camera.getViewMatrix();//stop move skybox
+	glm::mat4  view = glm::mat4(glm::mat3(Camera.getViewMatrix()));
+	glm::mat4 projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	vShader.setMat4("view", view);
+	vShader.setMat4("projection", projection);
+	glBindVertexArray(VAOId);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, vTextureId);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
 }
 
 //*********************************************************************
@@ -464,6 +566,16 @@ void processInput(GLFWwindow* vWindow)
 		Camera.processKeyboard(LEFT, DeltaTime);
 	if (glfwGetKey(vWindow, GLFW_KEY_D) == GLFW_PRESS)
 		Camera.processKeyboard(RIGHT, DeltaTime);
+
+	if (glfwGetKey(vWindow, GLFW_KEY_SPACE) == GLFW_PRESS && !shadowsKeyPressed)
+	{
+		shadows = !shadows;
+		shadowsKeyPressed = true;
+	}
+	if (glfwGetKey(vWindow, GLFW_KEY_SPACE) == GLFW_RELEASE)
+	{
+		shadowsKeyPressed = false;
+	}
 }
 
 //*********************************************************************
