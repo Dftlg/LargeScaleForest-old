@@ -33,8 +33,8 @@ void processInput(GLFWwindow* vWindow);
 unsigned int loadTexture(char const * path);
 unsigned int loadCubemap(std::vector<std::string> faces);
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1500;
+const unsigned int SCR_HEIGHT = 1000;
 bool shadows = true;
 bool shadowsKeyPressed = false;
 
@@ -105,10 +105,10 @@ int main()
 {
 	//std::thread Thread[Common::TreesNumber];
 
-	CVegaFemFactory vFem("../../models/mapleTree/data/temp", "../../models/mapleTree/trianglesTree.obj", "../../models/mapleTree/ObjectVertexIndex.txt");
+	CVegaFemFactory vFem("../../models/mapleTree/data/temp2", "../../models/mapleTree/trianglesTree.obj", "../../models/mapleTree/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter =7;
+	int numbercounter = 1;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -245,6 +245,7 @@ int main()
 		1.5f,  2.0f, 1.0f,	1.0f, 1.0f, 1.0f,
 		-1.5f,  2.0f, 1.0f,	1.0f, 1.0f, 1.0f
 	};
+#pragma endregion
 
 #pragma region bind light VAO and VBO
 	unsigned int lightVAO, lightPotionVBO;
@@ -280,6 +281,7 @@ int main()
 	unsigned int opacityTexture = loadTexture("resources/textures/opacity.png");
 #pragma endregion
 
+#pragma region skybox VAO and VBO and Texture
 	// skybox VAO
 	unsigned int skyboxVAO, skyboxVBO;
 	glGenVertexArrays(1, &skyboxVAO);
@@ -303,6 +305,7 @@ int main()
 	unsigned int cubemapTexture = loadCubemap(faces);
 	ourSkyBoxShader.use();
 	ourSkyBoxShader.setInt("skybox", 0);
+#pragma endregion
 
 #pragma region load model
 	CSence ourModel("../../models/mapleTree/trianglesTree.obj");
@@ -318,76 +321,31 @@ int main()
 #pragma endregion
 
 
-	//CSence ourModel("../../models/mapleTree/trianglesTree.obj");
-
-	//ourModel.setMeshRotation();
-	//ourModel.setGroupsIndex(vFem);
-	//ourModel.setVerticesNumber(vFem);
-	//ourModel.setMeshGroupAndAssimpIndex();
-	//
-
-	//ourTreeShader.use();
-
-
-	//查找帧段
-	//std::vector<std::vector<glm::vec3>> matchedFramesSequences;
-	//std::vector<int>vExtraForces = GenerateSamplingForce(Common::ProductFrameNumber,130, 1, 0, 0,4);
-	//Common::SpKVFData voSpKVData;
-	//bool flag = true;
 
 	//个数等于
 	std::vector<std::vector<int>> vMultipleExtraForces;
-	for (int i = 0; i < 25; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3000, 1, 0, 0, 4));
-	}
+	//for (int i = 0; i < 25; i++)
+	//{
+	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3000, 1, 0, 0, 4));
+	//}
 
-	for (int i = 0; i < 5; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 490, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3500, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 10; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 5; i++)
+	//for (int i = 0; i < 5; i++)
+	//{
+	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 490, 1, 0, 0, 4));
+	//}
+	//for (int i = 0; i < 5; i++)
+	//{
+	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3500, 1, 0, 0, 4));
+	//}
+	//for (int i = 0; i < 10; i++)
+	//{
+	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
+	//}
+	for (int i = 0; i < 50; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4000, 1, 0, 0, 4));
 	}
-	/*for (int i = 0; i < 5; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3200, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3300, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 10; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4100, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 10; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3700, 1, 0, 0, 4));
-	}*/
-	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 500, 1, 0, 0, 4));
-	////vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2000, 1, 0, 0, 4));
-	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4000, 1, 0, 0, 4));
-	////vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
-	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
-	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
-	//for (int i = 0; i < 46; i++)
-	//{
-	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
-	//}
+	
 	Size = Common::ProductFrameNumber;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
 
@@ -544,15 +502,7 @@ int main()
 		
 
 	
-
-	/*	for (int i = 0; i < tempTreeFileAndFrameIndex.size(); i++)
-		{
-			std::cout << tempTreeFileAndFrameIndex[i].first << "--" << tempTreeFileAndFrameIndex[i].second << "||";
-		}
-		std::cout << std::endl;*/
-
-		//ourModel.UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
-		//Sleep(100);
+		Sleep(100);
 		
 	
 		glDepthFunc(GL_LESS); // set depth function back to default
@@ -601,7 +551,7 @@ void renderTree(CShader & vShader, CSence& vModel)
 	vShader.setMat4("view", view);
 	vShader.setVec3("camPos", Camera.getPosition());
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(1.0f, -0.5f, -2.0f));// translate it down so it's at the center of the scene
+	model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));// translate it down so it's at the center of the scene
 	model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
 	vShader.setMat4("model", model);
 	vModel.draw(vShader);

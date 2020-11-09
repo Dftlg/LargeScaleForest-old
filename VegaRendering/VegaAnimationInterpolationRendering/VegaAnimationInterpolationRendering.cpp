@@ -24,8 +24,8 @@ void processInput(GLFWwindow* vWindow);
 unsigned int loadTexture(char const * path);
 unsigned int loadCubemap(std::vector<std::string> faces);
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1500;
+const unsigned int SCR_HEIGHT = 1000;
 bool shadows = true;
 bool shadowsKeyPressed = false;
 
