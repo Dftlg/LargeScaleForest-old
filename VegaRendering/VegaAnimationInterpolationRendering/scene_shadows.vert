@@ -29,7 +29,6 @@ layout (std430, binding=1) buffer DeformationArray
 void main()
 {
 	v2f_TexCoords = aTexCoords; 
-	//v2f_WorldPos = vec3(model * vec4(aPos,1.0));
 	v2f_Normal = mat3(model) * aNormal;
 
 	vec4 tempPos;

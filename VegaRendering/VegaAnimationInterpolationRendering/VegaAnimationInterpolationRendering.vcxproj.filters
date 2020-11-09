@@ -21,8 +21,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Plane.frag" />
-    <None Include="Plane.vert" />
     <None Include="skybox.frag" />
     <None Include="skybox.vert" />
     <None Include="light.frag" />
@@ -32,8 +30,5 @@
     <None Include="scene_shadows.frag" />
     <None Include="scene_shadows.vert" />
     <None Include="point_shadows_depth.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Other_point_shadows_depth.vert" />
   </ItemGroup>
 </Project>
