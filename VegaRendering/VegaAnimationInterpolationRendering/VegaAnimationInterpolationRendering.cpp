@@ -85,14 +85,14 @@ int main()
 	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	#pragma endregion
 	
-	glEnable(GL_MULTISAMPLE);
+	
 	// configure global opengl state
+	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
 	#pragma region build and compile shaders
 	CShader ourSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
-	//CShader ourPlaneShader("Plane.vert", "scene_shadows.frag");
 	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
 	CShader ourLightShader("light.vert", "light.frag");
 	CShader ourSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
