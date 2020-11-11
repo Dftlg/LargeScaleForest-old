@@ -108,7 +108,7 @@ int main()
 	CVegaFemFactory vFem("../../models/mapleTree/data/temp2", "../../models/mapleTree/trianglesTree.obj", "../../models/mapleTree/ObjectVertexIndex.txt");
 	std::vector<int> b{ 200, 1, 0 };
 	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 1;
+	int numbercounter = 7;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -224,7 +224,7 @@ int main()
 
 #pragma region lights data
 	glm::vec3 lightVertices[] = {
-		glm::vec3(-1.5f,  2.5f, 1.0f),
+		glm::vec3(-1.5f,  2.5f, 2.0f),
 		glm::vec3(1.5f,  2.5f, 1.0f),
 		glm::vec3(-1.5f,  2.0f, 1.0f),
 		glm::vec3(1.5f,  2.0f, 1.0f),
@@ -343,7 +343,7 @@ int main()
 	//}
 	for (int i = 0; i < 50; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4000, 1, 0, 0, 4));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4300, 1, 0, 0, 4));
 	}
 	
 	Size = Common::ProductFrameNumber;
@@ -502,7 +502,7 @@ int main()
 		
 
 	
-		Sleep(100);
+		//Sleep(100);
 		
 	
 		glDepthFunc(GL_LESS); // set depth function back to default
@@ -551,7 +551,7 @@ void renderTree(CShader & vShader, CSence& vModel)
 	vShader.setMat4("view", view);
 	vShader.setVec3("camPos", Camera.getPosition());
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));// translate it down so it's at the center of the scene
+	model = glm::translate(model, glm::vec3(0.0f, -0.5f, -2.0f));// translate it down so it's at the center of the scene
 	model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
 	vShader.setMat4("model", model);
 	vModel.draw(vShader);

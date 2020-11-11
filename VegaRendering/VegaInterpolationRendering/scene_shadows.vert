@@ -39,20 +39,18 @@ layout (std430, binding=3) buffer IndexArray
 void main()
 {
 	v2f_TexCoords = aTexCoords; 
-	
 
-	if(planeOrTree < 0)
-	{
-		v2f_Normal = mat3(model) * aNormal;
-		 gl_Position = projection * view * model * vec4(aPos, 1.0);
+	 if(planeOrTree < 0)
+	 {
+		 v2f_Normal = mat3(model) * aNormal;
 		 v2f_WorldPos = vec3(model * vec4(aPos,1.0));
-	}
+		 gl_Position = projection * view * model * vec4(aPos, 1.0);	 
+	 }
 	else
 	{
-		v2f_Normal = mat3(model)* mat3(instanceMatrix) * aNormal;
-		v2f_WorldPos = vec3(model *instanceMatrix* vec4(aPos,1.0));
-		//sum_u[gl_InstanceID*assimpvertexNums+positionIndex]=u[treeFrameIndex[gl_InstanceID][0]*frameNums*vertexNums+treeFrameIndex[gl_InstanceID][1]*vertexNums+faceId]+sum_u[gl_InstanceID*assimpvertexNums+positionIndex];
 		vec4 tempPos=vec4(aPos,1.0)+sum_u[gl_InstanceID*assimpvertexNums+positionIndex];
-	    gl_Position = projection * view * model * instanceMatrix * tempPos; 
+		v2f_Normal = mat3(model)* mat3(instanceMatrix) * aNormal;
+		v2f_WorldPos = vec3(model *instanceMatrix* tempPos);
+	    gl_Position = projection * view * model * instanceMatrix * tempPos;
 	}
 }
