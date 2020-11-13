@@ -24,6 +24,7 @@ void main()
 	{
 		vec4 tempPos = vec4(aPos,1.0)+u[treeIndex * frameNums * vertexNums + frameIndex * vertexNums+faceId];
 		 gl_Position = model * instanceMatrix * tempPos;
+		 //gl_Position = model * tempPos;
 	}
 	
 }

@@ -11,7 +11,6 @@
 #include "Mesh.h"
 #include "VegaFemFactory.h"
 
-
 void renderPlane(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId);
 void renderTree(CShader& vShader, CSence& vModel, int& vFrameIndex, const int& vFrameNums);
 void renderLight(CShader& vShader, const unsigned int& VAOId);
@@ -24,8 +23,8 @@ void processInput(GLFWwindow* vWindow);
 unsigned int loadTexture(char const * path);
 unsigned int loadCubemap(std::vector<std::string> faces);
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1500;
+const unsigned int SCR_HEIGHT = 1000;
 bool shadows = true;
 bool shadowsKeyPressed = false;
 
@@ -47,8 +46,8 @@ int numbercounter = 1;
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/mapleTree/data/temp", "../../models/mapleTree/trianglesTree.obj", "../../models/8.10/ObjectVertexIndex.txt");
-	std::vector<double> b{ 500,1,0,0 };
+	CVegaFemFactory vFem("../../models/mapleTree/data/U", "../../models/mapleTree/trianglesTree.obj", "../../models/8.10/ObjectVertexIndex.txt");
+	std::vector<double> b{ 4300,1,0,0 };
 	std::vector<std::pair<int, int>> angle;
 	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
 	for (int i = 0; i < numbercounter; i++)
@@ -243,6 +242,7 @@ int main()
 	ourSkyBoxShader.setInt("skybox", 0);
 	#pragma endregion
 	
+
 	#pragma region load model
 		CSence ourModel("../../models/mapleTree/trianglesTree.obj");
 		ourModel.setMeshRotation();
@@ -395,7 +395,7 @@ int main()
 		//tree
 		renderTree(ourSceneDepthShader,ourModel, i, frameNums);
 		//skybox	
-		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
+		//renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		//2.render scene as normal 
@@ -474,7 +474,7 @@ void renderTree(CShader & vShader, CSence& vModel, int & vFrameIndex, const int 
 	{
 
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(1.0f*j, -0.5f, -2.0f));// translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(0.0f, -0.5f, -2.0f));// translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
 		vShader.setMat4("model", model);
 		vShader.setInt("treeIndex", j);

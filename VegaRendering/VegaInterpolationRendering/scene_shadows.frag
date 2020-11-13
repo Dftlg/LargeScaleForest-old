@@ -27,15 +27,34 @@ uniform samplerCube depthMap;
 
 const float PI = 3.14159265359;
 
+// array of offset direction for sampling
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
 // ----------------------------------------------------------------------------
 float ShadowCalculation(vec3 fragPos,vec3 lightPos)
 {
-    vec3 fragToLight = fragPos - lightPos;
-    float closestDepth = texture(depthMap, fragToLight).r;
-    closestDepth *= far_plane;
+     vec3 fragToLight = fragPos - lightPos;
     float currentDepth = length(fragToLight);
-    float bias = 0.1;
-    float shadow = (currentDepth -  bias > closestDepth) ? 1.0 : 0.0;  
+	float shadow = 0.0;
+    float bias = 0.05;
+    int samples = 64;
+    float viewDistance = length(viewPos - fragPos);
+    float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(depthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        closestDepth *= far_plane;   // undo mapping [0;1]
+        if(currentDepth - bias > closestDepth)
+            shadow += 1.0;
+    }
+    shadow /= float(samples);
 	
 	// FragColor = vec4(vec3(closestDepth / far_plane), 1.0);       
     return shadow;

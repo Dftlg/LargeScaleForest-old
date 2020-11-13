@@ -29,19 +29,23 @@ layout (std430, binding=1) buffer DeformationArray
 void main()
 {
 	v2f_TexCoords = aTexCoords; 
-	v2f_Normal = mat3(model) * aNormal;
+	//v2f_Normal = mat3(model) * aNormal;
+	//v2f_WorldPos = vec3(model * vec4(aPos,1.0));
 
 	vec4 tempPos;
 
 	if(treeIndex < 0)
 	{
-		 gl_Position = projection * view * model * vec4(aPos, 1.0);
-		 v2f_WorldPos = vec3(model * vec4(aPos,1.0));
-	}
+		v2f_WorldPos = vec3(model * vec4(aPos,1.0));
+		v2f_Normal = mat3(model) * aNormal;
+		gl_Position = projection * view * model * vec4(aPos, 1.0);
+		
+	} 
 	else
 	{
 		tempPos = vec4(aPos,1.0)+u[treeIndex * frameNums * vertexNums + frameIndex * vertexNums+faceId];
-		v2f_WorldPos = vec3(model * instanceMatrix * vec4(aPos,1.0));
+		v2f_WorldPos = vec3(model * instanceMatrix * tempPos);
+		v2f_Normal = mat3(model) * mat3(instanceMatrix) * aNormal;	
 	    gl_Position = projection * view * model * instanceMatrix * tempPos; 
 	}
 

@@ -38,31 +38,14 @@ glm::mat4* CSence::randomRotation()
 	for (int i = 0; i < Common::TreesNumber; i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(TreesPosition[i].first*25, -0.5f, TreesPosition[i].second*25));
+	/*	model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber/2)*30, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2) *30));
 		srand(time(0));
 		float tempRandom = (float)RandomGenerate();	
 		model = glm::rotate(model, glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
 		glm::vec3 tempScale = GenerateRamdomScale();
-		model = glm::scale(model, tempScale);
+		model = glm::scale(model, tempScale);*/
 		modelMatrices[i] = model;
 	}
-
-	//for (int i = 0; i < Size; i++)
-	//{
-	//	for (int j = 0; j < Size; j++)
-	//	{
-	//		glm::mat4 model = glm::mat4(1.0f);
-	//		model = glm::translate(model, glm::vec3(0.5f*i, -0.5f, j*1.0f));
-
-	//		srand(time(0));
-	//		float tempRandom = (float)RandomGenerate();
-	//		model = glm::rotate(model, glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
-	//		modelMatrices[i * Size + j] = model;
-	//	}
-	//	// translate it down so it's at the center of the scene
-	//	//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-	//}
-
 	return modelMatrices;
 }
 
