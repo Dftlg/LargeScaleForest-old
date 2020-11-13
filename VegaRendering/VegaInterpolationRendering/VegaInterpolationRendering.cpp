@@ -103,8 +103,8 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/mapleTree/data/deltaU3", "../../models/mapleTree/trianglesTree.obj", "../../models/mapleTree/ObjectVertexIndex.txt");
-	int numbercounter = 8;
+	CVegaFemFactory vFem("../../models/mini_mapleTree/data/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt");
+	int numbercounter = 5;
 	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -294,7 +294,7 @@ int main()
 #pragma endregion
 
 #pragma region load model
-	CSence ourModel("../../models/mapleTree/trianglesTree.obj");
+	CSence ourModel("../../models/mini_mapleTree/tree.obj");
 	ourModel.setMeshRotation();
 	ourModel.setGroupsIndex(vFem);
 	ourModel.setVerticesNumber(vFem);
@@ -327,7 +327,7 @@ int main()
 	//{
 	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
 	//}
-	for (int i = 0; i < 1; i++)
+	/*for (int i = 0; i < 1; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4300, 1, 0, 0, 4));
 	}
@@ -338,10 +338,10 @@ int main()
 	for (int i = 0; i < 10; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 5; i++)
+	}*/
+	for (int i = 0; i < 1; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4000, 1, 0, 0, 4));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,415, 1, 0, 0, 4));
 	}
 	/*for (int i = 0; i < 5; i++)
 	{
