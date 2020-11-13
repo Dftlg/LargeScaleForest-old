@@ -92,9 +92,9 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 		{
 			tempTreeFileAndFrameIndex.push_back(vVFF.getFileAndFrameIndex(treenumber, SearchFrameNumber % 5));
 
-			//std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
+			std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
 		}
-		//std::cout << std::endl;
+		std::cout << std::endl;
 		SearchQueue.Enqueue(tempTreeFileAndFrameIndex);
 		SearchFrameNumber++;
 		tempTreeFileAndFrameIndex.clear();
@@ -103,30 +103,17 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 
 int main()
 {
-	//std::thread Thread[Common::TreesNumber];
-
-	CVegaFemFactory vFem("../../models/mapleTree/data/temp2", "../../models/mapleTree/trianglesTree.obj", "../../models/mapleTree/ObjectVertexIndex.txt");
-	std::vector<int> b{ 200, 1, 0 };
-	std::vector<std::pair<int, int>> angle;
-	int numbercounter = 7;
-	bool interpolationOnAnimation = false, interpolationOnAttribute = false;
-	for (int i = 0; i < numbercounter; i++)
-	{
-		angle.push_back(std::make_pair(0, i * 30));
-	}
-
+	CVegaFemFactory vFem("../../models/mapleTree/data/deltaU3", "../../models/mapleTree/trianglesTree.obj", "../../models/mapleTree/ObjectVertexIndex.txt");
+	int numbercounter = 8;
 	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
 	for (int i = 0; i < numbercounter; i++)
 	{
-		//给定角度下相关联的一些位移帧文件集合，但由于目前只有一个，就每个角度特定对应一个
-		//std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrames(angle[i].first, angle[i].second, b);
 		std::vector<Common::SFileFrames> temp;
 		temp.push_back(vtemp[i]);
-		vFem.readFramesDeformationData(temp, i);//i本来应该是vtemp.size()
+		vFem.readFramesDeformationData(temp, i);
 	}
 
-	// glfw: initialize and configure
-
+#pragma region initialize and configure glfw
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -152,8 +139,7 @@ int main()
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	// build and compile shaders
-	// -------------------------
+#pragma endregion
 
 #pragma region build and compile shaders
 	CShader ourSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
@@ -341,7 +327,7 @@ int main()
 	//{
 	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
 	//}
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4300, 1, 0, 0, 4));
 	}
@@ -349,23 +335,20 @@ int main()
 	Size = Common::ProductFrameNumber;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
 
-
-	//帧数
+#pragma region Sets the number of frames and vertices to shader
+	//frame number
 	int frameNums = vFem.getFileFrames(0)->Frames.size();
-	//obj模型的顶点数
+	//obj model vertices
 	int vertexNums = vFem.getFileFrames(0)->Frames[0].BaseFileDeformations.size();
-	ourSceneShadowShader.use();
-	ourSceneShadowShader.setInt("frameNums", frameNums);
-	ourSceneShadowShader.setInt("vertexNums", vertexNums);
-	ourSceneShadowShader.setInt("assimpvertexNums", ourModel.getAssimpVerticesNumber());
-
 	ourSceneDepthShader.use();
 	ourSceneDepthShader.setInt("frameNums", frameNums);
 	ourSceneDepthShader.setInt("vertexNums", vertexNums);
 	ourSceneDepthShader.setInt("assimpvertexNums", ourModel.getAssimpVerticesNumber());
-	glm::mat4 model = glm::mat4(1.0f);
-	glm::mat4 projection;
-	glm::mat4 view;
+	ourSceneShadowShader.use();
+	ourSceneShadowShader.setInt("frameNums", frameNums);
+	ourSceneShadowShader.setInt("vertexNums", vertexNums);
+	ourSceneShadowShader.setInt("assimpvertexNums", ourModel.getAssimpVerticesNumber());
+#pragma endregion	
 
 #pragma region configure depth map FBO
 	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
@@ -389,28 +372,28 @@ int main()
 #pragma endregion
 
 #pragma region create depth cubemap transformation matrices and some value
-	float near_plane = 1.0f;
-	float far_plane = 25.0f;
-	glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
-	std::vector < glm::mat4> shadowTransforms;
-	for (unsigned int i = 0; i < 1; ++i)
-	{
-		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
-		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-		shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-	}
-	ourSceneDepthShader.use();
-	ourSceneDepthShader.setFloat("far_plane", far_plane);
-	ourSceneDepthShader.setVec3("lightPos", lightVertices[0]);
-	for (unsigned int i = 0; i < 6; ++i)
-	{
-		ourSceneDepthShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
-	}
+		float near_plane = 1.0f;
+		float far_plane = 25.0f;
+		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
+		std::vector < glm::mat4> shadowTransforms;
+		for (unsigned int i = 0; i < 1; ++i)
+		{
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		}
+		ourSceneDepthShader.use();
+		ourSceneDepthShader.setFloat("far_plane", far_plane);
+		ourSceneDepthShader.setVec3("lightPos", lightVertices[0]);
+		for (unsigned int i = 0; i < 6; ++i)
+		{
+			ourSceneDepthShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+		}
 
-#pragma endregion
+	#pragma endregion
 
 #pragma region set light to fragment
 	ourSceneShadowShader.use();
@@ -432,13 +415,13 @@ int main()
 	//开启线程进行读取Tree索引
 	boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex,vFem, ourModel, vMultipleExtraForces);
 
-	//int Size = vMultipleExtraForces[0].size() / 5;
-	int tempFrame = 0;
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 projection;
+	glm::mat4 view;
 
 	while (!glfwWindowShouldClose(Window))
 	{
 		// per-frame time logic
-		// --------------------
 		float currentFrame = glfwGetTime();
 		DeltaTime = (currentFrame - LastFrame);
 		LastFrame = currentFrame;
@@ -493,18 +476,12 @@ int main()
 		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 		ourSceneShadowShader.setInt("planeOrTree", 1);
 		renderTree(ourSceneShadowShader, ourModel);
-		//light
-		//ourLightShader.use();
-		//renderLight(ourLightShader, lightVAO);
 		//skybox	
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
-		
-
 	
-		//Sleep(100);
+		Sleep(100);
 		
-	
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);
 		glfwPollEvents();

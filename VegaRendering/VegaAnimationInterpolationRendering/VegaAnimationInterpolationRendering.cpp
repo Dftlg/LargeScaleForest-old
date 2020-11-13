@@ -11,7 +11,6 @@
 #include "Mesh.h"
 #include "VegaFemFactory.h"
 
-void renderCube(CShader& vShader, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId);
 void renderPlane(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId);
 void renderTree(CShader& vShader, CSence& vModel, int& vFrameIndex, const int& vFrameNums);
 void renderLight(CShader& vShader, const unsigned int& VAOId);

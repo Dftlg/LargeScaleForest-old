@@ -894,11 +894,18 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		voMatchedFrameSequenceIndex.clear();
 		std::vector<std::pair<int, double>>tempSortedForceSequence = tempForceErrorSequence;
 		sort(tempSortedForceSequence.begin(), tempSortedForceSequence.end(), [](const std::pair<int, int>&x, const std::pair<int, int>&y)->int {return x.second < y.second; });
-		voCurrentFrameIndex = tempSortedForceSequence[0].first;
-		voSpKVData = m_AllReallyLoadConnectedFem[tempSortedForceSequence[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(tempSortedForceSequence[0].first % Common::SamplingFrameNumber) / 5];
-		vIsFirstFrame = 0;
-		for (int k = 4; k >= 0; k--)
-			voMatchedFrameSequenceIndex.push_back(tempSortedForceSequence[0].first - k);
+		for (int i = 0; i < tempSortedForceSequence.size(); i++)
+		{
+			if ((*(m_VelocitySequence[tempForceErrorSequence[i].first].second))[0].x>0)
+			{
+				voCurrentFrameIndex = tempSortedForceSequence[i].first;
+				voSpKVData = m_AllReallyLoadConnectedFem[tempSortedForceSequence[i].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(tempSortedForceSequence[i].first % Common::SamplingFrameNumber) / 5];
+				vIsFirstFrame = 0;
+				for (int k = 4; k >= 0; k--)
+					voMatchedFrameSequenceIndex.push_back(tempSortedForceSequence[i].first - k);
+				break;
+			}
+		}		
 	}
 	else
 	{
@@ -1026,8 +1033,8 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		int NextFrameIndex = voCurrentFrameIndex + 5;
 
 		std::vector<std::pair<int, double>> allWeightsSumResults;
-		double forcesWeight = 0.35;
-		double KVfWeight = 0.65;
+		double forcesWeight = 0.4;
+		double KVfWeight = 0.6;
 #pragma omp parallel for
 		for (int i = 0; i < m_reorderSpKVFSegmentIndexSequence.size(); i++)
 		{

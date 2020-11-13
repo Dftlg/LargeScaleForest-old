@@ -51,7 +51,7 @@ namespace Common
 	static int CorrectuDeformationFrame = 20;
 
 	//一个文件中存多少帧
-	static int SamplingFrameNumber = 120;
+	static int SamplingFrameNumber = 180;
 
 	static int ProductFrameNumber = 120;
 
