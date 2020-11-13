@@ -98,7 +98,7 @@ double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
 	int BaseNumber = 0;
 	if (tempNumber < 1)
 	{
-		while (tempNumber > 1)
+		while (tempNumber < 1)
 		{
 			tempNumber *= 10;
 			BaseNumber++;
@@ -107,7 +107,7 @@ double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
 	}
 	else if (tempNumber >= 1)
 	{
-		while (tempNumber < 1)
+		while (tempNumber >= 1)
 		{
 			tempNumber /= 10;
 			BaseNumber++;

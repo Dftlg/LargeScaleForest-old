@@ -375,7 +375,7 @@ int main()
 	//}
 	Size = Common::ProductFrameNumber;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
-
+	vFem.initKVFDataSearchRangeError();
 
 	//帧数
 	int frameNums = vFem.getFileFrames(0)->Frames.size();
