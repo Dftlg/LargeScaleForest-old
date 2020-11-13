@@ -210,8 +210,8 @@ int main()
 
 #pragma region lights data
 	glm::vec3 lightVertices[] = {
-		glm::vec3(-1.5f,  2.5f, 2.0f),
-		glm::vec3(1.5f,  2.5f, 1.0f),
+		glm::vec3(-1.5f,  2.5f, 1.0f),
+		glm::vec3(1.5f,  2.5f, 1.0f), 
 		glm::vec3(-1.5f,  2.0f, 1.0f),
 		glm::vec3(1.5f,  2.0f, 1.0f),
 	};
@@ -331,12 +331,53 @@ int main()
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4300, 1, 0, 0, 4));
 	}
-	
+	for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3500, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4000, 1, 0, 0, 4));
+	}
+	/*for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3200, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3300, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4100, 1, 0, 0, 4));
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3700, 1, 0, 0, 4));
+	}*/
+	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 500, 1, 0, 0, 4));
+	////vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2000, 1, 0, 0, 4));
+	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4000, 1, 0, 0, 4));
+	////vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
+	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
+	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
+	//for (int i = 0; i < 46; i++)
+	//{
+	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
+	//}
 	Size = Common::ProductFrameNumber;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
 
-#pragma region Sets the number of frames and vertices to shader
-	//frame number
+
+	//帧数
 	int frameNums = vFem.getFileFrames(0)->Frames.size();
 	//obj model vertices
 	int vertexNums = vFem.getFileFrames(0)->Frames[0].BaseFileDeformations.size();
