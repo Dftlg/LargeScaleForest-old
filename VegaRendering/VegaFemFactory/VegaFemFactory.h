@@ -39,6 +39,7 @@ public:
 	std::string getFileName(const std::string & vFileDirectory);
 	//返回一个形变文件
 	//Common::SFileFrames getFileFrames(int vIndex) { return m_FilesData[vIndex]; }
+	Common::SpKVFData getFirstKVFDataFromFirstFileFrame() { return m_FilesData[0].KVFFrameDatas[0]; }
 
 	Common::SFileFrames* getFileFrames(int vIndex) { return &m_FilesData[vIndex]; }
 	std::vector<std::vector<int>> getMultipleFramesIndex() { return m_MultipleFramesIndex; }
@@ -69,6 +70,8 @@ public:
 	void initMatchedFrameStruct(int vTreeSize);
 
 	void initTempMultipleTreeData(int vTreeSize);
+
+	void initKVFDataSearchRangeError();
 
 	void resetTempMultipleTreeData(int vTreeSize);
 	
@@ -109,6 +112,14 @@ public:
 		if (abs(vFirstNumber.x - vSecondNumber.x) < vJudegRange && 
 			abs(vFirstNumber.y - vSecondNumber.y) < vJudegRange &&
 			abs(vFirstNumber.z - vSecondNumber.z) < vJudegRange)
+			return true;
+		return false;
+	};
+	inline bool AbsError(glm::vec3 vFirstNumber, glm::vec3 vSecondNumber, double vJudegRange,int vReduce)
+	{
+		if (abs((vFirstNumber.x - vSecondNumber.x)/vReduce) < vJudegRange &&
+			abs((vFirstNumber.y - vSecondNumber.y)/vReduce) < vJudegRange &&
+			abs((vFirstNumber.z - vSecondNumber.z)/vReduce) < vJudegRange)
 			return true;
 		return false;
 	};
@@ -155,5 +166,8 @@ private:
 	std::vector<std::vector<std::pair<int, int>>> m_MultipleFileAndFramesIndex;
 
 	int CurrentFrameIndex = 0;
-	
+
+	std::vector<double> m_VelocityRangeError;
+	std::vector<std::vector<double>> m_KMatrixRangeError;
+	std::vector<double> m_InternalForcesError;
 };

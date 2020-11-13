@@ -225,7 +225,7 @@ int main()
 #pragma region lights data
 	glm::vec3 lightVertices[] = {
 		glm::vec3(-1.5f,  2.5f, 1.0f),
-		glm::vec3(1.5f,  2.5f, 1.0f),
+		glm::vec3(1.5f,  2.5f, 1.0f), 
 		glm::vec3(-1.5f,  2.0f, 1.0f),
 		glm::vec3(1.5f,  2.0f, 1.0f),
 	};
@@ -356,7 +356,7 @@ int main()
 	}
 	for (int i = 0; i < 5; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4000, 1, 0, 0, 4));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4000, 1, 0, 0, 4));
 	}
 	/*for (int i = 0; i < 5; i++)
 	{
@@ -390,7 +390,7 @@ int main()
 	//}
 	Size = Common::ProductFrameNumber;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
-
+	vFem.initKVFDataSearchRangeError();
 
 	//帧数
 	int frameNums = vFem.getFileFrames(0)->Frames.size();

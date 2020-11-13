@@ -23,3 +23,5 @@ std::vector<double> GetForceConfigurate(const std::string & vFilePath);
 std::vector<std::pair<double, double>> RandomTreePositionGenerate(int vTreeNumber);
 
 glm::vec3 GenerateRamdomScale();
+
+double OneNumberRangeError(float vNumber, int vControlFloatPosition=0, int vRange=1);

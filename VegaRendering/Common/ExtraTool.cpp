@@ -90,3 +90,28 @@ std::vector<double> GetForceConfigurate(const std::string& vFilePath)
 	return tempConfig;
 	
 }
+
+//输入数据，控制范围在数据的周围每次扩大10例如：10,100,0.1,0.001，控制其范围的倍率
+double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
+{
+	float tempNumber = abs(vNumber);
+	int BaseNumber = 0;
+	if (tempNumber < 1)
+	{
+		while (tempNumber > 1)
+		{
+			tempNumber *= 10;
+			BaseNumber++;
+		}
+		return (1.0 / ((BaseNumber+vControlFloatPosition) * 10))*vRange;
+	}
+	else if (tempNumber >= 1)
+	{
+		while (tempNumber < 1)
+		{
+			tempNumber /= 10;
+			BaseNumber++;
+		}
+		return ((BaseNumber-vControlFloatPosition) * 10)*vRange;
+	} 
+}

@@ -779,6 +779,32 @@ void CVegaFemFactory::initMatchedFrameStruct(int vTreeSize)
 	/*std::fill_n(std::back_inserter(m_Flag), vTreeSize, 1);*/
 }
 
+void CVegaFemFactory::initKVFDataSearchRangeError()
+{
+	for (int i = 0; i < 5; i++)
+	{
+		int a = 1;
+	}
+	Common::SpKVFData firstKVFData4FirstFile = getFirstKVFDataFromFirstFileFrame();
+	//compute V RangeError
+	for (auto tempv : firstKVFData4FirstFile.Velocity)
+		m_VelocityRangeError.push_back(OneNumberRangeError(tempv.x));
+
+	for (auto tempF : firstKVFData4FirstFile.InternalForces)
+		m_InternalForcesError.push_back(OneNumberRangeError(tempF.x));
+
+	for (auto tempK : firstKVFData4FirstFile.Kmatrix)
+	{
+		std::vector<double> tempOneVertexRangeError;
+		for (int tempNumber = 0; tempNumber < tempK.size(); tempNumber++)
+		{
+			tempOneVertexRangeError.push_back(OneNumberRangeError(tempK[tempNumber]));
+		}
+		m_KMatrixRangeError.push_back(tempOneVertexRangeError);
+		tempOneVertexRangeError.clear();
+	}
+}
+
 void CVegaFemFactory::initTempMultipleTreeData(int vTreeSize)
 {
 	m_MultipleFramesIndex.resize(vTreeSize);
@@ -831,29 +857,6 @@ void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> 
 		}
 	std::clock_t end = clock();
 	//std::cout << (end - start) << std::endl;
-	//for (auto treeIndex = 0; treeIndex < m_TempSpKVFData.size(); treeIndex++)
-	//{
-	//	m_TempSpKVFData[treeIndex].Forces.clear();
-	//	//每棵树的当前5个力的段
-	//	for (int k = 0; k < 5; k++)
-	//		m_TempSpKVFData[treeIndex].Forces.push_back(voExtraForces[treeIndex][k]);
-	//}
-	//	//可以并行
-	//for (auto treeIndex = 0; treeIndex < m_TempSpKVFData.size(); treeIndex++)
-	//{
-	//	vThreads[treeIndex](&CVegaFemFactory::searchMatchedOneTreeFrameSequences, m_MultipleFramesIndex[treeIndex], m_TempSpKVFData[treeIndex], voExtraForces[treeIndex], m_CurrentFrameIndex[treeIndex], m_Flag[treeIndex]);
-	//}
-	//	/*m_ioService.post
-	//		searchMatchedOneTreeFrameSequences(m_MultipleFramesIndex[treeIndex], m_TempSpKVFData[treeIndex], voExtraForces[treeIndex], m_CurrentFrameIndex[treeIndex], m_Flag[treeIndex]);*/
-	//for (auto treeIndex = 0; treeIndex < m_TempSpKVFData.size(); treeIndex++)
-	//{
-	//	for (int j = 0; j < 5; j++)
-	//	{
-	//		m_MultipleFileAndFramesIndex[treeIndex][j].first = m_MultipleFramesIndex[treeIndex][j] / Common::SamplingFrameNumber;
-	//		m_MultipleFileAndFramesIndex[treeIndex][j].second = m_MultipleFramesIndex[treeIndex][j] % Common::SamplingFrameNumber;
-	//	}
-	//}
-	
 }
 
 static int number = 0;
@@ -933,7 +936,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 				//std::cout << "test" << m_VelocitySequence[i].second->size();
 				for (int k = 0; k < m_VelocitySequence[i].second->size(); k++)
 				{
-					if (AbsError(voSpKVData.Velocity[k], glm::vec3(0, 0, 0), Common::VelocityErrorRange))
+					if (AbsError(voSpKVData.Velocity[k], glm::vec3(0, 0, 0), m_VelocityRangeError[k]))
 						count++;
 				}
 				tempVelocityErrorSequence.push_back(std::make_pair(m_VelocitySequence[i].first, count));
@@ -941,7 +944,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 			}
 			for (int k = 0; k < m_VelocitySequence[i].second->size(); k++)
 			{
-				if (AbsError((*(m_VelocitySequence[i - 1].second))[k], voSpKVData.Velocity[k], Common::VelocityErrorRange))
+				if (AbsError((*(m_VelocitySequence[i - 1].second))[k], voSpKVData.Velocity[k], m_VelocityRangeError[k]))
 					count++;
 			}
 			tempVelocityErrorSequence.push_back(std::make_pair(m_VelocitySequence[i].first, count));
@@ -966,7 +969,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 					//std::cout << "test" << (*m_KMartixSequence[i].second)[k].size();
 					for (int j = 0; j < (*m_KMartixSequence[i].second)[k].size(); j++)
 					{
-						if (AbsError(voSpKVData.Kmatrix[k][j], 0, Common::KErrorRange))
+						if (AbsError(voSpKVData.Kmatrix[k][j], 0, m_KMatrixRangeError[k][j]))
 							count++;
 					}
 				}
@@ -977,7 +980,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 			{
 				for (int j = 0; j < (*m_KMartixSequence[i].second)[k].size(); j++)
 				{
-					if (AbsError(((*m_KMartixSequence[i-1].second)[k])[j], voSpKVData.Kmatrix[k][j], Common::KErrorRange))
+					if (AbsError(((*m_KMartixSequence[i-1].second)[k])[j], voSpKVData.Kmatrix[k][j], m_KMatrixRangeError[k][j]))
 						count++;
 				}
 			}
@@ -997,7 +1000,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 			{
 				for (int k = 0; k < m_InternalForcesSequence[i].second->size(); k++)
 				{
-					if (AbsError(voSpKVData.InternalForces[k], glm::vec3(0, 0, 0), Common::internalForceErrorRange))
+					if (AbsError(voSpKVData.InternalForces[k], glm::vec3(0, 0, 0), Common::internalForceErrorRange, m_InternalForcesError[k]))
 						count++;
 				}
 				tempInternalForcesErrorSequence.push_back(std::make_pair(m_InternalForcesSequence[i].first, count));
@@ -1005,7 +1008,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 			}
 			for (int k = 0; k < m_InternalForcesSequence[i].second->size(); k++)
 			{
-				if (AbsError((*(m_InternalForcesSequence[i - 1].second))[k], voSpKVData.InternalForces[k], Common::internalForceErrorRange))
+				if (AbsError((*(m_InternalForcesSequence[i - 1].second))[k], voSpKVData.InternalForces[k], m_InternalForcesError[k]))
 					count++;
 			}
 			tempInternalForcesErrorSequence.push_back(std::make_pair(m_InternalForcesSequence[i].first, count));
