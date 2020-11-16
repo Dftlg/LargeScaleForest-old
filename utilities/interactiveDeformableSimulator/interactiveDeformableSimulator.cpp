@@ -1615,8 +1615,13 @@ void initSimulation()
 
   std::vector<double> tempConfig = GetForceConfigurate(outputFilename);
   //6172,6552,2768
+  //1000
   std::vector<int>pullVertexIndex = { 6172,6552,2768,4214,12203,11346 };
-  std::vector<float>scale = { 1.0,0.8,0.08,0.05,-0.02,-0.05 };
+  //std::vector<float>scale = { 1.0,0.8,0.08,0.05,-0.02,-0.05 };
+  //600
+  //std::vector<float>scale = { 1.0,0.8,0.05,0.03,-0.009,-0.03 };
+  //3000
+  std::vector<float>scale = { 1.0,0.8,0.02,0.01,-0.009,-0.009 };
   StemExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
   LeafExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
   
