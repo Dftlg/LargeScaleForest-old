@@ -40,10 +40,20 @@ vec3 gridSamplingDisk[20] = vec3[]
 // ----------------------------------------------------------------------------
 float ShadowCalculation(vec3 fragPos,vec3 lightPos)
 {
-     vec3 fragToLight = fragPos - lightPos;
-    float currentDepth = length(fragToLight);
 	float shadow = 0.0;
-    float bias = 0.05;
+	vec3 fragToLight = fragPos - lightPos;
+	vec4 fragPosLightSpace = vec4(fragToLight,1.0);
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+	if(projCoords.z > 0.7)
+	{
+        shadow = 0.0;
+		return shadow;
+	}
+
+    //vec3 fragToLight = fragPos - lightPos;
+    float currentDepth = length(fragToLight);
+	
+    float bias = 0.1;
     int samples = 64;
     float viewDistance = length(viewPos - fragPos);
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
@@ -56,6 +66,7 @@ float ShadowCalculation(vec3 fragPos,vec3 lightPos)
     }
     shadow /= float(samples);
 	
+
 	// FragColor = vec4(vec3(closestDepth / far_plane), 1.0);       
     return shadow;
 }
