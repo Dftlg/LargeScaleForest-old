@@ -877,10 +877,9 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 	for (int i = 0; i < m_ForceSequence.size(); i++)
 	{
 		int forceError = 0;
-		for (auto k = 0; k < 5;)
+		for (auto k = 0; k < 5;k++)
 		{
 			forceError += AbsError(voSpKVData.Forces[k], m_ForceSequence[i].second[k]);
-			k = k + 2;
 		}
 		forceError /= Common::ExpandForceError;
 		tempForceErrorSequence.push_back(std::make_pair(m_ForceSequence[i].first, forceError));
@@ -901,7 +900,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 				tempForceErrorSequence[i].second = 9999;
 		}
 		std::vector<std::pair<int, double>>tempSortedForceSequence = tempForceErrorSequence;
-		sort(tempSortedForceSequence.begin(), tempSortedForceSequence.end(), [](const std::pair<int, int>&x, const std::pair<int, int>&y)->int {return x.second < y.second; });
+		sort(tempSortedForceSequence.begin(), tempSortedForceSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second < y.second; });
 		voCurrentFrameIndex = tempSortedForceSequence[0].first;
 		voSpKVData = m_AllReallyLoadConnectedFem[tempSortedForceSequence[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(tempSortedForceSequence[0].first % Common::SamplingFrameNumber) / 5];
 		vIsFirstFrame = 0;
@@ -920,7 +919,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		for (int i = 0; i < tempForceErrorSequence.size(); i++)
 		{
 			//std::cout << tempForceErrorSequence[i].second << std::endl;
-			gaussianForceErrrorSequence.push_back(std::make_pair(tempForceErrorSequence[i].first, GaussianFunction(tempForceErrorSequence[i].second / double(1000), sqrt(0.2), 0, 0.001)));
+			gaussianForceErrrorSequence.push_back(std::make_pair(tempForceErrorSequence[i].first, GaussianFunction(tempForceErrorSequence[i].second / double(4000), sqrt(0.2), 0, 0.001)));
 			gaussianForceErrrorSum += gaussianForceErrrorSequence[i].second;
 		}
 
@@ -1034,6 +1033,16 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		int NextFrameIndex = voCurrentFrameIndex + 5;
 
 
+		std::vector<std::pair<int, double>> reorderTempKErrorSequence = tempKErrorSequence;
+		std::vector<std::pair<int, double>> reorderTempVelocityErrorSequence = tempVelocityErrorSequence;
+		std::vector<std::pair<int, double>> reorderTempInternalForcesErrorSequence = tempInternalForcesErrorSequence;
+		std::vector <std::pair<int, double>> reorderGaussianForceErrrorSequence = gaussianForceErrrorSequence;
+		std::vector <std::pair<int, double>> reorderTempForceErrorSequence = tempForceErrorSequence;
+		sort(reorderTempKErrorSequence.begin(), reorderTempKErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
+		sort(reorderTempVelocityErrorSequence.begin(), reorderTempVelocityErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
+		sort(reorderTempInternalForcesErrorSequence.begin(), reorderTempInternalForcesErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
+		sort(reorderGaussianForceErrrorSequence.begin(), reorderGaussianForceErrrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
+		sort(reorderTempForceErrorSequence.begin(), reorderTempForceErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second < y.second; });
 		std::vector<std::pair<int, double>> allWeightsSumResults;
 		double forcesWeight = 0.8;
 		double KVfWeight = 0.2;
@@ -1052,7 +1061,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 			allWeightsSumResults.push_back(std::make_pair(m_reorderSpKVFSegmentIndexSequence[i], tempResult));
 		}
 		
-		sort(allWeightsSumResults.begin(), allWeightsSumResults.end(), [](const std::pair<double, double>&x, const std::pair<double, double>&y)->int {return x.second > y.second;});
+		sort(allWeightsSumResults.begin(), allWeightsSumResults.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second;});
 		
 		voSpKVData = m_AllReallyLoadConnectedFem[allWeightsSumResults[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(allWeightsSumResults[0].first % Common::SamplingFrameNumber) / 5];
 		voCurrentFrameIndex = allWeightsSumResults[0].first;

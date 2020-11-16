@@ -341,7 +341,7 @@ int main()
 	}*/
 	for (int i = 0; i < 1; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1015, 1, 0, 0, 600));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1050, 1, 0.25, 0, 600));
 	}
 	/*for (int i = 0; i < 5; i++)
 	{
