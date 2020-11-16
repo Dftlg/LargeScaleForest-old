@@ -240,7 +240,16 @@ int enableTextures = 0;
 int staticSolver = 0;
 int graphicFrame = 0;
 int lockAt30Hz = 0;
-int forceNum = 2;
+int forceNum = 3;
+struct SPullVertexInfo
+{
+	int StemPullVertexNum;
+	std::vector<int> PullVertexIndex;
+	std::vector<int> StemExtraForces;
+	std::vector<int> LeafExtraForces;
+	std::vector<float> Scale;
+};
+SPullVertexInfo pullVertexInfo;
 int* pulledVertex = (int*)calloc(forceNum, sizeof(int));
 double vForce[3];
 int* constantpulledVertex = (int*)calloc(forceNum, sizeof(int));
@@ -259,7 +268,8 @@ int numFixedKVFNumber;
 int * fixedKVFVertices;
 std::vector<int> KVFVertices;
 
-std::vector<int> ExtraForces;
+std::vector<int> StemExtraForces;
+std::vector<int> LeafExtraForces;
 std::vector<int> TempExtraForces;
 int FramesNumber = 0;
 int Amplitude = 0;
@@ -487,37 +497,29 @@ void displayFunction(void)
 	 
   }
 
-  if (constantpulledVertex!=nullptr)
-  {
-	  for (int i = 0; i < _msize(constantpulledVertex) / 4; i++)
-	  {
-		  double constantpulledVertexPos[3];
-		  deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(constantpulledVertex[i],
-			  &constantpulledVertexPos[0], &constantpulledVertexPos[1], &constantpulledVertexPos[2]);
-
-		  drawForceDirection(constantpulledVertexPos, vForce, 1);
-	  }
+  /*for (int i = 0;i< pullVertexInfo.PullVertexIndex.size(); i++)
+  {*/
+	  double constantpulledVertexPos[3];
+	  deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(pullVertexInfo.PullVertexIndex[2], &constantpulledVertexPos[0], &constantpulledVertexPos[1], &constantpulledVertexPos[2]);
+	  drawForceDirection(constantpulledVertexPos, vForce, 1);
+ // }
 	  
-  }
 
   // render the currently pulled vertex
-  if (pulledVertex != nullptr)
-  {
-	  glColor3f(1, 0.8, 0);
-	  double pulledVertexPos[3];
-	  for (int i = 0; i < _msize(pulledVertex) / 4; i++)
-	  {
-		  deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(pulledVertex[i],
-			  &pulledVertexPos[0], &pulledVertexPos[1], &pulledVertexPos[2]);
-		  glEnable(GL_POLYGON_OFFSET_POINT);
-		  glPolygonOffset(-1.0, -1.0);
-		  glPointSize(8.0);
-		  glBegin(GL_POINTS);
-		  glVertex3f(pulledVertexPos[0], pulledVertexPos[1], pulledVertexPos[2]);
-		  glEnd();
-		  glDisable(GL_POLYGON_OFFSET_FILL);
-	  }
-  }
+ glColor3f(1, 0.8, 0);
+ double pulledVertexPos[3];
+ for (int i = 0;i< pullVertexInfo.PullVertexIndex.size(); i++)
+ {
+	 deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(pullVertexInfo.PullVertexIndex[i], &pulledVertexPos[0], &pulledVertexPos[1], &pulledVertexPos[2]);
+	  glEnable(GL_POLYGON_OFFSET_POINT);
+	  glPolygonOffset(-1.0, -1.0);
+	  glPointSize(8.0);
+	  glBegin(GL_POINTS);
+	  glVertex3f(pulledVertexPos[0], pulledVertexPos[1], pulledVertexPos[2]);
+	  glEnd();
+	  glDisable(GL_POLYGON_OFFSET_FILL);
+ }
+
 
   // render model fixed vertices
   if (renderFixedVertices)
@@ -652,47 +654,79 @@ void idleFunction(void)
 
   if ((!lockScene) && (!pauseSimulation) && (singleStepMode <= 1))
   {
-    // determine force in case user is pulling on a vertex
-    /*if (g_iLeftMouseButton) 
-    {
-      if (pulledVertex != -1)
-      {*/
-		 pulledVertex[0] = 6552;
-		 pulledVertex[1] = 6595;
-		/* double forceX =99;
-		 double forceY = -49;*/
-      /*double forceX = (g_vMousePos[0] - dragStartX);
-        double forceY = -(g_vMousePos[1] - dragStartY);*/
-		 for (int i = 0; i < forceNum; i++)
-		 {
-			 constantpulledVertex[i] = pulledVertex[i];
-		 }
-        double externalForce[3];
+	  // determine force in case user is pulling on a vertex
+	  /*if (g_iLeftMouseButton)
+	  {
+		if (pulledVertex != -1)
+		{*/
+		//stem	
+	  pulledVertex[0] = 6172;
 
-		//计算外力
-       /* camera->CameraVector2WorldVector_OrientationOnly3D(
-            forceX, forceY, 0, externalForce);*/
-		camera->setWorldCoorinateSystemForce(ExtraForces[subTimestepCounter], 0, 0, externalForce);
 
-		std::copy(externalForce, externalForce + 3, vForce);
+	  pulledVertex[1] = 6552;
+	   pulledVertex[2] = 4214;
+	  /*pulledVertex[4] = 12203;
+	  pulledVertex[5] = 2768;
+	  pulledVertex[6] = 12015;
+	  pulledVertex[7] = 4625;
+	  pulledVertex[8] = 9529;*/
 
-        for(int j=0; j<3; j++)
-          externalForce[j] *= deformableObjectCompliance;
+	  /* double forceX =99;
+	   double forceY = -49;*/
+	   /*double forceX = (g_vMousePos[0] - dragStartX);
+		 double forceY = -(g_vMousePos[1] - dragStartY);*/
+	 
+	  double externalForce[3];
 
-        //printf("%d fx: %G fy: %G | %G %G %G\n", pulledVertex, forceX, forceY, externalForce[0], externalForce[1], externalForce[2]);
+	  //计算外力
+	 /* camera->CameraVector2WorldVector_OrientationOnly3D(
+		  forceX, forceY, 0, externalForce);*/
+	 // camera->setWorldCoorinateSystemForce(StemExtraForces[subTimestepCounter], 0, 0, externalForce);
 
-        // register force on the pulled vertex
-		for (int i = 0; i < forceNum; i++)
-		{
-			for (int k = 0; k < 3; k++)
-			{
-				f_ext[3 * pulledVertex[i] + k] += externalForce[k];
-			}
-		}
+	  
 
-        // distribute force over the neighboring vertices
-		for (int i = 0; i < forceNum; i++)
-			distributeForce(pulledVertex[i], f_ext, externalForce);
+	  //stem
+	  for (int i = 0; i < pullVertexInfo.StemPullVertexNum; i++)
+	  {
+		  camera->setWorldCoorinateSystemForce(pullVertexInfo.StemExtraForces[subTimestepCounter], 0, 0, externalForce);  
+		  for (int j = 0; j < 3; j++)
+		  {
+			  externalForce[j] *= deformableObjectCompliance * pullVertexInfo.Scale[i];
+			  f_ext[3 * pullVertexInfo.PullVertexIndex[i] + j] += externalForce[j];
+		  }
+		  //distribute force over the neighboring vertices
+		  distributeForce(pullVertexInfo.PullVertexIndex[i], f_ext, externalForce);
+	  }
+
+	  //leaf
+
+	  for (int i = pullVertexInfo.StemPullVertexNum; i < pullVertexInfo.PullVertexIndex.size(); i++)
+	  {
+		  camera->setWorldCoorinateSystemForce(pullVertexInfo.LeafExtraForces[subTimestepCounter], 90, 90, externalForce);
+		  std::copy(externalForce, externalForce + 3, vForce);
+		  for (int j = 0; j < 3; j++)
+		  {
+			  externalForce[j] *= deformableObjectCompliance * pullVertexInfo.Scale[i];
+			  f_ext[3 * pullVertexInfo.PullVertexIndex[i] + j] += externalForce[j];
+		  }
+		  //distribute force over the neighboring vertices
+		  distributeForce(pullVertexInfo.PullVertexIndex[i], f_ext, externalForce);
+	  }
+	 
+
+	  //printf("%d fx: %G fy: %G | %G %G %G\n", pulledVertex, forceX, forceY, externalForce[0], externalForce[1], externalForce[2]);
+
+	  // register force on the pulled vertex
+	  //for (int i = 0; i < pullVertexInfo.PullVertexNum; i++)
+	  //{
+		 // for (int j = 0; j < 3; j++)
+		 // {
+			//  externalForce[j] *= deformableObjectCompliance * scale[i];
+			//  f_ext[3 * pulledVertex[i] + j] += externalForce[j];
+		 // }
+		 // //distribute force over the neighboring vertices
+		 // distributeForce(pulledVertex[i], f_ext, externalForce);
+	  //}
 		
       /*}
     }*/
@@ -714,7 +748,7 @@ void idleFunction(void)
     // timestep the dynamics 
     for(int i=0; i<substepsPerTimeStep; i++)
     {
-		TempExtraForces.push_back(ExtraForces[subTimestepCounter]);
+		TempExtraForces.push_back(StemExtraForces[subTimestepCounter]);
 		if ((subTimestepCounter+1) % Common::ForcesSampling == 0)
 		{
 			integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
@@ -1580,9 +1614,23 @@ void initSimulation()
   preu= (double*)calloc(3 * n, sizeof(double));
 
   std::vector<double> tempConfig = GetForceConfigurate(outputFilename);
- 
-  ExtraForces=GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2],tempConfig[3],6);
+  //6172,6552,2768
+  std::vector<int>pullVertexIndex = { 6172,6552,2768,4214,12203,11346 };
+  std::vector<float>scale = { 1.0,0.8,0.08,0.05,-0.02,-0.05 };
+  StemExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
+  LeafExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
+  
+  pullVertexInfo.StemPullVertexNum = 2;
+  pullVertexInfo.PullVertexIndex = pullVertexIndex;
+  pullVertexInfo.StemExtraForces = StemExtraForces;
+  pullVertexInfo.LeafExtraForces = LeafExtraForces;
+  pullVertexInfo.Scale = scale;
 
+  for (int i = 0; i < pullVertexInfo.StemExtraForces.size(); i++)
+  {
+	  constantpulledVertex[i] = pullVertexInfo.PullVertexIndex[i];
+  }
+  
 
   // load initial condition
   if (strcmp(initialPositionFilename, "__none") != 0)

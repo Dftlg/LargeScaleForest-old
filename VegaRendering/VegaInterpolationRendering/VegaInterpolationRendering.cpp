@@ -67,7 +67,7 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 		//当前12个帧段进行一次重置获取5个帧段号索引
 		if (SearchFrameNumber %Size==0)
 		{
-			//std::cout << "search reset" << std::endl;
+			std::cout << "search reset" << std::endl;
 			vVFF.resetTempMultipleTreeData(vMultipleExtraForces.size());
 			SearchFrameStep = 0;
 		}
@@ -104,7 +104,7 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 int main()
 {
 	CVegaFemFactory vFem("../../models/mini_mapleTree/data/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt");
-	int numbercounter = 5;
+	int numbercounter = 8;
 	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -341,7 +341,7 @@ int main()
 	}*/
 	for (int i = 0; i < 1; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,415, 1, 0, 0, 4));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1015, 1, 0, 0, 600));
 	}
 	/*for (int i = 0; i < 5; i++)
 	{
@@ -373,7 +373,8 @@ int main()
 	//{
 	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
 	//}
-	Size = Common::ProductFrameNumber;
+	//Size = Common::ProductFrameNumber;
+	Size = 180;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
 	vFem.initKVFDataSearchRangeError();
 
@@ -475,7 +476,8 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//每给定的总力段进行一次渲染时的帧D_sum reset
-		if (FrameNumber%Common::ProductFrameNumber == 0)
+		/*if (FrameNumber%Common::ProductFrameNumber == 0)*/
+		if (FrameNumber%180 == 0)
 		{
 			ourModel.resetSSBO4UDeformation();
 
@@ -570,7 +572,7 @@ void renderTree(CShader & vShader, CSence& vModel)
 	vShader.setVec3("camPos", Camera.getPosition());
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, -0.5f, -2.0f));// translate it down so it's at the center of the scene
-	model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
+	//model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// it's a bit too big for our scene, so scale it down
 	vShader.setMat4("model", model);
 	vModel.draw(vShader);
 

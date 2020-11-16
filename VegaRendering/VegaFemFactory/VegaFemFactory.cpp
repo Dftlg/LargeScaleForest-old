@@ -788,17 +788,17 @@ void CVegaFemFactory::initKVFDataSearchRangeError()
 	Common::SpKVFData firstKVFData4FirstFile = getFirstKVFDataFromFirstFileFrame();
 	//compute V RangeError
 	for (auto tempv : firstKVFData4FirstFile.Velocity)
-		m_VelocityRangeError.push_back(OneNumberRangeError(tempv.x));
+		m_VelocityRangeError.push_back(OneNumberRangeError(tempv.x,1,5));
 
 	for (auto tempF : firstKVFData4FirstFile.InternalForces)
-		m_InternalForcesError.push_back(OneNumberRangeError(tempF.x));
+		m_InternalForcesError.push_back(OneNumberRangeError(tempF.x,1,5));
 
 	for (auto tempK : firstKVFData4FirstFile.Kmatrix)
 	{
 		std::vector<double> tempOneVertexRangeError;
 		for (int tempNumber = 0; tempNumber < tempK.size(); tempNumber++)
 		{
-			tempOneVertexRangeError.push_back(OneNumberRangeError(tempK[tempNumber]));
+			tempOneVertexRangeError.push_back(OneNumberRangeError(tempK[tempNumber],1,5));
 		}
 		m_KMatrixRangeError.push_back(tempOneVertexRangeError);
 		tempOneVertexRangeError.clear();
@@ -895,20 +895,18 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 	if (vIsFirstFrame == 1)
 	{
 		voMatchedFrameSequenceIndex.clear();
+		for (int i = 0; i < tempForceErrorSequence.size(); i++)
+		{
+			if (tempForceErrorSequence[i].first % (Common::SamplingFrameNumber) > 20)
+				tempForceErrorSequence[i].second = 9999;
+		}
 		std::vector<std::pair<int, double>>tempSortedForceSequence = tempForceErrorSequence;
 		sort(tempSortedForceSequence.begin(), tempSortedForceSequence.end(), [](const std::pair<int, int>&x, const std::pair<int, int>&y)->int {return x.second < y.second; });
-		for (int i = 0; i < tempSortedForceSequence.size(); i++)
-		{
-			if ((*(m_VelocitySequence[tempForceErrorSequence[i].first].second))[0].x>0)
-			{
-				voCurrentFrameIndex = tempSortedForceSequence[i].first;
-				voSpKVData = m_AllReallyLoadConnectedFem[tempSortedForceSequence[i].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(tempSortedForceSequence[i].first % Common::SamplingFrameNumber) / 5];
-				vIsFirstFrame = 0;
-				for (int k = 4; k >= 0; k--)
-					voMatchedFrameSequenceIndex.push_back(tempSortedForceSequence[i].first - k);
-				break;
-			}
-		}		
+		voCurrentFrameIndex = tempSortedForceSequence[0].first;
+		voSpKVData = m_AllReallyLoadConnectedFem[tempSortedForceSequence[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(tempSortedForceSequence[0].first % Common::SamplingFrameNumber) / 5];
+		vIsFirstFrame = 0;
+		for (int k = 4; k >= 0; k--)
+			voMatchedFrameSequenceIndex.push_back(tempSortedForceSequence[0].first - k);
 	}
 	else
 	{
@@ -922,7 +920,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		for (int i = 0; i < tempForceErrorSequence.size(); i++)
 		{
 			//std::cout << tempForceErrorSequence[i].second << std::endl;
-			gaussianForceErrrorSequence.push_back(std::make_pair(tempForceErrorSequence[i].first, GaussianFunction(tempForceErrorSequence[i].second / double(2000), sqrt(0.2), 0, 0.001)));
+			gaussianForceErrrorSequence.push_back(std::make_pair(tempForceErrorSequence[i].first, GaussianFunction(tempForceErrorSequence[i].second / double(1000), sqrt(0.2), 0, 0.001)));
 			gaussianForceErrrorSum += gaussianForceErrrorSequence[i].second;
 		}
 
@@ -1035,16 +1033,17 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		//当选择了某一个文件的一帧时会应用该帧对下一帧段的KVF导致下一帧段判断的kvf值一定等于1*kvf权重，特殊判定将这以帧权重比更改
 		int NextFrameIndex = voCurrentFrameIndex + 5;
 
+
 		std::vector<std::pair<int, double>> allWeightsSumResults;
-		double forcesWeight = 0.4;
-		double KVfWeight = 0.6;
+		double forcesWeight = 0.8;
+		double KVfWeight = 0.2;
 #pragma omp parallel for
 		for (int i = 0; i < m_reorderSpKVFSegmentIndexSequence.size(); i++)
 		{
 			double tempResult = 0;
 			if (NextFrameIndex == tempVelocityErrorSequence[i].first)
 			{
-				tempResult = (gaussianForceErrrorSequence[i].second)*0.7 + 0.3 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
+				tempResult = (gaussianForceErrrorSequence[i].second)*0.9 + 0.1 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
 			}
 			else
 			{

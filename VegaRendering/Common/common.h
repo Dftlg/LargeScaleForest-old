@@ -53,7 +53,7 @@ namespace Common
 	//一个文件中存多少帧
 	static int SamplingFrameNumber = 180;
 
-	static int ProductFrameNumber = 120;
+	static int ProductFrameNumber = 18000;
 
 	//static int KErrorRange = 10;
 	static int ExpandForceError = 1;
