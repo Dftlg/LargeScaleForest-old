@@ -65,12 +65,12 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 	while (true)
 	{
 		//当前12个帧段进行一次重置获取5个帧段号索引
-		if (SearchFrameNumber %Size==0)
+	/*	if (SearchFrameNumber %Size==0)
 		{
 			std::cout << "search reset" << std::endl;
 			vVFF.resetTempMultipleTreeData(vMultipleExtraForces.size());
 			SearchFrameStep = 0;
-		}
+		}*/
 		if (SearchFrameNumber % 5 == 0)
 		{
 			//每5个力计算一次匹配的5帧
@@ -339,9 +339,13 @@ int main()
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
 	}*/
+	/*for (int i = 0; i < 1; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1350, 1, 0, 0, 600));
+	}*/
 	for (int i = 0; i < 1; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1050, 1, 0.25, 0, 600));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1015, 1, 0, 0, 600));
 	}
 	/*for (int i = 0; i < 5; i++)
 	{
@@ -374,7 +378,7 @@ int main()
 	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
 	//}
 	//Size = Common::ProductFrameNumber;
-	Size = 180;
+	//Size = 180;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
 	vFem.initKVFDataSearchRangeError();
 
@@ -477,13 +481,13 @@ int main()
 
 		//每给定的总力段进行一次渲染时的帧D_sum reset
 		/*if (FrameNumber%Common::ProductFrameNumber == 0)*/
-		if (FrameNumber%180 == 0)
+		/*if (FrameNumber%180 == 0)
 		{
 			ourModel.resetSSBO4UDeformation();
 
 			std::cout << "//////////////////////////////////////" << std::endl;
 			std::cout << "Reset" << std::endl;
-		}
+		}*/
 		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
 		bool Success = SearchQueue.TryDequeue(tempTreeFileAndFrameIndex);
 		ourModel.UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);

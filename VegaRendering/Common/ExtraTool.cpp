@@ -103,7 +103,7 @@ double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
 			tempNumber *= 10;
 			BaseNumber++;
 		}
-		return (1.0 / ((BaseNumber + vControlFloatPosition) * 10))*vRange;
+		return (1.0 / pow(10,(BaseNumber + vControlFloatPosition)))*vRange;
 	}
 	else if (tempNumber >= 1)
 	{
@@ -112,6 +112,6 @@ double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
 			tempNumber /= 10;
 			BaseNumber++;
 		}
-		return ((BaseNumber - vControlFloatPosition) * 10)*vRange;
+		return (pow(10,(BaseNumber-1 - vControlFloatPosition)))*vRange;
 	} 
 }

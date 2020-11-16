@@ -1044,15 +1044,15 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		sort(reorderGaussianForceErrrorSequence.begin(), reorderGaussianForceErrrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
 		sort(reorderTempForceErrorSequence.begin(), reorderTempForceErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second < y.second; });
 		std::vector<std::pair<int, double>> allWeightsSumResults;
-		double forcesWeight = 0.8;
-		double KVfWeight = 0.2;
+		double forcesWeight = 0.35;
+		double KVfWeight = 0.65;
 #pragma omp parallel for
 		for (int i = 0; i < m_reorderSpKVFSegmentIndexSequence.size(); i++)
 		{
 			double tempResult = 0;
 			if (NextFrameIndex == tempVelocityErrorSequence[i].first)
 			{
-				tempResult = (gaussianForceErrrorSequence[i].second)*0.9 + 0.1 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
+				tempResult = (gaussianForceErrrorSequence[i].second)*0.7 + 0.3 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
 			}
 			else
 			{
