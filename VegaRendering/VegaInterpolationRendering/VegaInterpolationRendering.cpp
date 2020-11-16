@@ -39,7 +39,7 @@ bool shadows = true;
 bool shadowsKeyPressed = false;
 
 // camera
-CCamera Camera(glm::vec3(-2.0f, 1.0f, 0));
+CCamera Camera(glm::vec3(-2, 1, 0));
 float LastX = SCR_WIDTH / 2.0f;
 float LastY = SCR_HEIGHT / 2.0f;
 bool FirstMouse = true;
@@ -65,12 +65,12 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 	while (true)
 	{
 		//当前12个帧段进行一次重置获取5个帧段号索引
-		if (SearchFrameNumber %Size==0)
+	/*	if (SearchFrameNumber %Size==0)
 		{
 			std::cout << "search reset" << std::endl;
 			vVFF.resetTempMultipleTreeData(vMultipleExtraForces.size());
 			SearchFrameStep = 0;
-		}
+		}*/
 		if (SearchFrameNumber % 5 == 0)
 		{
 			//每5个力计算一次匹配的5帧
@@ -151,13 +151,13 @@ int main()
 #pragma region plane vertices data
 	float planeVertices[] = {
 		// positions              // normals       // texture Coords  
-		 50.0f, -0.5f,  50.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
-		-50.0f, -0.5f,  50.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-		-50.0f, -0.5f, -50.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
-					 	
-		 50.0f, -0.5f,  50.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
-		-50.0f, -0.5f, -50.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
-		 50.0f, -0.5f, -50.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
+		 25.0f, -0.5f,  25.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
+		-25.0f, -0.5f,  25.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+		-25.0f, -0.5f, -25.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
+
+		 25.0f, -0.5f,  25.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
+		-25.0f, -0.5f, -25.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
+		 25.0f, -0.5f, -25.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
 	};
 #pragma endregion
 
@@ -210,10 +210,10 @@ int main()
 
 #pragma region lights data
 	glm::vec3 lightVertices[] = {
-		glm::vec3(-1.5f,  3.5f, 1.0f),
-		glm::vec3( 1.5f,  3.5f, 1.0f),
-		glm::vec3(-1.5f,  3.0f, 1.0f),
-		glm::vec3( 1.5f,  3.0f, 1.0f),
+		glm::vec3(-3.5f,  4.5f, 1.0f),
+		glm::vec3(3.5f,  4.5f, 1.0f), 
+		glm::vec3(-3.5f,  4.0f, 1.0f),
+		glm::vec3(3.5f,  4.0f, 1.0f),
 	};
 
 	glm::vec3 lightColors[] = {
@@ -345,7 +345,7 @@ int main()
 	}*/
 	for (int i = 0; i < 1; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1015, 1, 0, 0, 600));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 600));
 	}
 	/*for (int i = 0; i < 5; i++)
 	{
@@ -378,7 +378,7 @@ int main()
 	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
 	//}
 	//Size = Common::ProductFrameNumber;
-	Size = 180;
+	//Size = 180;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
 	vFem.initKVFDataSearchRangeError();
 
@@ -407,9 +407,11 @@ int main()
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+	GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
 	glDrawBuffer(GL_NONE);
@@ -419,7 +421,7 @@ int main()
 
 #pragma region create depth cubemap transformation matrices and some value
 		float near_plane = 1.0f;
-		float far_plane = 80.0f;
+		float far_plane = 60.0f;
 		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
 		std::vector < glm::mat4> shadowTransforms;
 		for (unsigned int i = 0; i < 1; ++i)
@@ -481,13 +483,13 @@ int main()
 
 		//每给定的总力段进行一次渲染时的帧D_sum reset
 		/*if (FrameNumber%Common::ProductFrameNumber == 0)*/
-		if (FrameNumber%180 == 0)
+		/*if (FrameNumber%180 == 0)
 		{
 			ourModel.resetSSBO4UDeformation();
 
 			std::cout << "//////////////////////////////////////" << std::endl;
 			std::cout << "Reset" << std::endl;
-		}
+		}*/
 		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
 		bool Success = SearchQueue.TryDequeue(tempTreeFileAndFrameIndex);
 		ourModel.UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
@@ -576,7 +578,7 @@ void renderTree(CShader & vShader, CSence& vModel)
 	vShader.setVec3("camPos", Camera.getPosition());
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, -0.5f, -2.0f));// translate it down so it's at the center of the scene
-	//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));	// it's a bit too big for our scene, so scale it down
+	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
 	vShader.setMat4("model", model);
 	vModel.draw(vShader);
 
