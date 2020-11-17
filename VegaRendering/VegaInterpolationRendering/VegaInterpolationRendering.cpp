@@ -104,7 +104,7 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 int main()
 {
 	CVegaFemFactory vFem("../../models/mini_mapleTree/data/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt");
-	int numbercounter = 8;
+	int numbercounter = 7;
 	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -310,7 +310,7 @@ int main()
 
 	//个数等于
 	std::vector<std::vector<int>> vMultipleExtraForces;
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1350, 1, 0, 0, 600));
 	}
@@ -318,11 +318,11 @@ int main()
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1015, 1, 0, 0, 600));
 	}
-	for (int i = 0; i < 10; i++)
+	/*for (int i = 0; i < 15; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 600, 1, 0.25, 0, 600));
-	}
-	for (int i = 0; i < 10; i++)
+	}*/
+	for (int i = 0; i < 15; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 600));
 	}

@@ -766,7 +766,7 @@ void CVegaFemFactory::initMatchedFrameStruct(int vTreeSize)
 	std::vector<glm::vec3>* tempInternalForces;
 	for (int i = 0; i < m_reorderSpKVFSegmentIndexSequence.size(); i++)
 	{
-		//重组Spkvf文件格式，将其中文件的索引拍成连续的4，9....64...69
+		//重组Spkvf文件格式，将其中文件的索引排成连续的4，9....64...69
 		tempKMartix = &m_AllReallyLoadConnectedFem[m_reorderSpKVFSegmentIndexSequence[i] / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(m_reorderSpKVFSegmentIndexSequence[i] % Common::SamplingFrameNumber) / 5].Kmatrix;
 		m_KMartixSequence.push_back(std::make_pair(m_reorderSpKVFSegmentIndexSequence[i], tempKMartix));
 		tempVelocity = &m_AllReallyLoadConnectedFem[m_reorderSpKVFSegmentIndexSequence[i] / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(m_reorderSpKVFSegmentIndexSequence[i] % Common::SamplingFrameNumber) / 5].Velocity;
@@ -929,7 +929,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		compare velocity*/
 		for (int i = 0; i < m_VelocitySequence.size(); i++)
 		{
-			if (gaussianForceErrrorSequence[i].second == 0)
+			if (gaussianForceErrrorSequence[i].second < 0.6)
 			{
 				tempVelocityErrorSequence.push_back(std::make_pair(m_VelocitySequence[i].first, 0));
 				continue;
@@ -959,7 +959,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 #pragma omp parallel for
 		for (int i = 0; i < m_KMartixSequence.size(); i++)
 		{
-			if (gaussianForceErrrorSequence[i].second == 0|| tempVelocityErrorSequence[i].second==0)
+			if (gaussianForceErrrorSequence[i].second < 0.6 || tempVelocityErrorSequence[i].second==0)
 			{
 				tempKErrorSequence.push_back(std::make_pair(m_KMartixSequence[i].first, 0));
 				continue;
@@ -994,7 +994,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		//compare internalForces
 		for (int i = 0; i < m_InternalForcesSequence.size(); i++)
 		{
-			if (gaussianForceErrrorSequence[i].second == 0||(tempVelocityErrorSequence[i].second == 0&& tempKErrorSequence[i].second==0))
+			if (gaussianForceErrrorSequence[i].second < 0.6||(tempVelocityErrorSequence[i].second == 0&& tempKErrorSequence[i].second==0))
 			{
 				tempInternalForcesErrorSequence.push_back(std::make_pair(m_InternalForcesSequence[i].first, 0));
 				continue;
@@ -1063,6 +1063,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		}
 		
 		sort(allWeightsSumResults.begin(), allWeightsSumResults.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second;});
+		//std::cout << gaussianForceErrrorSequence[allWeightsSumResults[0].first / 5].second << std::endl;
 		
 		voSpKVData = m_AllReallyLoadConnectedFem[allWeightsSumResults[0].first / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(allWeightsSumResults[0].first % Common::SamplingFrameNumber) / 5];
 		voCurrentFrameIndex = allWeightsSumResults[0].first;
