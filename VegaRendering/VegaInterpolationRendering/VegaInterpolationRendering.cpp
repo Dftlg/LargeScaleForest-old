@@ -39,7 +39,7 @@ bool shadows = true;
 bool shadowsKeyPressed = false;
 
 // camera
-CCamera Camera(glm::vec3(-2, 1, 0));
+CCamera Camera(glm::vec3(0, 0.6, 1));
 float LastX = SCR_WIDTH / 2.0f;
 float LastY = SCR_HEIGHT / 2.0f;
 bool FirstMouse = true;
@@ -60,10 +60,7 @@ int FrameNumber = 0;
 int SearchFrameNumber = 0;
 int SearchFrameStep = 0;
 
-//前一个std::vector表示匹配树的个数，后一个std::vector表示每一帧中需要的数据
-//vMultipleExtraForces 表示每一帧风的方向，每次用5帧来进行搜索
-//vWindDirection 表示每帧一个风的方向
-void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces,std::vector<std::vector<Common::SWindDirecetion>> & vWindDirection)
+void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces)
 {
 	while (true)
 	{
@@ -78,19 +75,15 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 		{
 			//每5个力计算一次匹配的5帧
 			std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
-			std::vector<std::vector<Common::SWindDirecetion>> tempMultipleFiveWindDirection;
 			for (int i = 0; i < vMultipleExtraForces.size(); i++)
 			{
 				for (int k = (SearchFrameStep) * 5; k < (SearchFrameStep + 1) * 5; k++)
 				{
-					//int t=vMultipleExtraForces[i][k];
 					tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
-					tempMultipleFiveWindDirection[i].push_back(vWindDirection[i][k]);
 				}
 			}
-			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces, tempMultipleFiveWindDirection);
+			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces);
 			tempMultipleFiveForces.clear();
-			tempMultipleFiveWindDirection.clear();
 			SearchFrameStep++;
 			//std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
 		}
@@ -111,7 +104,7 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 int main()
 {
 	CVegaFemFactory vFem("../../models/mini_mapleTree/data/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt");
-	int numbercounter = 1;
+	int numbercounter = 8;
 	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -158,13 +151,13 @@ int main()
 #pragma region plane vertices data
 	float planeVertices[] = {
 		// positions              // normals       // texture Coords  
-		 25.0f, -0.5f,  25.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
-		-25.0f, -0.5f,  25.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-		-25.0f, -0.5f, -25.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
-
-		 25.0f, -0.5f,  25.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
-		-25.0f, -0.5f, -25.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
-		 25.0f, -0.5f, -25.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
+		 15.0f, -0.5f,  15.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
+		-15.0f, -0.5f,  15.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+		-15.0f, -0.5f, -15.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
+		 				
+		 15.0f, -0.5f,  15.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
+		-15.0f, -0.5f, -15.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
+		 15.0f, -0.5f, -20.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
 	};
 #pragma endregion
 
@@ -218,9 +211,9 @@ int main()
 #pragma region lights data
 	glm::vec3 lightVertices[] = {
 		glm::vec3(-3.5f,  4.5f, 1.0f),
-		glm::vec3(3.5f,  4.5f, 1.0f), 
+		glm::vec3( 3.5f,  4.5f, 1.0f), 
 		glm::vec3(-3.5f,  4.0f, 1.0f),
-		glm::vec3(3.5f,  4.0f, 1.0f),
+		glm::vec3( 3.5f,  4.0f, 1.0f),
 	};
 
 	glm::vec3 lightColors[] = {
@@ -317,93 +310,23 @@ int main()
 
 	//个数等于
 	std::vector<std::vector<int>> vMultipleExtraForces;
-	//for (int i = 0; i < 25; i++)
-	//{
-	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3000, 1, 0, 0, 4));
-	//}
-
-	//for (int i = 0; i < 5; i++)
-	//{
-	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 490, 1, 0, 0, 4));
-	//}
-	//for (int i = 0; i < 5; i++)
-	//{
-	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3500, 1, 0, 0, 4));
-	//}
-	//for (int i = 0; i < 10; i++)
-	//{
-	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
-	//}
-	//for (int i = 0; i < 50; i++)
-	//{
-	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4000, 1, 0, 0, 4));
-	//}
-	/*for (int i = 0; i < 1; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4300, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3500, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 10; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
-	}*/
-	/*for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 15; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1350, 1, 0, 0, 600));
-	}*/
-	for (int i = 0; i < 1; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 6000));
-	}
-	/*for (int i = 0; i < 10; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 600, 1, 0.25, 0, 6000));
 	}
 	for (int i = 0; i < 15; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 6000));
-	}
-	for (int i = 0; i < 15; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1350, 1, 0, 0, 6000));
-	}*/
-	//for (int i = 0; i < 1; i++)
-	//{
-	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 6000));
-	//}
-	/*for (int i = 0; i < 5; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3200, 1, 0, 0, 4));
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3300, 1, 0, 0, 4));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1015, 1, 0, 0, 600));
 	}
 	for (int i = 0; i < 10; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4100, 1, 0, 0, 4));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 600, 1, 0.25, 0, 600));
 	}
 	for (int i = 0; i < 10; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 3700, 1, 0, 0, 4));
-	}*/
-	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 500, 1, 0, 0, 4));
-	////vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2000, 1, 0, 0, 4));
-	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4000, 1, 0, 0, 4));
-	////vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
-	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
-	//vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
-	//for (int i = 0; i < 46; i++)
-	//{
-	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 450, 1, 0, 0, 4));
-	//}
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 600));
+	}
+
 	//Size = Common::ProductFrameNumber;
 	//Size = 180;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
@@ -448,7 +371,7 @@ int main()
 
 #pragma region create depth cubemap transformation matrices and some value
 		float near_plane = 1.0f;
-		float far_plane = 40.0f;
+		float far_plane = 80.0f;
 		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
 		std::vector < glm::mat4> shadowTransforms;
 		for (unsigned int i = 0; i < 1; ++i)
@@ -493,7 +416,6 @@ int main()
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
 	glm::mat4 view;
-
 	while (!glfwWindowShouldClose(Window))
 	{
 		// per-frame time logic
@@ -556,7 +478,7 @@ int main()
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 	
-		Sleep(1000);
+		//Sleep(100);
 		
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);
@@ -604,9 +526,8 @@ void renderTree(CShader & vShader, CSence& vModel)
 	vShader.setMat4("view", view);
 	vShader.setVec3("camPos", Camera.getPosition());
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, -0.5f, -2.0f));// translate it down so it's at the center of the scene
-	//model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
-	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+	model = glm::translate(model, glm::vec3(0.0f, -0.3f, -2.0f));// translate it down so it's at the center of the scene
+	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
 	vShader.setMat4("model", model);
 	vModel.draw(vShader);
 

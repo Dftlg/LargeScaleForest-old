@@ -1059,7 +1059,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		int NextFrameIndex = voCurrentFrameIndex + 5;
 
 
-		std::vector<std::pair<int, double>> reorderTempKErrorSequence = tempKErrorSequence;
+		/*std::vector<std::pair<int, double>> reorderTempKErrorSequence = tempKErrorSequence;
 		std::vector<std::pair<int, double>> reorderTempVelocityErrorSequence = tempVelocityErrorSequence;
 		std::vector<std::pair<int, double>> reorderTempInternalForcesErrorSequence = tempInternalForcesErrorSequence;
 		std::vector <std::pair<int, double>> reorderGaussianForceErrrorSequence = gaussianForceErrrorSequence;
@@ -1068,7 +1068,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		sort(reorderTempVelocityErrorSequence.begin(), reorderTempVelocityErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
 		sort(reorderTempInternalForcesErrorSequence.begin(), reorderTempInternalForcesErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
 		sort(reorderGaussianForceErrrorSequence.begin(), reorderGaussianForceErrrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
-		sort(reorderTempForceErrorSequence.begin(), reorderTempForceErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second < y.second; });
+		sort(reorderTempForceErrorSequence.begin(), reorderTempForceErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second < y.second; });*/
 		std::vector<std::pair<int, double>> allWeightsSumResults;
 		double forcesWeight = 0.35;
 		double KVfWeight = 0.65;
@@ -1079,6 +1079,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 			if (NextFrameIndex == tempVelocityErrorSequence[i].first)
 			{
 				tempResult = (gaussianForceErrrorSequence[i].second)*0.7 + 0.3 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
+				//tempResult = 1.0 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
 			}
 			else
 			{
