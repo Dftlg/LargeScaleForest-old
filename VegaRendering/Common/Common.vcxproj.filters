@@ -27,6 +27,9 @@
     <ClInclude Include="SynchronisedQueue.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="WindFiled.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -36,6 +39,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ExtraTool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WindField.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

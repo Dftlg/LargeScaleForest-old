@@ -60,7 +60,10 @@ int FrameNumber = 0;
 int SearchFrameNumber = 0;
 int SearchFrameStep = 0;
 
-void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces)
+//前一个std::vector表示匹配树的个数，后一个std::vector表示每一帧中需要的数据
+//vMultipleExtraForces 表示每一帧风的方向，每次用5帧来进行搜索
+//vWindDirection 表示每帧一个风的方向
+void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces,std::vector<std::vector<Common::SWindDirecetion>> & vWindDirection)
 {
 	while (true)
 	{
@@ -75,15 +78,19 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 		{
 			//每5个力计算一次匹配的5帧
 			std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
+			std::vector<std::vector<Common::SWindDirecetion>> tempMultipleFiveWindDirection;
 			for (int i = 0; i < vMultipleExtraForces.size(); i++)
 			{
 				for (int k = (SearchFrameStep) * 5; k < (SearchFrameStep + 1) * 5; k++)
 				{
+					//int t=vMultipleExtraForces[i][k];
 					tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
+					tempMultipleFiveWindDirection[i].push_back(vWindDirection[i][k]);
 				}
 			}
-			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces);
+			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces, tempMultipleFiveWindDirection);
 			tempMultipleFiveForces.clear();
+			tempMultipleFiveWindDirection.clear();
 			SearchFrameStep++;
 			//std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
 		}
@@ -92,9 +99,9 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 		{
 			tempTreeFileAndFrameIndex.push_back(vVFF.getFileAndFrameIndex(treenumber, SearchFrameNumber % 5));
 
-			std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
+			//std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
 		SearchQueue.Enqueue(tempTreeFileAndFrameIndex);
 		SearchFrameNumber++;
 		tempTreeFileAndFrameIndex.clear();
@@ -327,6 +334,10 @@ int main()
 	//{
 	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2800, 1, 0, 0, 4));
 	//}
+	//for (int i = 0; i < 50; i++)
+	//{
+	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 4000, 1, 0, 0, 4));
+	//}
 	/*for (int i = 0; i < 1; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,4300, 1, 0, 0, 4));
@@ -345,8 +356,24 @@ int main()
 	}*/
 	for (int i = 0; i < 1; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 600));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 6000));
 	}
+	/*for (int i = 0; i < 10; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 600, 1, 0.25, 0, 6000));
+	}
+	for (int i = 0; i < 15; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 6000));
+	}
+	for (int i = 0; i < 15; i++)
+	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1350, 1, 0, 0, 6000));
+	}*/
+	//for (int i = 0; i < 1; i++)
+	//{
+	//	vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 6000));
+	//}
 	/*for (int i = 0; i < 5; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0, 0, 4));
@@ -421,7 +448,7 @@ int main()
 
 #pragma region create depth cubemap transformation matrices and some value
 		float near_plane = 1.0f;
-		float far_plane = 60.0f;
+		float far_plane = 40.0f;
 		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
 		std::vector < glm::mat4> shadowTransforms;
 		for (unsigned int i = 0; i < 1; ++i)
@@ -529,7 +556,7 @@ int main()
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 	
-		Sleep(100);
+		Sleep(1000);
 		
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);
@@ -578,7 +605,8 @@ void renderTree(CShader & vShader, CSence& vModel)
 	vShader.setVec3("camPos", Camera.getPosition());
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, -0.5f, -2.0f));// translate it down so it's at the center of the scene
-	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
+	//model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
+	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
 	vShader.setMat4("model", model);
 	vModel.draw(vShader);
 

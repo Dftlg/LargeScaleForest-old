@@ -14,6 +14,10 @@
 
 #define M_PI 3.1415926
 
+int MaxElement(std::vector<int> &vDataSet);
+
+int MinElement(std::vector<int> &vDataSet);
+
 int RandomGenerate();
 
 std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency, double vPhase, int vYpluse, int wavelength = 2);

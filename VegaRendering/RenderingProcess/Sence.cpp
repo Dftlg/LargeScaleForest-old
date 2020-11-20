@@ -38,12 +38,12 @@ glm::mat4* CSence::randomRotation()
 	for (int i = 0; i < Common::TreesNumber; i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-	/*	model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber/2)*30, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2) *30));
+		model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber/2)*0.5, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2) *0.5));
 		srand(time(0));
 		float tempRandom = (float)RandomGenerate();	
 		model = glm::rotate(model, glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
 		glm::vec3 tempScale = GenerateRamdomScale();
-		model = glm::scale(model, tempScale);*/
+		model = glm::scale(model, tempScale);
 		modelMatrices[i] = model;
 	}
 	return modelMatrices;
