@@ -228,8 +228,9 @@ void drawForceDirection(double vpulledVertexPos[3], double vexternalForce[3], in
 		std::copy(vpulledVertexPos, vpulledVertexPos + 3, vertex);
 
 		vertex[i] +=30 ;
-		glVertex3fv(vertex);
 		glVertex3dv(vpulledVertexPos);
+		glVertex3fv(vertex);
+		
 	}
 
 	for (auto i = 0; i < 3; i++)
@@ -239,7 +240,6 @@ void drawForceDirection(double vpulledVertexPos[3], double vexternalForce[3], in
 	float color[3] = { 0.5,0,0.5 };
 	glColor3fv(color);
 
-	//glVertex3dv(foucePosition);
 	glVertex3dv(vpulledVertexPos);
 	glVertex3dv(targetPosition);
 

@@ -30,20 +30,17 @@ void CSence::setMeshRotation()
 glm::mat4* CSence::randomRotation()
 {
 	glm::mat4* modelMatrices = new glm::mat4[Common::TreesNumber];
-
-	//int Size = sqrt(Common::TreesInstanceNumber);
-	//srand(time(0));
 	std::vector<std::pair<double, double>> TreesPosition = RandomTreePositionGenerate(Common::TreesNumber);
 	//生成一个Common::TreesNumber*Common::TreesNumber大小的网格，在网格内产生树的位置，并在一个网格上继续增加随机位置
 	for (int i = 0; i < Common::TreesNumber; i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber/2)*0.5, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2)*0.5));
+		model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber/2)*5.0, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2)*0.0));
 		srand(time(0));
-		float tempRandom = (float)RandomGenerate();	
-		model = glm::rotate(model, glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
-		glm::vec3 tempScale = GenerateRamdomScale();
-		model = glm::scale(model, tempScale);
+		//float tempRandom = (float)RandomGenerate();	
+		//model = glm::rotate(model, glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
+		//glm::vec3 tempScale = GenerateRamdomScale();
+		//model = glm::scale(model, tempScale);
 		modelMatrices[i] = model;
 	}
 	return modelMatrices;

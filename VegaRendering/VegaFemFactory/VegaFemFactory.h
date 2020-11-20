@@ -158,6 +158,7 @@ private:
 	std::vector<std::pair<int, std::vector<glm::vec3>* >> m_InternalForcesSequence;
 	//所有文件的SpKVF数据索引
 	std::vector<int> m_reorderSpKVFSegmentIndexSequence;
+	std::vector<std::vector<int>> m_sortSpKVFSegmentIndexSequenceByAngle;
 	
 	std::vector<std::vector<int>> m_MultipleFramesIndex;
 	std::vector<Common::SpKVFData> m_TempSpKVFData;
