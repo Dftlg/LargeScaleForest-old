@@ -497,12 +497,12 @@ void displayFunction(void)
 	 
   }
 
-  /*for (int i = 0;i< pullVertexInfo.PullVertexIndex.size(); i++)
-  {*/
+  for (int i = 0;i< pullVertexInfo.PullVertexIndex.size(); i++)
+  {
 	  double constantpulledVertexPos[3];
-	  deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(pullVertexInfo.PullVertexIndex[2], &constantpulledVertexPos[0], &constantpulledVertexPos[1], &constantpulledVertexPos[2]);
+	  deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(pullVertexInfo.PullVertexIndex[i], &constantpulledVertexPos[0], &constantpulledVertexPos[1], &constantpulledVertexPos[2]);
 	  drawForceDirection(constantpulledVertexPos, vForce, 1);
- // }
+  }
 	  
 
   // render the currently pulled vertex
@@ -513,7 +513,7 @@ void displayFunction(void)
 	 deformableObjectRenderingMesh->GetSingleVertexPositionFromBuffer(pullVertexInfo.PullVertexIndex[i], &pulledVertexPos[0], &pulledVertexPos[1], &pulledVertexPos[2]);
 	  glEnable(GL_POLYGON_OFFSET_POINT);
 	  glPolygonOffset(-1.0, -1.0);
-	  glPointSize(8.0);
+	  glPointSize(18.0);
 	  glBegin(GL_POINTS);
 	  glVertex3f(pulledVertexPos[0], pulledVertexPos[1], pulledVertexPos[2]);
 	  glEnd();
@@ -688,7 +688,8 @@ void idleFunction(void)
 	  //stem
 	  for (int i = 0; i < pullVertexInfo.StemPullVertexNum; i++)
 	  {
-		  camera->setWorldCoorinateSystemForce(pullVertexInfo.StemExtraForces[subTimestepCounter], 0, 0, externalForce);  
+		  camera->setWorldCoorinateSystemForce(pullVertexInfo.StemExtraForces[subTimestepCounter], 0, 120, externalForce);
+		  std::copy(externalForce, externalForce + 3, vForce);
 		  for (int j = 0; j < 3; j++)
 		  {
 			  externalForce[j] *= deformableObjectCompliance * pullVertexInfo.Scale[i];
@@ -699,11 +700,10 @@ void idleFunction(void)
 	  }
 
 	  //leaf
-
 	  for (int i = pullVertexInfo.StemPullVertexNum; i < pullVertexInfo.PullVertexIndex.size(); i++)
 	  {
 		  camera->setWorldCoorinateSystemForce(pullVertexInfo.LeafExtraForces[subTimestepCounter], 90, 90, externalForce);
-		  std::copy(externalForce, externalForce + 3, vForce);
+		  //std::copy(externalForce, externalForce + 3, vForce);
 		  for (int j = 0; j < 3; j++)
 		  {
 			  externalForce[j] *= deformableObjectCompliance * pullVertexInfo.Scale[i];
@@ -1616,16 +1616,16 @@ void initSimulation()
   std::vector<double> tempConfig = GetForceConfigurate(outputFilename);
   //6172,6552,2768
   //1000
-  std::vector<int>pullVertexIndex = { 6172,6552,2768,4214,12203,11346 };
+  std::vector<int>pullVertexIndex = { 5828,6539,8117 };
   //std::vector<float>scale = { 1.0,0.8,0.08,0.05,-0.02,-0.05 };
   //600
   //std::vector<float>scale = { 1.0,0.8,0.05,0.03,-0.009,-0.03 };
   //3000
-  std::vector<float>scale = { 1.0,0.8,0.02,0.01,-0.009,-0.009 };
+  std::vector<float>scale = { 1.0,1.0,1.0,0.01,-0.009,-0.009 };
   StemExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
   LeafExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
   
-  pullVertexInfo.StemPullVertexNum = 2;
+  pullVertexInfo.StemPullVertexNum = 3;
   pullVertexInfo.PullVertexIndex = pullVertexIndex;
   pullVertexInfo.StemExtraForces = StemExtraForces;
   pullVertexInfo.LeafExtraForces = LeafExtraForces;
@@ -2302,7 +2302,7 @@ int main(int argc, char* argv[])
 
   //configFilename = string("D:/GraduationProject/Vega/examples/simpleBridge_vox/simpleBridge_vox.config");
  /* configFilename = string("D:/GraduationProject/Vega/models/newgrass/voxelizegrass/voxelizegrass.config");*/
-  configFilename = string("../../models/mini_mapleTree/tree.config");
+  configFilename = string("../../models/yellow_tree/tree.config");
   printf("Loading scene configuration from %s.\n", configFilename.c_str());
 
   initConfigurations(); // parse the config file同时输出到cmd

@@ -11,15 +11,6 @@
 #include "Mesh.h"
 #include "VegaFemFactory.h"
 #include "../Common/SynchronisedQueue.h"
-//#include "TreeInstanceMesh.h"
-//#include "volumetricMeshLoader.h"
-//#include "tetMesh.h"
-//#include <vector>
-//#include <string>
-//#include <cstdio>
-//#include <cassert>
-//#include <float.h>
-//#include "sceneObjectDeformable.h"
 
 void renderPlane(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId);
 void renderTree(CShader& vShader, CSence& vModel);
@@ -103,14 +94,22 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/mini_mapleTree/data/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt");
-	int numbercounter = 7;
-	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
+	CVegaFemFactory vFem("G:/GraduationProject/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt");
+	int numbercounter = 3;
+	std::vector<double> b{ 1000,1,0,0 };
+	std::vector<std::pair<int, int>> angle;
 	for (int i = 0; i < numbercounter; i++)
 	{
-		std::vector<Common::SFileFrames> temp;
-		temp.push_back(vtemp[i]);
-		vFem.readFramesDeformationData(temp, i);
+		angle.push_back(std::make_pair(0, i * 60));
+	}
+	//std::vector<Common::SFileFrames> vtemp = vFem.searchFileFramesOnAnimation(angle[i].first, angle[i].second, b);
+	//std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
+	for (int i = 0; i < numbercounter; i++)
+	{
+		std::vector<Common::SFileFrames> vtemp = vFem.searchFileFramesOnAnimation(angle[i].first, angle[i].second, b);
+		/*std::vector<Common::SFileFrames> temp;
+		temp.push_back(vtemp[i]);*/
+		vFem.readFramesDeformationData(vtemp, i);
 	}
 
 #pragma region initialize and configure glfw
@@ -144,7 +143,6 @@ int main()
 #pragma region build and compile shaders
 	CShader ourSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
 	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
-	//CShader ourLightShader("light.vert", "light.frag");
 	CShader ourSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
 #pragma endregion
 
@@ -294,7 +292,7 @@ int main()
 #pragma endregion
 
 #pragma region load model
-	CSence ourModel("../../models/mini_mapleTree/tree.obj");
+	CSence ourModel("../../models/yellow_tree/tree_last.obj");
 	ourModel.setMeshRotation();
 	ourModel.setGroupsIndex(vFem);
 	ourModel.setVerticesNumber(vFem);
@@ -310,22 +308,22 @@ int main()
 
 	//个数等于
 	std::vector<std::vector<int>> vMultipleExtraForces;
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1350, 1, 0, 0, 600));
-	}
-	for (int i = 0; i < 15; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1015, 1, 0, 0, 600));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1000, 1, 0, 0, 6000));
 	}
 	/*for (int i = 0; i < 15; i++)
 	{
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1010, 1, 0.5, 0, 600));
+	}
+	for (int i = 0; i < 20; i++)
+	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 600, 1, 0.25, 0, 600));
 	}*/
-	for (int i = 0; i < 15; i++)
+	/*for (int i = 0; i < 15; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 600));
-	}
+	}*/
 
 	//Size = Common::ProductFrameNumber;
 	//Size = 180;
@@ -478,7 +476,7 @@ int main()
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 	
-		//Sleep(100);
+		Sleep(100);
 		
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);

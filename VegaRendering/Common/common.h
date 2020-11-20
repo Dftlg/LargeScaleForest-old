@@ -36,7 +36,7 @@ namespace Common
 
 	//const int TreesInstanceNumber = 1;
 
-	const int TreesNumber = 50;
+	const int TreesNumber = 2;
 
 	static int MaxTimeStep = 60;
 
@@ -53,7 +53,7 @@ namespace Common
 	//一个文件中存多少帧
 	static int SamplingFrameNumber = 180;
 
-	static int ProductFrameNumber = 18000;
+	static int ProductFrameNumber = 180000;
 
 	//static int KErrorRange = 10;
 	static int ExpandForceError = 1;
