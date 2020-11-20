@@ -229,6 +229,10 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 		getline(KVFFile, lineString);
 		int ElementNumber = atoi(lineString.c_str()) * 8 * 3;
 		Common::SpKVFData tempKVFData;
+
+		tempKVFData.Theta = vFileFrame.Theta;
+		tempKVFData.Phi = vFileFrame.Phi;
+
 		getline(KVFFile, lineString);
 		if (lineString == "FrameIndex")
 		{
@@ -758,6 +762,7 @@ void CVegaFemFactory::initMatchedFrameStruct(int vTreeSize)
 			std::vector<int> tempExternalForces = m_AllReallyLoadConnectedFem[i].FemDataset[0]->KVFFrameDatas[k].Forces;
 			m_reorderSpKVFSegmentIndexSequence.push_back(m_AllReallyLoadConnectedFem[i].FemDataset[0]->KVFFrameDatas[k].FrameIndex + Common::SamplingFrameNumber * i);
 			m_ForceSequence.push_back(std::make_pair(m_reorderSpKVFSegmentIndexSequence.back(), tempExternalForces));
+			m_WindDirectionSequence.push_back(std::make_pair(m_reorderSpKVFSegmentIndexSequence.back(), m_AllReallyLoadConnectedFem[i].FemDataset[0]->KVFFrameDatas[k].WindDirection));
 		}
 
 	}
@@ -834,7 +839,7 @@ void CVegaFemFactory::resetTempMultipleTreeData(int vTreeSize)
 //以5帧为单位进行帧段的查找匹配操作,对于多棵树同时进行查找操作
 //每次计算需要当前的一段5力以及下一段的5个力，每次计算出前5段力的结果
 //输出当前查找到每颗树5帧的索引号
-void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces)
+void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces,std::vector<std::vector<Common::SWindDirecetion>> &vForceDirection)
 {
 	std::vector<int> FrameIndexSequence;
 
@@ -845,8 +850,10 @@ void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> 
 			m_TempSpKVFData[treeIndex].Forces.clear();
 			//每棵树的当前5个力的段
 			for (int k = 0; k < 5; k++)
+			{
 				m_TempSpKVFData[treeIndex].Forces.push_back(voExtraForces[treeIndex][k]);
-
+				m_TempSpKVFData[treeIndex].WindDirection.push_back(vForceDirection[treeIndex][k]);
+			}
 			//可以并行
 			searchMatchedOneTreeFrameSequences(m_MultipleFramesIndex[treeIndex], m_TempSpKVFData[treeIndex], voExtraForces[treeIndex], m_CurrentFrameIndex[treeIndex], m_Flag[treeIndex]);
 			for (int j = 0; j < 5; j++)
@@ -871,7 +878,26 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 	std::vector<std::pair<int, double>> tempInternalForcesErrorSequence;
 	std::vector <std::pair<int, double>> gaussianForceErrrorSequence;
 	
-	
+	//windDirection
+	std::vector<int> ThetaData;
+	std::vector<int> PhiData;
+	for (int i = 0; i < voSpKVData.WindDirection.size(); i++)
+	{
+		ThetaData.push_back(voSpKVData.WindDirection[i].Theta);
+		PhiData.push_back(voSpKVData.WindDirection[i].Phi);
+	}
+	int MaxTheta = MaxElement(ThetaData)+15;
+	int MinTheta = MinElement(ThetaData) - 15;
+	int MaxPhi = MaxElement(PhiData) + 15;
+	int MinPhi = MinElement(ThetaData) - 15;
+
+	std::vector<int> searchFileAndFrameIndexWithWind;
+	for (int i = 0; i < m_WindDirectionSequence.size(); i++)
+	{
+		if (m_WindDirectionSequence[i].second[0].Theta<MaxTheta&&m_WindDirectionSequence[i].second[0].Theta > MinTheta)
+			if (m_WindDirectionSequence[i].second[0].Phi<MaxPhi&&m_WindDirectionSequence[i].second[0].Phi > MinPhi)
+				searchFileAndFrameIndexWithWind.push_back(m_WindDirectionSequence[i].first);
+	}
 
 	//f内
 	for (int i = 0; i < m_ForceSequence.size(); i++)

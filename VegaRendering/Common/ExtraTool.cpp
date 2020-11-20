@@ -1,6 +1,20 @@
 
 #include "ExtraTool.h"
 
+int MaxElement(std::vector<int> &vDataSet)
+{
+	std::vector<int>::iterator result;
+	result = std::max_element(vDataSet.begin(), vDataSet.end());
+	return std::distance(vDataSet.begin(), result);
+}
+
+int MinElement(std::vector<int> &vDataSet)
+{
+	std::vector<int>::iterator result;
+	result = std::min_element(vDataSet.begin(), vDataSet.end());
+	return std::distance(vDataSet.begin(), result);
+}
+
 int RandomGenerate()
 {
 	LARGE_INTEGER seed;
@@ -115,3 +129,4 @@ double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
 		return (pow(10,(BaseNumber-1 - vControlFloatPosition)))*vRange;
 	} 
 }
+
