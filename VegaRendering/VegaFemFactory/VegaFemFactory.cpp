@@ -839,7 +839,7 @@ void CVegaFemFactory::resetTempMultipleTreeData(int vTreeSize)
 //以5帧为单位进行帧段的查找匹配操作,对于多棵树同时进行查找操作
 //每次计算需要当前的一段5力以及下一段的5个力，每次计算出前5段力的结果
 //输出当前查找到每颗树5帧的索引号
-void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces,std::vector<std::vector<Common::SWindDirecetion>> &vForceDirection)
+void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces,std::vector<std::vector<Common::SWindDirection>> &vForceDirection)
 {
 	std::vector<int> FrameIndexSequence;
 
@@ -848,6 +848,7 @@ void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> 
 		for (int treeIndex = 0; treeIndex < m_TempSpKVFData.size(); treeIndex++)
 		{
 			m_TempSpKVFData[treeIndex].Forces.clear();
+			m_TempSpKVFData[treeIndex].WindDirection.clear();
 			//每棵树的当前5个力的段
 			for (int k = 0; k < 5; k++)
 			{
@@ -955,7 +956,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		compare velocity*/
 		for (int i = 0; i < m_VelocitySequence.size(); i++)
 		{
-			if (gaussianForceErrrorSequence[i].second == 0)
+			if (isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind)||gaussianForceErrrorSequence[i].second == 0)
 			{
 				tempVelocityErrorSequence.push_back(std::make_pair(m_VelocitySequence[i].first, 0));
 				continue;
@@ -985,7 +986,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 #pragma omp parallel for
 		for (int i = 0; i < m_KMartixSequence.size(); i++)
 		{
-			if (gaussianForceErrrorSequence[i].second == 0|| tempVelocityErrorSequence[i].second==0)
+			if (isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind)||gaussianForceErrrorSequence[i].second == 0|| tempVelocityErrorSequence[i].second==0)
 			{
 				tempKErrorSequence.push_back(std::make_pair(m_KMartixSequence[i].first, 0));
 				continue;
@@ -1020,7 +1021,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		//compare internalForces
 		for (int i = 0; i < m_InternalForcesSequence.size(); i++)
 		{
-			if (gaussianForceErrrorSequence[i].second == 0||(tempVelocityErrorSequence[i].second == 0&& tempKErrorSequence[i].second==0))
+			if (isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind)||gaussianForceErrrorSequence[i].second == 0||(tempVelocityErrorSequence[i].second == 0&& tempKErrorSequence[i].second==0))
 			{
 				tempInternalForcesErrorSequence.push_back(std::make_pair(m_InternalForcesSequence[i].first, 0));
 				continue;

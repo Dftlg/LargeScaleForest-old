@@ -18,6 +18,8 @@ int MaxElement(std::vector<int> &vDataSet);
 
 int MinElement(std::vector<int> &vDataSet);
 
+bool isDataExist(int number, std::vector<int> &vDataSet);
+
 int RandomGenerate();
 
 std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency, double vPhase, int vYpluse, int wavelength = 2);

@@ -196,10 +196,16 @@ namespace Common
 		}
 	};
 
-	struct SWindDirecetion
+	struct SWindDirection
 	{
 		int Theta;
 		int Phi;
+		SWindDirection() = default;
+		SWindDirection(int vTheta, int vPhi)
+		{
+			Theta = vTheta;
+			Phi = vPhi;
+		}
 	};
 
 	//一个文件中帧的KVF数据，KVF数据既代表前面帧的结果，又可以用来判断后面帧的数据
@@ -209,7 +215,7 @@ namespace Common
 		int FrameIndex;
 
 		//风的方向
-		std::vector<SWindDirecetion> WindDirection;
+		std::vector<SWindDirection> WindDirection;
 
 		std::vector<int> Forces;
 		std::vector<int> KLengths;

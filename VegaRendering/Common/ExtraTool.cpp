@@ -15,6 +15,14 @@ int MinElement(std::vector<int> &vDataSet)
 	return std::distance(vDataSet.begin(), result);
 }
 
+bool isDataExist(int number, std::vector<int> &vDataSet)
+{
+	for (auto tempdata : vDataSet)
+		if (tempdata == number)
+			return true;
+	return false;
+}
+
 int RandomGenerate()
 {
 	LARGE_INTEGER seed;

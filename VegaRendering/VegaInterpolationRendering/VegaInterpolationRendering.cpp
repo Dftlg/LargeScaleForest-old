@@ -11,6 +11,7 @@
 #include "Mesh.h"
 #include "VegaFemFactory.h"
 #include "../Common/SynchronisedQueue.h"
+#include "../Common/WindFiled.h"
 //#include "TreeInstanceMesh.h"
 //#include "volumetricMeshLoader.h"
 //#include "tetMesh.h"
@@ -60,7 +61,11 @@ int FrameNumber = 0;
 int SearchFrameNumber = 0;
 int SearchFrameStep = 0;
 
-void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces)
+
+//前一个std::vector表示匹配树的个数，后一个std::vector表示每一帧中需要的数据
+//vMultipleExtraForces 表示每一帧风的方向，每次用5帧来进行搜索
+//vWindDirection 表示每帧一个风的方向
+void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces, std::vector<std::vector<Common::SWindDirection>> & vWindDirection)
 {
 	while (true)
 	{
@@ -75,15 +80,19 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 		{
 			//每5个力计算一次匹配的5帧
 			std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
+			std::vector<std::vector<Common::SWindDirection>> tempMultipleFiveWindDirection;
 			for (int i = 0; i < vMultipleExtraForces.size(); i++)
 			{
 				for (int k = (SearchFrameStep) * 5; k < (SearchFrameStep + 1) * 5; k++)
 				{
+					//int t=vMultipleExtraForces[i][k];
 					tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
+					tempMultipleFiveWindDirection[i].push_back(vWindDirection[i][k]);
 				}
 			}
-			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces);
+			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces, tempMultipleFiveWindDirection);
 			tempMultipleFiveForces.clear();
+			tempMultipleFiveWindDirection.clear();
 			SearchFrameStep++;
 			//std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
 		}
@@ -310,6 +319,7 @@ int main()
 
 	//个数等于
 	std::vector<std::vector<int>> vMultipleExtraForces;
+	std::vector<std::vector<Common::SWindDirection>> vMultipleExtraDirections;
 	for (int i = 0; i < 15; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1350, 1, 0, 0, 600));
@@ -327,6 +337,12 @@ int main()
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 600));
 	}
 
+	std::vector<SWaveFunctionPara> OneDirectionWindPara;
+	OneDirectionWindPara.push_back(SWaveFunctionPara(1015, 1, 0, 0));
+	OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
+	CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindPara, 600, Common::SWindDirection(0,0));
+	vMultipleExtraForces.push_back(OnedirectionWind.getDirectionWindForces());
+	vMultipleExtraDirections.push_back(OnedirectionWind.getDirectionWindDirection());
 	//Size = Common::ProductFrameNumber;
 	//Size = 180;
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
