@@ -31,6 +31,12 @@ void CMesh::setRotation(glm::mat4 * temp)
 	__setupInstanceMesh();
 }
 
+//void CMesh::setSpecificRotation(glm::mat4 *temp)
+//{
+//    m_specificmodelRotationMatrices = temp;
+//    __setupInstanceSpecificRotationMesh();
+//}
+
 void CMesh::setGroupAndAssimpIndex(std::vector<int>& vGroupIndex, int vLastCapacity, int vNextCapacity)
 {
 	m_GroupIndex = vGroupIndex;
@@ -151,6 +157,30 @@ void CMesh::__setupInstanceMesh()
 	glBindVertexArray(0);
 
 }
+//void CMesh::__setupInstanceSpecificRotationMesh()
+//{
+//    glBindVertexArray(m_VAO);
+//
+//    glGenBuffers(1, &m_InstanceSpecificRotationVBO);
+//    glBindBuffer(GL_ARRAY_BUFFER, m_InstanceSpecificRotationVBO);
+//    glBufferData(GL_ARRAY_BUFFER, Common::TreesNumber * sizeof(glm::mat4), &m_specificmodelRotationMatrices[0], GL_STATIC_DRAW);
+//
+//    glEnableVertexAttribArray(9);
+//    glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)0);
+//    glEnableVertexAttribArray(10);
+//    glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)(sizeof(glm::vec4)));
+//    glEnableVertexAttribArray(11);
+//    glVertexAttribPointer(11, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)(2 * sizeof(glm::vec4)));
+//    glEnableVertexAttribArray(12);
+//    glVertexAttribPointer(12, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)(3 * sizeof(glm::vec4)));
+//
+//    glVertexAttribDivisor(9, 1);
+//    glVertexAttribDivisor(10, 1);
+//    glVertexAttribDivisor(11, 1);
+//    glVertexAttribDivisor(12, 1);
+//
+//    glBindVertexArray(0);
+//}
 
 void CMesh::__setupGroupIndexMesh()
 {
@@ -180,4 +210,3 @@ void CMesh::__setupAssimpGroupIndex()
 }
 
 
- 

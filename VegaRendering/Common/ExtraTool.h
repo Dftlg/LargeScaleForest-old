@@ -1,5 +1,7 @@
 #pragma once    
 #include<iostream>
+#include <fstream>
+#include<sstream>
 #include<ctime>
 #include<random>
 #include<math.h>
@@ -24,7 +26,7 @@ int RandomGenerate();
 
 std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency, double vPhase, int vYpluse, int wavelength = 2);
 
-std::vector<double> GetForceConfigurate(const std::string & vFilePath);
+std::vector<std::vector<double>> GetForceConfigurate(const std::string & vFilePath, const std::string &vExternFile, int &vTheta, int &vPhi);
 
 std::vector<std::pair<double, double>> RandomTreePositionGenerate(int vTreeNumber);
 

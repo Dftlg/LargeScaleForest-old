@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <GL/glew.h>
 #include<glm/glm.hpp>
 #include<glm/gtc/type_ptr.hpp>
@@ -65,12 +65,12 @@ int SearchFrameStep = 0;
 //前一个std::vector表示匹配树的个数，后一个std::vector表示每一帧中需要的数据
 //vMultipleExtraForces 表示每一帧风的方向，每次用5帧来进行搜索
 //vWindDirection 表示每帧一个风的方向
-void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces, std::vector<std::vector<Common::SWindDirection>> & vWindDirection)
+void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces, std::vector<std::vector<Common::SForceDirection>> & vWindDirection)
 {
 	while (true)
 	{
 		//当前12个帧段进行一次重置获取5个帧段号索引
-	/*	if (SearchFrameNumber %Size==0)
+		/*if (SearchFrameNumber %Size==0)
 		{
 			std::cout << "search reset" << std::endl;
 			vVFF.resetTempMultipleTreeData(vMultipleExtraForces.size());
@@ -80,7 +80,7 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 		{
 			//每5个力计算一次匹配的5帧
 			std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
-			std::vector<std::vector<Common::SWindDirection>> tempMultipleFiveWindDirection;
+			std::vector<std::vector<Common::SForceDirection>> tempMultipleFiveWindDirection(vMultipleExtraForces.size());
 			for (int i = 0; i < vMultipleExtraForces.size(); i++)
 			{
 				for (int k = (SearchFrameStep) * 5; k < (SearchFrameStep + 1) * 5; k++)
@@ -101,9 +101,9 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 		{
 			tempTreeFileAndFrameIndex.push_back(vVFF.getFileAndFrameIndex(treenumber, SearchFrameNumber % 5));
 
-			//std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
+			std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
 		}
-		//std::cout << std::endl;
+		std::cout << std::endl;
 		SearchQueue.Enqueue(tempTreeFileAndFrameIndex);
 		SearchFrameNumber++;
 		tempTreeFileAndFrameIndex.clear();
@@ -112,8 +112,8 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 
 int main()
 {
-	CVegaFemFactory vFem("../../models/mini_mapleTree/data/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt");
-	int numbercounter = 8;
+	CVegaFemFactory vFem("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt");
+	int numbercounter = 1;
 	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -303,8 +303,10 @@ int main()
 #pragma endregion
 
 #pragma region load model
-	CSence ourModel("../../models/mini_mapleTree/tree.obj");
+	CSence ourModel("../../models/yellow_tree/tree_last.obj");
+
 	ourModel.setMeshRotation();
+
 	ourModel.setGroupsIndex(vFem);
 	ourModel.setVerticesNumber(vFem);
 	ourModel.setMeshGroupAndAssimpIndex();
@@ -319,8 +321,8 @@ int main()
 
 	//个数等于
 	std::vector<std::vector<int>> vMultipleExtraForces;
-	std::vector<std::vector<Common::SWindDirection>> vMultipleExtraDirections;
-	for (int i = 0; i < 15; i++)
+	std::vector<std::vector<Common::SForceDirection>> vMultipleExtraDirections;
+	/*for (int i = 0; i < 15; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1350, 1, 0, 0, 600));
 	}
@@ -335,16 +337,31 @@ int main()
 	for (int i = 0; i < 10; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 600));
-	}
+	}*/
 
 	std::vector<SWaveFunctionPara> OneDirectionWindPara;
-	OneDirectionWindPara.push_back(SWaveFunctionPara(1015, 1, 0, 0));
+	//OneDirectionWindPara.push_back(SWaveFunctionPara(1010, 1, 0, 0));
 	OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
-	CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindPara, 600, Common::SWindDirection(0,0));
+	OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0, 1000));
+	OneDirectionWindPara.push_back(SWaveFunctionPara(700, 1, 0.5, 500));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1));
+    //OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1,1500));
+
+    //OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
+    //OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500));
+    //OneDirectionWindPara.push_back(SWaveFunctionPara(1200, 1, 0, 1000, 1, 1000));
+    //OneDirectionWindPara.push_back(SWaveFunctionPara(800, 1, 0.5, 400));
+    //OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0.25, 700, 1));
+	CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindPara, 6000, Common::SForceDirection(0,0),ourModel.getAngles()[0]);
+
+    /*OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1, 1500));
+    CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindPara, 6000, Common::SForceDirection(0, 120));*/
+
 	vMultipleExtraForces.push_back(OnedirectionWind.getDirectionWindForces());
 	vMultipleExtraDirections.push_back(OnedirectionWind.getDirectionWindDirection());
+    //OnedirectionWind.saveForces2File("D:/GraduationProject/LargeScaleForest/models/yellow_tree/ForceSave/forces.txt");
 	//Size = Common::ProductFrameNumber;
-	//Size = 180;
+	/*Size = 180;*/
 	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
 	vFem.initKVFDataSearchRangeError();
 
@@ -427,7 +444,7 @@ int main()
 
 
 	//开启线程进行读取Tree索引
-	boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex,vFem, ourModel, vMultipleExtraForces);
+	boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex,vFem, ourModel, vMultipleExtraForces, vMultipleExtraDirections);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
@@ -494,7 +511,7 @@ int main()
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 	
-		//Sleep(100);
+		Sleep(100);
 		
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);

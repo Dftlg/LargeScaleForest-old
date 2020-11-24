@@ -17,7 +17,11 @@ void CSence::draw(const CShader& vShader)
 }
 
 void CSence::setMeshRotation()
+//void CSence::setMeshRotation(std::vector<float> &vRotations)
 {
+ /*   glm::mat4*temp = translateTreePosition();
+    m_SetRotation = vRotations;*/
+
 	glm::mat4*temp = randomRotation();
 
 	for (auto& Mesh : m_Meshes)
@@ -26,19 +30,64 @@ void CSence::setMeshRotation()
 	}
 }
 
+//void CSence::setMeshRotationRelationWindFieldAndTreeDirection(std::vector<float> &vRotations)
+//{
+//    glm::mat4*temp = specificTreeRotation(vRotations);
+//
+//    for (auto& Mesh : m_Meshes)
+//    {
+//        Mesh.setSpecificRotation(temp);
+//    }
+//}
+//
+glm::mat4* CSence::specificTreeRotation(std::vector<float> &vRotations)
+{
+    glm::mat4* modelMatrices = new glm::mat4[Common::TreesNumber];
+    for (int i = 0; i < Common::TreesNumber; i++)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        m_Angles.push_back(Common::SForceDirection(0, vRotations[i]));
+        model = glm::rotate(model, glm::radians(vRotations[i]), glm::vec3(0.0, 1.0, 0.0));
+        //glm::vec3 tempScale = GenerateRamdomScale();
+        //model = glm::scale(model, tempScale);
+        modelMatrices[i] = model;
+    }
+    return modelMatrices;
+}
+
+glm::mat4* CSence::translateTreePosition()
+{
+    glm::mat4* modelMatrices = new glm::mat4[Common::TreesNumber];
+    std::vector<std::pair<double, double>> TreesPosition = RandomTreePositionGenerate(Common::TreesNumber);
+    for (int i = 0; i < Common::TreesNumber; i++)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber / 2)*5.0, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2)*0.0));
+        modelMatrices[i] = model;
+    }
+    return modelMatrices;
+}
 
 glm::mat4* CSence::randomRotation()
 {
 	glm::mat4* modelMatrices = new glm::mat4[Common::TreesNumber];
 	std::vector<std::pair<double, double>> TreesPosition = RandomTreePositionGenerate(Common::TreesNumber);
-	//Éú³ÉÒ»¸öCommon::TreesNumber*Common::TreesNumber´óĞ¡µÄÍø¸ñ£¬ÔÚÍø¸ñÄÚ²úÉúÊ÷µÄÎ»ÖÃ£¬²¢ÔÚÒ»¸öÍø¸ñÉÏ¼ÌĞøÔö¼ÓËæ»úÎ»ÖÃ
+	//ç”Ÿæˆä¸€ä¸ªCommon::TreesNumber*Common::TreesNumberå¤§å°çš„ç½‘æ ¼ï¼Œåœ¨ç½‘æ ¼å†…äº§ç”Ÿæ ‘çš„ä½ç½®ï¼Œå¹¶åœ¨ä¸€ä¸ªç½‘æ ¼ä¸Šç»§ç»­å¢åŠ éšæœºä½ç½®
 	for (int i = 0; i < Common::TreesNumber; i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber/2)*5.0, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2)*0.0));
 		srand(time(0));
-		//float tempRandom = (float)RandomGenerate();	
-		//model = glm::rotate(model, glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
+        //å› ä¸æœç´¢çš„é£åœºä¸æ ‘è§’åº¦æœ‰å…³ï¼Œæœ€å¥½ç»™å®šæ•°æ®é›†ï¼Œå¦åˆ™æœ‰å¯èƒ½äº§ç”Ÿæœç´¢ä¸åˆ°æ•°æ®çš„æƒ…å†µ
+		float tempRandom = (float)RandomGenerate();
+
+
+       //tempRandom = -120;
+        tempRandom = 0;
+        m_Angles.push_back(Common::SForceDirection(0,tempRandom));
+
+
+		model = glm::rotate(model, glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
 		//glm::vec3 tempScale = GenerateRamdomScale();
 		//model = glm::scale(model, tempScale);
 		modelMatrices[i] = model;
@@ -60,7 +109,7 @@ void CSence::setMeshGroupAndAssimpIndex()
 	}
 }
 
-//Í¨¹ıgroups»ñÈ¡¶¥µã¸öÊı£¬½«ÊäÈëµÄdeformation»®·Ö¡£
+//é€šè¿‡groupsè·å–é¡¶ç‚¹ä¸ªæ•°ï¼Œå°†è¾“å…¥çš„deformationåˆ’åˆ†ã€‚
 void CSence::SetParaMesh()
 {
 	for (auto i = 0; i < m_Mesh->getNumGroups(); i++)
@@ -232,7 +281,7 @@ void CSence::__processNode(const aiNode* vNode, const aiScene* vScene,bool vSave
 			__processSaveDeformation(Mesh, vScene);
 		}
 	}
-	//groupµÄ¸öÊı
+	//groupçš„ä¸ªæ•°
 	for (unsigned int i = 0; i < vNode->mNumChildren; i++)
 	{
 		__processNode(vNode->mChildren[i], vScene, vSaveDeformationOrLoadData);
@@ -240,7 +289,7 @@ void CSence::__processNode(const aiNode* vNode, const aiScene* vScene,bool vSave
 }
 
 //****************************************************************************************************
-//FUNCTION:Õë¶ÔÃ¿Ò»¸ögroup½øĞĞ´¦Àí
+//FUNCTION:é’ˆå¯¹æ¯ä¸€ä¸ªgroupè¿›è¡Œå¤„ç†
 CMesh CSence::__processMesh(const aiMesh* vMesh, const aiScene* vScene)
 {
 	std::vector<Common::SVertex> Vertices;
@@ -386,9 +435,9 @@ std::vector<Common::STexture> CSence::loadMaterialTextures(aiMaterial *vMat, aiT
 
 void CSence::initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber)
 {
-	//Ö¡Êı
+	//å¸§æ•°
 	m_FrameNums = vFem.getFileFrames(0)->Frames.size();
-	//objÄ£ĞÍµÄ¶¥µãÊı
+	//objæ¨¡å‹çš„é¡¶ç‚¹æ•°
 	m_VertexNums = vFem.getFileFrames(0)->Frames[0].BaseFileDeformations.size();
 
 	m_FileNumber = vFileNumber;
@@ -423,27 +472,27 @@ void CSence::initSSBOTreeFileAndFrameIndex(const int vTreeNumber)
 
 void CSence::setSSBO4UDeformationAndIndex(const CShader& vShader)
 {
-	//ÉèÖÃËùÓĞDeltaUÊı¾İ
+	//è®¾ç½®æ‰€æœ‰DeltaUæ•°æ®
 	GLuint shader_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaDeformationArray");
 	GLint SSBOBinding = 0, BlockDataSize = 0;
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding);
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize);
 
 	std::cout << m_FrameNums * m_VertexNums*m_FileNumber << std::endl;
-	//³õÊ¼»¯SSBO
+	//åˆå§‹åŒ–SSBO
 	glGenBuffers(1, &m_DeltaUSSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_DeltaUSSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(m_FrameNums*m_VertexNums*m_FileNumber), m_DeltaDeformationU, GL_STATIC_DRAW);
 
-	//shaderºÍµãÁ¬½Ó
+	//shaderå’Œç‚¹è¿æ¥
 	GLuint ssbo_binding_point_index = 1;
-	//µãºÍSSBOµÄÁ¬½Ó
+	//ç‚¹å’ŒSSBOçš„è¿æ¥
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, m_DeltaUSSBO);
-	//µãºÍshaderµÄÁ¬½Ó
+	//ç‚¹å’Œshaderçš„è¿æ¥
 	glShaderStorageBlockBinding(vShader.getID(), shader_index, ssbo_binding_point_index);
 
-	//ÉèÖÃDelataUÓÃÀ´´æ´¢Éú³ÉÊ÷µÄµ±Ç°ĞÍ±äÁ¿
-	//shaderºÍµãÁ¬½Ó
+	//è®¾ç½®DelataUç”¨æ¥å­˜å‚¨ç”Ÿæˆæ ‘çš„å½“å‰å‹å˜é‡
+	//shaderå’Œç‚¹è¿æ¥
 	GLuint shader_delta_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
 	GLint SSBOBinding1 = 0, BlockDataSize1 = 0;
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding1);
@@ -453,12 +502,12 @@ void CSence::setSSBO4UDeformationAndIndex(const CShader& vShader)
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_UdeformationSSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(m_AssimpVerticesNumber*Common::TreesNumber), m_DeformationU, GL_DYNAMIC_DRAW);
 	GLuint deltassbo_binding_point_index = 2;
-	//µãºÍSSBOµÄÁ¬½Ó
+	//ç‚¹å’ŒSSBOçš„è¿æ¥
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_index, m_UdeformationSSBO);
-	//µãºÍshaderµÄÁ¬½Ó
+	//ç‚¹å’Œshaderçš„è¿æ¥
 	glShaderStorageBlockBinding(vShader.getID(), shader_delta_index, deltassbo_binding_point_index);
 
-	//ÉèÖÃTreeFileºÍFrameIndex
+	//è®¾ç½®TreeFileå’ŒFrameIndex
 	GLuint shader_file_frame_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "IndexArray");
 	GLint SSBOBinding2 = 0, BlockDataSize2 = 0;
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding2);
@@ -468,41 +517,41 @@ void CSence::setSSBO4UDeformationAndIndex(const CShader& vShader)
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_TreeFileAndFrameSSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::ivec2)*(Common::TreesNumber), m_TreeFileAndFrameIndex, GL_DYNAMIC_DRAW);
 	GLuint file_frame_ssbo_binding_point_index = 3;
-	//µãºÍSSBOµÄÁ¬½Ó
+	//ç‚¹å’ŒSSBOçš„è¿æ¥
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, file_frame_ssbo_binding_point_index, m_TreeFileAndFrameSSBO);
-	//µãºÍshaderµÄÁ¬½Ó
+	//ç‚¹å’Œshaderçš„è¿æ¥
 	glShaderStorageBlockBinding(vShader.getID(), shader_file_frame_index, file_frame_ssbo_binding_point_index);
 	
 }
 
 void CSence::setSSBOUdeformationAndIndx4ShadowMapShader(const CShader& vShader)
 {
-	//ÉèÖÃËùÓĞDeltaUÊı¾İ
+	//è®¾ç½®æ‰€æœ‰DeltaUæ•°æ®
 	GLuint shader_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaDeformationArray");
 
-	//shaderºÍµãÁ¬½Ó
+	//shaderå’Œç‚¹è¿æ¥
 	GLuint ssbo_binding_point_index = 1;
-	//µãºÍSSBOµÄÁ¬½Ó
+	//ç‚¹å’ŒSSBOçš„è¿æ¥
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, m_DeltaUSSBO);
-	//µãºÍshaderµÄÁ¬½Ó
+	//ç‚¹å’Œshaderçš„è¿æ¥
 	glShaderStorageBlockBinding(vShader.getID(), shader_index, ssbo_binding_point_index);
 
-	//ÉèÖÃDelataUÓÃÀ´´æ´¢Éú³ÉÊ÷µÄµ±Ç°ĞÍ±äÁ¿
-	//shaderºÍµãÁ¬½Ó
+	//è®¾ç½®DelataUç”¨æ¥å­˜å‚¨ç”Ÿæˆæ ‘çš„å½“å‰å‹å˜é‡
+	//shaderå’Œç‚¹è¿æ¥
 	GLuint shader_delta_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeformationArray");
 
 	GLuint deltassbo_binding_point_index = 2;
-	//µãºÍSSBOµÄÁ¬½Ó
+	//ç‚¹å’ŒSSBOçš„è¿æ¥
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_index, m_UdeformationSSBO);
-	//µãºÍshaderµÄÁ¬½Ó
+	//ç‚¹å’Œshaderçš„è¿æ¥
 	glShaderStorageBlockBinding(vShader.getID(), shader_delta_index, deltassbo_binding_point_index);
 
-	//ÉèÖÃTreeFileºÍFrameIndex
+	//è®¾ç½®TreeFileå’ŒFrameIndex
 	GLuint shader_file_frame_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "IndexArray");
 	GLuint file_frame_ssbo_binding_point_index = 3;
-	//µãºÍSSBOµÄÁ¬½Ó
+	//ç‚¹å’ŒSSBOçš„è¿æ¥
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, file_frame_ssbo_binding_point_index, m_TreeFileAndFrameSSBO);
-	//µãºÍshaderµÄÁ¬½Ó
+	//ç‚¹å’Œshaderçš„è¿æ¥
 	glShaderStorageBlockBinding(vShader.getID(), shader_file_frame_index, file_frame_ssbo_binding_point_index);
 }
 

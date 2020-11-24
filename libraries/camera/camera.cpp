@@ -313,6 +313,7 @@ void SphericalCamera::CameraVector2WorldVector_OrientationOnly3D(double c0, doub
   w[2] = (c0 * xAxis[2] + c1 * yAxis[2] + c2 * zAxis[2]) * camera2WorldScalingFactor;
 }
 
+//Theta and Phi 0-360
 void SphericalCamera::setWorldCoorinateSystemForce(float vforceDegree,double vforceDirectionTheta,double vforceDirectionPhi, double voforce[3]) const
 {
 	double Thetaradian = vforceDirectionTheta * PI / 180;

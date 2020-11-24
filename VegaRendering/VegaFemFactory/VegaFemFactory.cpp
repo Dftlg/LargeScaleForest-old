@@ -3,17 +3,17 @@
 
 CVegaFemFactory::CVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile,const std::string &vCorrectDeformationUVertexIndex)
 {
-	//m_FilesDataÖĞÃ¿¸ö¶ÔÏóµÄÎÄ¼şÃûºÍ¾ä¶ÔÂ·¾¶¼ÓÉÏ
+	//m_FilesDataä¸­æ¯ä¸ªå¯¹è±¡çš„æ–‡ä»¶åå’Œå¥å¯¹è·¯å¾„åŠ ä¸Š
 	readFilePath4Directory(vDirectoryName);
-	//¸ù¾İÉÏÃæ½âÎöµÄÎÄ¼şÃû½«m_FilesDataÃ¿¸ö¶ÔÏóµÄ½Ç¶ÈºÍ²¨¶¯ĞòÁĞ¼ÓÉÏ
+	//æ ¹æ®ä¸Šé¢è§£æçš„æ–‡ä»¶åå°†m_FilesDataæ¯ä¸ªå¯¹è±¡çš„è§’åº¦å’Œæ³¢åŠ¨åºåˆ—åŠ ä¸Š
 	setDeformationStateFromFileName();
-	//¿ÉÒÔ¿´×÷ÊÇÒ»¸öobjµÄmodel¶ÔÏó£¬ÓĞmesh¼¯ºÏ£¬ÒÔ¼°group×é¼¯ºÏ£¬
+	//å¯ä»¥çœ‹ä½œæ˜¯ä¸€ä¸ªobjçš„modelå¯¹è±¡ï¼Œæœ‰meshé›†åˆï¼Œä»¥åŠgroupç»„é›†åˆï¼Œ
 	m_ModelTransformStruct = new CModelDeformationTransform(vMutilVerticesBaseFile);
-	//¼ÓÔØĞèÒªÅĞ¶ÏµÄÎ»ÒÆË÷Òı
+	//åŠ è½½éœ€è¦åˆ¤æ–­çš„ä½ç§»ç´¢å¼•
 	//readCorrectUdeformationIndex(vCorrectDeformationUVertexIndex);
 }
 
-//½«ÎÄ¼ş¼ĞÏÂËùÓĞÎÄ¼ş´´½¨¶à¸öSFileFramesÎÄ¼ş¶ÔÏó£¬µ«²¢Î´¼ÓÔØÊı¾İ£¬Ö»ÊÇ½«ÎÄ¼ş¶ÔÓ¦µÄÃû×ÖºÍ¾ø¶ÔÂ·¾¶¼ÓÉÏ
+//å°†æ–‡ä»¶å¤¹ä¸‹æ‰€æœ‰æ–‡ä»¶åˆ›å»ºå¤šä¸ªSFileFramesæ–‡ä»¶å¯¹è±¡ï¼Œä½†å¹¶æœªåŠ è½½æ•°æ®ï¼Œåªæ˜¯å°†æ–‡ä»¶å¯¹åº”çš„åå­—å’Œç»å¯¹è·¯å¾„åŠ ä¸Š
 void CVegaFemFactory::readFilePath4Directory(const std::string & vDirectoryName)
 {
 	intptr_t  hFile = 0;
@@ -58,17 +58,17 @@ void CVegaFemFactory::write2File(const std::string & vPath, std::vector <std::pa
 }
 
 
-//¶ÔÓÚËÑË÷³öµÄSFileFrames¼ÓÔØÊı¾İ
+//å¯¹äºæœç´¢å‡ºçš„SFileFramesåŠ è½½æ•°æ®
 void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>& vSearchFrames, int vSearchConnectionIndex)
 {
 	Common::SConnectedFemFiles tempConnectedFile(vSearchConnectionIndex);
-	//¼ÇÂ¼Ëù¸ø½Ç¶ÈÏÂµÄÎ»ÒÆĞèÒª¼¸¸öÎ»ÒÆÎÄ¼şÀ´²åÖµ
+	//è®°å½•æ‰€ç»™è§’åº¦ä¸‹çš„ä½ç§»éœ€è¦å‡ ä¸ªä½ç§»æ–‡ä»¶æ¥æ’å€¼
 	int counterConnectFileNumber = 0;
-	//ËÑË÷µ½µÄÖ¸¶¨½Ç¶ÈÏÂÏà¹ØµÄÎ»ÒÆÎÄ¼ş¼¯ºÏ
+	//æœç´¢åˆ°çš„æŒ‡å®šè§’åº¦ä¸‹ç›¸å…³çš„ä½ç§»æ–‡ä»¶é›†åˆ
 	time_t current = time(NULL);
 	for (auto searchindex = 0; searchindex < vSearchFrames.size(); searchindex++)
 	{
-		//forÑ­»·Â·¾¶ÏÂËùÓĞµÄÎ»ÒÆÎÄ¼ş
+		//forå¾ªç¯è·¯å¾„ä¸‹æ‰€æœ‰çš„ä½ç§»æ–‡ä»¶
 		for (auto fileIndex = 0; fileIndex < m_FilesData.size(); fileIndex++)
 		{
 			if (vSearchFrames[searchindex].FileName == m_FilesData[fileIndex].FileName)
@@ -96,8 +96,8 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 					sprintf(s, "Position%d", timeStepCount);
 					std::istringstream sin(lineString);
 					std::string str;
-					sin >> str;//Position%04dºóÃæÓĞ¿Õ¸ñ
-					//Ò»Ö¡
+					sin >> str;//Position%04dåé¢æœ‰ç©ºæ ¼
+					//ä¸€å¸§
 					if (str == s)
 					{
 						std::string VertexSizeStr;
@@ -107,7 +107,7 @@ void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>
 						getline(positionFile, lineString);
 						std::istringstream dataset(lineString);
 
-						//Ò»¸öÎ»ÒÆÎÄ¼şÊı¾İÖĞµÄÒ»Ö¡¶¥µãÎ»ÒÆ
+						//ä¸€ä¸ªä½ç§»æ–‡ä»¶æ•°æ®ä¸­çš„ä¸€å¸§é¡¶ç‚¹ä½ç§»
 						Common::SFileData tempFileData(Frameindex);
 						for (int j = 0; j < VertexSize; j++)
 						{
@@ -167,8 +167,8 @@ void CVegaFemFactory::readFramesDeformationDataBasedFilesIndex(std::vector<std::
 			sprintf(s, "Position%d", timeStepCount);
 			std::istringstream sin(lineString);
 			std::string str;
-			sin >> str;//Position%04dºóÃæÓĞ¿Õ¸ñ
-			//Ò»Ö¡
+			sin >> str;//Position%04dåé¢æœ‰ç©ºæ ¼
+			//ä¸€å¸§
 			if (str == s)
 			{
 				std::string VertexSizeStr;
@@ -178,7 +178,7 @@ void CVegaFemFactory::readFramesDeformationDataBasedFilesIndex(std::vector<std::
 				getline(positionFile, lineString);
 				std::istringstream dataset(lineString);
 
-				//Ò»¸öÎ»ÒÆÎÄ¼şÊı¾İÖĞµÄÒ»Ö¡¶¥µãÎ»ÒÆ
+				//ä¸€ä¸ªä½ç§»æ–‡ä»¶æ•°æ®ä¸­çš„ä¸€å¸§é¡¶ç‚¹ä½ç§»
 				Common::SFileData tempFileData(Frameindex);
 				for (int j = 0; j < VertexSize; j++)
 				{
@@ -199,7 +199,7 @@ void CVegaFemFactory::readFramesDeformationDataBasedFilesIndex(std::vector<std::
 
 	for (int i = 0; i < vFilesAndFramesIndexSequence.size(); i++)
 	{
-		//Ã¿20Ö¡½øĞĞÒ»´ÎĞÎ±ä½ÃÕı
+		//æ¯20å¸§è¿›è¡Œä¸€æ¬¡å½¢å˜çŸ«æ­£
 		//if (i%4 ==0||i!=0 )
 		//{
 		//	voMatchedFramesData
@@ -230,9 +230,11 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 		int ElementNumber = atoi(lineString.c_str()) * 8 * 3;
 		Common::SpKVFData tempKVFData;
 
-		tempKVFData.Theta = vFileFrame.Theta;
-		tempKVFData.Phi = vFileFrame.Phi;
-
+		Common::SForceDirection tempWindDirection(vFileFrame.Theta, vFileFrame.Phi);
+		for (int i = 0; i < 5; i++)
+		{
+			tempKVFData.WindDirection.push_back(tempWindDirection);
+		}
 		getline(KVFFile, lineString);
 		if (lineString == "FrameIndex")
 		{
@@ -251,7 +253,7 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 				double tempKnumber;
 				ForceSet >> tempKnumber;
 				tempForces.push_back(tempKnumber);
-				//³õÊ¼»¯´æÔÚ´íÎó
+				//åˆå§‹åŒ–å­˜åœ¨é”™è¯¯
 				//tempKNumbers.push_back(tempKnumber);
 			}
 			tempKVFData.Forces = tempForces;
@@ -269,7 +271,7 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 			{
 				double tempKnumber;
 				DataSet >> tempKnumber;
-				//³õÊ¼»¯´æÔÚ´íÎó
+				//åˆå§‹åŒ–å­˜åœ¨é”™è¯¯
 				tempKNumbers.push_back(tempKnumber);
 			}
 			tempKVFData.Kmatrix.push_back(tempKNumbers);
@@ -315,8 +317,8 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 	
 }
 
-//¶àÏß³Ì¶ÁÈ¡Ò»¸öÎÄ¼ş
-//µÚ¶ş¸ö²ÎÊıÒÑ¾­¼ÓÔØµÄ½á¹¹ÌåµÄµÚ¼¸¸öFileFrames
+//å¤šçº¿ç¨‹è¯»å–ä¸€ä¸ªæ–‡ä»¶
+//ç¬¬äºŒä¸ªå‚æ•°å·²ç»åŠ è½½çš„ç»“æ„ä½“çš„ç¬¬å‡ ä¸ªFileFrames
 void CVegaFemFactory::readDeformationDataByMutileThread(Common::SFileFrames & vBaseFileFramesStruct, const std::string & vFilePath, int vSFileFramesIndex)
 {
 	std::vector<long long> BlockSizes;
@@ -416,28 +418,44 @@ void CVegaFemFactory::addSeekgOfEachFramesBlock(const std::string & vFilePath)
 	writePositionFile.close();
 }
 
-//¶ÔÓÚÒÑ¾­´´½¨µÄ¶à¸öSFileFrames¶ÔÏó£¬¸ù¾İÃ¿¸ö¶ÔÏóµÄÎÄ¼şÃû½âÎö³öÆä¶ÔÓ¦µÄÁ½¸ö½Ç¶ÈÒÔ¼°Á¦µÄ²¨¶¯ĞòÁĞ£¬½øĞĞ¶ÔÏóµÄÌî³ä£¬´ËÊ±»¹ÊÇÃ»ÓĞ¶ÁÈëÃ¿Ö¡µÄÎ»ÒÆÊı¾İ
+//å¯¹äºå·²ç»åˆ›å»ºçš„å¤šä¸ªSFileFrameså¯¹è±¡ï¼Œæ ¹æ®æ¯ä¸ªå¯¹è±¡çš„æ–‡ä»¶åè§£æå‡ºå…¶å¯¹åº”çš„ä¸¤ä¸ªè§’åº¦ä»¥åŠåŠ›çš„æ³¢åŠ¨åºåˆ—ï¼Œè¿›è¡Œå¯¹è±¡çš„å¡«å……ï¼Œæ­¤æ—¶è¿˜æ˜¯æ²¡æœ‰è¯»å…¥æ¯å¸§çš„ä½ç§»æ•°æ®
 void CVegaFemFactory::setDeformationStateFromFileName()
 {
 	int thetaPos;
 	int phiPos;
 	int forcePos;
+	int IndexPos;
 	for (auto i = 0; i < m_FilesData.size(); i++)
 	{
 		std::vector<std::string> ForceSequence;
 		thetaPos = m_FilesData[i].FileName.find("the");
 		phiPos = m_FilesData[i].FileName.find("phi");
 		forcePos = m_FilesData[i].FileName.find("force");
+		IndexPos = m_FilesData[i].FileName.find("Index");
+		
 		m_FilesData[i].Theta = std::stoi(m_FilesData[i].FileName.substr(thetaPos + 3, phiPos - thetaPos - 3));
 		m_FilesData[i].Phi = std::stoi(m_FilesData[i].FileName.substr(phiPos + 3, forcePos - phiPos - 3));
-		//std::string tempsequence="500,500,500"
-		//std::string tempsequence = m_FilesData[i].FileIndex.substr(forcePos + 5);
-		//std::vector<std::string> ForceSequence={500,500,500}
-		boost::split(ForceSequence, m_FilesData[i].FileName.substr(forcePos + 5), boost::is_any_of(","), boost::token_compress_off);
-		std::vector<std::string>::iterator it;
-		for (it = ForceSequence.begin(); it != ForceSequence.end(); ++it)
+
+		int tempForceNumber = std::stoi(m_FilesData[i].FileName.substr(forcePos + 5, IndexPos - forcePos - 5));
+		//std::cout << tempForceNumber<<std::endl;
+		std::string tempForceDirectory = m_FilesData[i].FilePath.substr(0,m_FilesData[i].FilePath.find_last_of("/"));
+		std::string tempFileForceName = tempForceDirectory +"/EachFileForce/"+ m_FilesData[i].FileName.substr(IndexPos + 5) + ".txt";
+		std::ifstream positionFile(tempFileForceName, std::ios::in);
+		std::string lineString;
+		int forcenumber = 0;
+		while (getline(positionFile, lineString))
 		{
-			m_FilesData[i].ForceFluctuationSequence.push_back(std::stof(*it));
+			boost::split(ForceSequence, lineString, boost::is_any_of(","), boost::token_compress_off);
+			std::vector<double> tempCon;
+			std::vector<std::string>::iterator it;
+			std::vector<double> tempSequence;
+			for (it = ForceSequence.begin(); it != ForceSequence.end(); ++it)
+			{
+				tempSequence.push_back(std::stof(*it));
+			}
+			m_FilesData[i].ForceFluctuationSequence.push_back(tempSequence);
+			tempSequence.clear();
+			forcenumber++;
 		}
 	}
 }
@@ -450,27 +468,27 @@ std::string CVegaFemFactory::getFileName(const std::string & vFileDirectory)
 	return fileName;
 }
 
-//½«Ä£ĞÍµÄÔ­Ê¼ĞÎ±äÊı¾İÀ©´ó¡£
-//·µ»ØÖµÓÃĞÂµÄ±äÁ¿ÊÇ·ñ¿ÉÒÔÓÃÒıÓÃ£¬¸Ğ¾õ²»ĞĞ£¬²åÖµ³öµÄ²»ÄÜÔÙSFileDataÖĞÕÒµ½¡£
-//vConnectionIndex´ú±íÁËµÚi¿ÃÊ÷£¬vTimestep´ú±íÁËµÚ¼¸Ö¡
+//å°†æ¨¡å‹çš„åŸå§‹å½¢å˜æ•°æ®æ‰©å¤§ã€‚
+//è¿”å›å€¼ç”¨æ–°çš„å˜é‡æ˜¯å¦å¯ä»¥ç”¨å¼•ç”¨ï¼Œæ„Ÿè§‰ä¸è¡Œï¼Œæ’å€¼å‡ºçš„ä¸èƒ½å†SFileDataä¸­æ‰¾åˆ°ã€‚
+//vConnectionIndexä»£è¡¨äº†ç¬¬iæ£µæ ‘ï¼ŒvTimestepä»£è¡¨äº†ç¬¬å‡ å¸§
 std::vector<Common::SFileDataGroup> CVegaFemFactory::getConnectedFemMutileDeformation(int vConnectionIndex, int vTimestep)
 {
-	//ËÑË÷ËùÓĞÒÑ¾­´æ´¢µÄÏà¹ØConnectionÏî,µÃ³öÃ¿Ò»¿ÃÊ÷Î»ÒÆËùĞèÒªµÄÏà¹ØÎ»ÒÆÎÄ¼ş
+	//æœç´¢æ‰€æœ‰å·²ç»å­˜å‚¨çš„ç›¸å…³Connectioné¡¹,å¾—å‡ºæ¯ä¸€æ£µæ ‘ä½ç§»æ‰€éœ€è¦çš„ç›¸å…³ä½ç§»æ–‡ä»¶
 	for (int connectIndex = 0; connectIndex < m_AllReallyLoadConnectedFem.size(); connectIndex++)
 	{
-		//ÕÒµ½ÁËµÚvConnectionIndexËùĞèÒªµÄ²åÖµÎ»ÒÆÎÄ¼ş
+		//æ‰¾åˆ°äº†ç¬¬vConnectionIndexæ‰€éœ€è¦çš„æ’å€¼ä½ç§»æ–‡ä»¶
 		if (vConnectionIndex == m_AllReallyLoadConnectedFem[connectIndex].ConnectedIndex)
 		{
-			//ÕâÀï¾ÍÔİ¶¨²åÖµÎÄ¼ş¾ÍÊÇ±¾Éí£¬¼´²»ĞèÒªÍ¨¹ıÆäËüÎÄ¼şÀ´²åÖµ
+			//è¿™é‡Œå°±æš‚å®šæ’å€¼æ–‡ä»¶å°±æ˜¯æœ¬èº«ï¼Œå³ä¸éœ€è¦é€šè¿‡å…¶å®ƒæ–‡ä»¶æ¥æ’å€¼
 			if (m_AllReallyLoadConnectedFem[connectIndex].Type == Common::EFileFramesType::OneRelatedFile)
 			{
-				//¶ÔÒ»¸öÎ»ÒÆÎÄ¼şÖĞµÄËùÓĞÖ¡Êı½øĞĞÑ­»·
+				//å¯¹ä¸€ä¸ªä½ç§»æ–‡ä»¶ä¸­çš„æ‰€æœ‰å¸§æ•°è¿›è¡Œå¾ªç¯
 				for (int time = 0; time < (m_AllReallyLoadConnectedFem[connectIndex].FemDataset[0])->Frames.size(); time++)
 				{
-					//ÕÒµ½µ±Ç°Òª»æÖÆµÄÖ¡Êı
+					//æ‰¾åˆ°å½“å‰è¦ç»˜åˆ¶çš„å¸§æ•°
 					if ((m_AllReallyLoadConnectedFem[connectIndex].FemDataset[0])->Frames[time].FrameIndex == vTimestep)
 					{
-						//·µ»ØÄ£ĞÍµÄÔöÁ¿
+						//è¿”å›æ¨¡å‹çš„å¢é‡
 						m_ModelTransformStruct->ConvertVertex2mutileVerteices((m_AllReallyLoadConnectedFem[connectIndex].FemDataset[0])->Frames[time]);
 
 						return (m_AllReallyLoadConnectedFem[connectIndex].FemDataset[0])->Frames[time].FileDeformation;
@@ -529,113 +547,113 @@ void CVegaFemFactory::__getFileSeekDirOfEachBlock(const std::string & vFilePath,
 	}
 }
 
-
-//ÔÚÒÑ¾­¼ÓÔØFileIndexµ«ÉĞÎ´¼ÓÔØÎ»ÒÆÊı¾İµÄSFileFramesËùÓĞËÑË÷Ïà¹ØµÄSFileFrames²¢·µ»Ø
-//·µ»ØÁÙ½üµÄ¶à¸ö·½ÏòÊı¾İË÷Òı±êÊ¶
-std::vector<Common::SFileFrames> CVegaFemFactory::searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<double>& vForceFluctuationSequence)
-{
-	int ThetaIndex = vTheta / 30;
-	int PhiIndex = vPhi / 30;
-	int ThetaSecondIndex = ThetaIndex + 1;
-	int PhiSecondIndex = PhiIndex + 1;
-	if (vTheta < 0)
-	{
-		ThetaSecondIndex = ThetaIndex - 1;
-	}
-	if (vPhi < 0)
-	{
-		PhiSecondIndex = PhiIndex - 1;
-	}
-	std::vector<Common::SFileFrames> fileFrames;
-	if (vTheta % 30 == 0 && vPhi % 30 == 0)
-	{
-		for (auto file : m_FilesData)
-		{
-			if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiIndex * 30))
-			{
-				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
-				{
-					fileFrames.push_back(file);
-				}
-			}
-		}
-	}
-	else if (vTheta % 30 == 0 && vPhi % 30 != 0)
-	{
-		for (auto file : m_FilesData)
-		{
-			if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiIndex * 30))
-			{
-				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
-				{
-					fileFrames.push_back(file);
-				}
-			}
-			else if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiSecondIndex * 30))
-			{
-				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
-				{
-					fileFrames.push_back(file);
-				}
-			}
-		}
-	}
-	else if (vTheta % 30 != 0 && vPhi % 30 == 0)
-	{
-		for (auto file : m_FilesData)
-		{
-			if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiIndex * 30))
-			{
-				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
-				{
-					fileFrames.push_back(file);
-				}
-			}
-			else if (file.Theta == (ThetaSecondIndex * 30) && file.Phi == (PhiIndex * 30))
-			{
-				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
-				{
-					fileFrames.push_back(file);
-				}
-			}
-		}
-	}
-	else
-	{
-		for (auto file : m_FilesData)
-		{
-			if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiIndex * 30))
-			{
-				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
-				{
-					fileFrames.push_back(file);
-				}
-			}
-			else if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiSecondIndex * 30))
-			{
-				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
-				{
-					fileFrames.push_back(file);
-				}
-			}
-			else if (file.Theta == (ThetaSecondIndex * 30) && file.Phi == (PhiIndex * 30))
-			{
-				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
-				{
-					fileFrames.push_back(file);
-				}
-			}
-			else if (file.Theta == (ThetaSecondIndex * 30) && file.Phi == (PhiSecondIndex * 30))
-			{
-				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
-				{
-					fileFrames.push_back(file);
-				}
-			}
-		}
-	}
-	return fileFrames;
-}
+//
+////åœ¨å·²ç»åŠ è½½FileIndexä½†å°šæœªåŠ è½½ä½ç§»æ•°æ®çš„SFileFramesæ‰€æœ‰æœç´¢ç›¸å…³çš„SFileFrameså¹¶è¿”å›
+////è¿”å›ä¸´è¿‘çš„å¤šä¸ªæ–¹å‘æ•°æ®ç´¢å¼•æ ‡è¯†
+//std::vector<Common::SFileFrames> CVegaFemFactory::searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<double>& vForceFluctuationSequence)
+//{
+//	int ThetaIndex = vTheta / 30;
+//	int PhiIndex = vPhi / 30;
+//	int ThetaSecondIndex = ThetaIndex + 1;
+//	int PhiSecondIndex = PhiIndex + 1;
+//	if (vTheta < 0)
+//	{
+//		ThetaSecondIndex = ThetaIndex - 1;
+//	}
+//	if (vPhi < 0)
+//	{
+//		PhiSecondIndex = PhiIndex - 1;
+//	}
+//	std::vector<Common::SFileFrames> fileFrames;
+//	if (vTheta % 30 == 0 && vPhi % 30 == 0)
+//	{
+//		for (auto file : m_FilesData)
+//		{
+//			if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiIndex * 30))
+//			{
+//				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
+//				{
+//					fileFrames.push_back(file);
+//				}
+//			}
+//		}
+//	}
+//	else if (vTheta % 30 == 0 && vPhi % 30 != 0)
+//	{
+//		for (auto file : m_FilesData)
+//		{
+//			if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiIndex * 30))
+//			{
+//				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
+//				{
+//					fileFrames.push_back(file);
+//				}
+//			}
+//			else if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiSecondIndex * 30))
+//			{
+//				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
+//				{
+//					fileFrames.push_back(file);
+//				}
+//			}
+//		}
+//	}
+//	else if (vTheta % 30 != 0 && vPhi % 30 == 0)
+//	{
+//		for (auto file : m_FilesData)
+//		{
+//			if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiIndex * 30))
+//			{
+//				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
+//				{
+//					fileFrames.push_back(file);
+//				}
+//			}
+//			else if (file.Theta == (ThetaSecondIndex * 30) && file.Phi == (PhiIndex * 30))
+//			{
+//				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
+//				{
+//					fileFrames.push_back(file);
+//				}
+//			}
+//		}
+//	}
+//	else
+//	{
+//		for (auto file : m_FilesData)
+//		{
+//			if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiIndex * 30))
+//			{
+//				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
+//				{
+//					fileFrames.push_back(file);
+//				}
+//			}
+//			else if (file.Theta == (ThetaIndex * 30) && file.Phi == (PhiSecondIndex * 30))
+//			{
+//				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
+//				{
+//					fileFrames.push_back(file);
+//				}
+//			}
+//			else if (file.Theta == (ThetaSecondIndex * 30) && file.Phi == (PhiIndex * 30))
+//			{
+//				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
+//				{
+//					fileFrames.push_back(file);
+//				}
+//			}
+//			else if (file.Theta == (ThetaSecondIndex * 30) && file.Phi == (PhiSecondIndex * 30))
+//			{
+//				if (vForceFluctuationSequence == file.ForceFluctuationSequence)
+//				{
+//					fileFrames.push_back(file);
+//				}
+//			}
+//		}
+//	}
+//	return fileFrames;
+//}
 
 std::vector<Common::SFileFrames> CVegaFemFactory::searchFileFrameOnAttribute()
 {
@@ -675,7 +693,7 @@ void CVegaFemFactory::searchMatchedDeformationFrames(std::vector<glm::vec3> & vU
 	Common::SMatchedDeformationFrames tempMatchedFrame;
 	for (auto i = 0; i < m_FilesData.size(); i++)
 	{
-		//Ã¿¸öÎÄ¼şÖĞ10Ö¡µÄÊı¾İĞÎ±ä
+		//æ¯ä¸ªæ–‡ä»¶ä¸­10å¸§çš„æ•°æ®å½¢å˜
 		for (auto fileFrameSpDeformation = 0; fileFrameSpDeformation < m_FilesData[i].Deformations.size(); fileFrameSpDeformation++)
 		{
 			int Counter = 0;
@@ -683,7 +701,7 @@ void CVegaFemFactory::searchMatchedDeformationFrames(std::vector<glm::vec3> & vU
 			{
 				for (auto objectVertexIndex = 0; objectVertexIndex < m_CorrectDeformationIndex[vertexInElement].size(); objectVertexIndex++)
 				{
-					//Í³¼Æ¶¥µã
+					//ç»Ÿè®¡é¡¶ç‚¹
 					Counter += distanceError(vFrameUDeformationData[objectVertexIndex], m_FilesData[i].Deformations[fileFrameSpDeformation].Deformation[objectVertexIndex]);
 				}
 			}
@@ -693,7 +711,7 @@ void CVegaFemFactory::searchMatchedDeformationFrames(std::vector<glm::vec3> & vU
 			MatchedFrames.push_back(tempMatchedFrame);
 		}
 	}
-	//»ñÈ¡×îÆ¥ÅäµÄĞÎ±äÊı¾İ
+	//è·å–æœ€åŒ¹é…çš„å½¢å˜æ•°æ®
 	std::sort(MatchedFrames.begin(), MatchedFrames.end());
 	for (int i = 0; i < m_FilesData.size(); i++)
 	{
@@ -740,7 +758,7 @@ void CVegaFemFactory::readUdeformationData(const std::string & vFile, Common::SF
 	
 		std::istringstream Dataset(lineString);
 
-		//Ò»¸öÎ»ÒÆÎÄ¼şÊı¾İÖĞµÄÒ»Ö¡¶¥µãÎ»ÒÆ
+		//ä¸€ä¸ªä½ç§»æ–‡ä»¶æ•°æ®ä¸­çš„ä¸€å¸§é¡¶ç‚¹ä½ç§»
 		std::vector<glm::vec3> tempDeformation;
 		double position[3];
 		for (int j = 0; j < DeformationVertexNumber; j++)
@@ -771,7 +789,7 @@ void CVegaFemFactory::initMatchedFrameStruct(int vTreeSize)
 	std::vector<glm::vec3>* tempInternalForces;
 	for (int i = 0; i < m_reorderSpKVFSegmentIndexSequence.size(); i++)
 	{
-		//ÖØ×éSpkvfÎÄ¼ş¸ñÊ½£¬½«ÆäÖĞÎÄ¼şµÄË÷ÒıÅÄ³ÉÁ¬ĞøµÄ4£¬9....64...69
+		//é‡ç»„Spkvfæ–‡ä»¶æ ¼å¼ï¼Œå°†å…¶ä¸­æ–‡ä»¶çš„ç´¢å¼•æ‹æˆè¿ç»­çš„4ï¼Œ9....64...69
 		tempKMartix = &m_AllReallyLoadConnectedFem[m_reorderSpKVFSegmentIndexSequence[i] / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(m_reorderSpKVFSegmentIndexSequence[i] % Common::SamplingFrameNumber) / 5].Kmatrix;
 		m_KMartixSequence.push_back(std::make_pair(m_reorderSpKVFSegmentIndexSequence[i], tempKMartix));
 		tempVelocity = &m_AllReallyLoadConnectedFem[m_reorderSpKVFSegmentIndexSequence[i] / Common::SamplingFrameNumber].FemDataset[0]->KVFFrameDatas[(m_reorderSpKVFSegmentIndexSequence[i] % Common::SamplingFrameNumber) / 5].Velocity;
@@ -836,10 +854,10 @@ void CVegaFemFactory::resetTempMultipleTreeData(int vTreeSize)
 	}
 }
 
-//ÒÔ5Ö¡Îªµ¥Î»½øĞĞÖ¡¶ÎµÄ²éÕÒÆ¥Åä²Ù×÷,¶ÔÓÚ¶à¿ÃÊ÷Í¬Ê±½øĞĞ²éÕÒ²Ù×÷
-//Ã¿´Î¼ÆËãĞèÒªµ±Ç°µÄÒ»¶Î5Á¦ÒÔ¼°ÏÂÒ»¶ÎµÄ5¸öÁ¦£¬Ã¿´Î¼ÆËã³öÇ°5¶ÎÁ¦µÄ½á¹û
-//Êä³öµ±Ç°²éÕÒµ½Ã¿¿ÅÊ÷5Ö¡µÄË÷ÒıºÅ
-void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces,std::vector<std::vector<Common::SWindDirection>> &vForceDirection)
+//ä»¥5å¸§ä¸ºå•ä½è¿›è¡Œå¸§æ®µçš„æŸ¥æ‰¾åŒ¹é…æ“ä½œ,å¯¹äºå¤šæ£µæ ‘åŒæ—¶è¿›è¡ŒæŸ¥æ‰¾æ“ä½œ
+//æ¯æ¬¡è®¡ç®—éœ€è¦å½“å‰çš„ä¸€æ®µ5åŠ›ä»¥åŠä¸‹ä¸€æ®µçš„5ä¸ªåŠ›ï¼Œæ¯æ¬¡è®¡ç®—å‡ºå‰5æ®µåŠ›çš„ç»“æœ
+//è¾“å‡ºå½“å‰æŸ¥æ‰¾åˆ°æ¯é¢—æ ‘5å¸§çš„ç´¢å¼•å·
+void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces,std::vector<std::vector<Common::SForceDirection>> &vForceDirection)
 {
 	std::vector<int> FrameIndexSequence;
 
@@ -849,13 +867,13 @@ void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> 
 		{
 			m_TempSpKVFData[treeIndex].Forces.clear();
 			m_TempSpKVFData[treeIndex].WindDirection.clear();
-			//Ã¿¿ÃÊ÷µÄµ±Ç°5¸öÁ¦µÄ¶Î
+			//æ¯æ£µæ ‘çš„å½“å‰5ä¸ªåŠ›çš„æ®µ
 			for (int k = 0; k < 5; k++)
 			{
 				m_TempSpKVFData[treeIndex].Forces.push_back(voExtraForces[treeIndex][k]);
 				m_TempSpKVFData[treeIndex].WindDirection.push_back(vForceDirection[treeIndex][k]);
 			}
-			//¿ÉÒÔ²¢ĞĞ
+			//å¯ä»¥å¹¶è¡Œ
 			searchMatchedOneTreeFrameSequences(m_MultipleFramesIndex[treeIndex], m_TempSpKVFData[treeIndex], voExtraForces[treeIndex], m_CurrentFrameIndex[treeIndex], m_Flag[treeIndex]);
 			for (int j = 0; j < 5; j++)
 			{
@@ -870,7 +888,7 @@ void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> 
 static int number = 0;
 static int a;
 
-//voExtraForcesĞèÒªµ±Ç°µÄÁ¦ÒÔ¼°ÏÂÒ»¶ÎµÄÁ¦
+//voExtraForceséœ€è¦å½“å‰çš„åŠ›ä»¥åŠä¸‹ä¸€æ®µçš„åŠ›
 void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMatchedFrameSequenceIndex, Common::SpKVFData& voSpKVData, std::vector<int>&voExtraForces,int &voCurrentFrameIndex, int& vIsFirstFrame)
 {
 	std::vector<std::pair<int, double>> tempForceErrorSequence;
@@ -889,8 +907,11 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 	}
 	int MaxTheta = MaxElement(ThetaData)+15;
 	int MinTheta = MinElement(ThetaData) - 15;
+    
 	int MaxPhi = MaxElement(PhiData) + 15;
-	int MinPhi = MinElement(ThetaData) - 15;
+	int MinPhi = MinElement(PhiData) - 15;
+
+    //std::cout << MaxPhi << "  ||" << MinPhi << std::endl;
 
 	std::vector<int> searchFileAndFrameIndexWithWind;
 	for (int i = 0; i < m_WindDirectionSequence.size(); i++)
@@ -900,7 +921,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 				searchFileAndFrameIndexWithWind.push_back(m_WindDirectionSequence[i].first);
 	}
 
-	//fÄÚ
+	//få†…
 	for (int i = 0; i < m_ForceSequence.size(); i++)
 	{
 		int forceError = 0;
@@ -909,10 +930,14 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 			forceError += AbsError(voSpKVData.Forces[k], m_ForceSequence[i].second[k]);
 		}
 		forceError /= Common::ExpandForceError;
+        if (!isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind))
+        {
+            forceError = 99999;
+        }
 		tempForceErrorSequence.push_back(std::make_pair(m_ForceSequence[i].first, forceError));
 	}
 	//initial tempSpKVData just based on Forces when find the first section
-	//µÚÒ»¶ÎÖ±½ÓÄ¬ÈÏÊ¹ÓÃÏàËÆÁ¦µÄÖ¡¶Î
+	//ç¬¬ä¸€æ®µç›´æ¥é»˜è®¤ä½¿ç”¨ç›¸ä¼¼åŠ›çš„å¸§æ®µ
 	//for (int i = 0; i < m_ForceSequence.size(); i++)
 	//{
 	//	std::cout << tempForceErrorSequence[i].first<<"--"<< tempForceErrorSequence[i].second<< std::endl;
@@ -923,8 +948,9 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		voMatchedFrameSequenceIndex.clear();
 		for (int i = 0; i < tempForceErrorSequence.size(); i++)
 		{
-			if (tempForceErrorSequence[i].first % (Common::SamplingFrameNumber) > 20)
-				tempForceErrorSequence[i].second = 9999;
+            if (tempForceErrorSequence[i].first % (Common::SamplingFrameNumber) > 20 )
+			/*if (tempForceErrorSequence[i].first % (Common::SamplingFrameNumber) > 20|| !isDataExist(tempForceErrorSequence[i].first, searchFileAndFrameIndexWithWind))*/
+				tempForceErrorSequence[i].second = 99999;
 		}
 		std::vector<std::pair<int, double>>tempSortedForceSequence = tempForceErrorSequence;
 		sort(tempSortedForceSequence.begin(), tempSortedForceSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second < y.second; });
@@ -941,7 +967,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		{
 			m_MultipleFileAndFramesIndex[i].resize(5);
 		}*/
-		//½«Á¦È¨ÖØÓÃ¸ßË¹È¨ÖØ±íÊ¾
+		//å°†åŠ›æƒé‡ç”¨é«˜æ–¯æƒé‡è¡¨ç¤º
 		double gaussianForceErrrorSum = 0;
 		for (int i = 0; i < tempForceErrorSequence.size(); i++)
 		{
@@ -956,7 +982,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		compare velocity*/
 		for (int i = 0; i < m_VelocitySequence.size(); i++)
 		{
-			if (isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind)||gaussianForceErrrorSequence[i].second == 0)
+			if (!isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind)||gaussianForceErrrorSequence[i].second <0.6)
 			{
 				tempVelocityErrorSequence.push_back(std::make_pair(m_VelocitySequence[i].first, 0));
 				continue;
@@ -986,13 +1012,13 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 #pragma omp parallel for
 		for (int i = 0; i < m_KMartixSequence.size(); i++)
 		{
-			if (isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind)||gaussianForceErrrorSequence[i].second == 0|| tempVelocityErrorSequence[i].second==0)
+			if (!isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind)||gaussianForceErrrorSequence[i].second <0.6|| tempVelocityErrorSequence[i].second==0)
 			{
 				tempKErrorSequence.push_back(std::make_pair(m_KMartixSequence[i].first, 0));
 				continue;
 			}
 			int count = 0;
-			//Êı¾İÖ»´æÁË4£¬9£¬14µÈµÚ0¶ÎÃ»´æ£¬¶øµÚ0¶ÎµÄÊı¾İÊÇÓÉ¾²Ö¹µÄkvf¾ØÕó¼ÆËã¶ø³É
+			//æ•°æ®åªå­˜äº†4ï¼Œ9ï¼Œ14ç­‰ç¬¬0æ®µæ²¡å­˜ï¼Œè€Œç¬¬0æ®µçš„æ•°æ®æ˜¯ç”±é™æ­¢çš„kvfçŸ©é˜µè®¡ç®—è€Œæˆ
 			if (m_KMartixSequence[i].first % Common::SamplingFrameNumber == 4)
 			{
 				for (int k = 0; k < m_KMartixSequence[i].second->size(); k++)
@@ -1021,7 +1047,7 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 		//compare internalForces
 		for (int i = 0; i < m_InternalForcesSequence.size(); i++)
 		{
-			if (isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind)||gaussianForceErrrorSequence[i].second == 0||(tempVelocityErrorSequence[i].second == 0&& tempKErrorSequence[i].second==0))
+			if (!isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind)||gaussianForceErrrorSequence[i].second <0.6||(tempVelocityErrorSequence[i].second == 0&& tempKErrorSequence[i].second==0))
 			{
 				tempInternalForcesErrorSequence.push_back(std::make_pair(m_InternalForcesSequence[i].first, 0));
 				continue;
@@ -1056,20 +1082,9 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 			tempInternalForcesErrorSequence[i].second = tempInternalForcesErrorSequence[i].second / getInternalForceSumNuber();
 		}
 
-		//µ±Ñ¡ÔñÁËÄ³Ò»¸öÎÄ¼şµÄÒ»Ö¡Ê±»áÓ¦ÓÃ¸ÃÖ¡¶ÔÏÂÒ»Ö¡¶ÎµÄKVFµ¼ÖÂÏÂÒ»Ö¡¶ÎÅĞ¶ÏµÄkvfÖµÒ»¶¨µÈÓÚ1*kvfÈ¨ÖØ£¬ÌØÊâÅĞ¶¨½«ÕâÒÔÖ¡È¨ÖØ±È¸ü¸Ä
+		//å½“é€‰æ‹©äº†æŸä¸€ä¸ªæ–‡ä»¶çš„ä¸€å¸§æ—¶ä¼šåº”ç”¨è¯¥å¸§å¯¹ä¸‹ä¸€å¸§æ®µçš„KVFå¯¼è‡´ä¸‹ä¸€å¸§æ®µåˆ¤æ–­çš„kvfå€¼ä¸€å®šç­‰äº1*kvfæƒé‡ï¼Œç‰¹æ®Šåˆ¤å®šå°†è¿™ä»¥å¸§æƒé‡æ¯”æ›´æ”¹
 		int NextFrameIndex = voCurrentFrameIndex + 5;
 
-
-		/*std::vector<std::pair<int, double>> reorderTempKErrorSequence = tempKErrorSequence;
-		std::vector<std::pair<int, double>> reorderTempVelocityErrorSequence = tempVelocityErrorSequence;
-		std::vector<std::pair<int, double>> reorderTempInternalForcesErrorSequence = tempInternalForcesErrorSequence;
-		std::vector <std::pair<int, double>> reorderGaussianForceErrrorSequence = gaussianForceErrrorSequence;
-		std::vector <std::pair<int, double>> reorderTempForceErrorSequence = tempForceErrorSequence;
-		sort(reorderTempKErrorSequence.begin(), reorderTempKErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
-		sort(reorderTempVelocityErrorSequence.begin(), reorderTempVelocityErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
-		sort(reorderTempInternalForcesErrorSequence.begin(), reorderTempInternalForcesErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
-		sort(reorderGaussianForceErrrorSequence.begin(), reorderGaussianForceErrrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second > y.second; });
-		sort(reorderTempForceErrorSequence.begin(), reorderTempForceErrorSequence.end(), [](const std::pair<int, double>&x, const std::pair<int, double>&y)->double {return x.second < y.second; });*/
 		std::vector<std::pair<int, double>> allWeightsSumResults;
 		double forcesWeight = 0.35;
 		double KVfWeight = 0.65;
@@ -1079,7 +1094,8 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 			double tempResult = 0;
 			if (NextFrameIndex == tempVelocityErrorSequence[i].first)
 			{
-				tempResult = (gaussianForceErrrorSequence[i].second)*0.7 + 0.3 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
+               // tempResult = (gaussianForceErrrorSequence[i].second)*forcesWeight + KVfWeight * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
+				tempResult = (gaussianForceErrrorSequence[i].second)*0.65 + 0.35 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
 				//tempResult = 1.0 * (tempKErrorSequence[i].second + tempVelocityErrorSequence[i].second + tempInternalForcesErrorSequence[i].second) / 3;
 			}
 			else

@@ -51,9 +51,15 @@ public:
 	void setFileDirectiory(std::string vFileDirectory) { m_FileDirectory = vFileDirectory; }
 	int getAssimpVerticesNumber() { return m_AssimpVerticesNumber; }
 	void draw(const CShader& vShader);
-	void setMeshRotation();
+	//void setMeshRotation(std::vector<float> &vRotations);
+    void setMeshRotation();
+    void setMeshRotationRelationWindFieldAndTreeDirection(std::vector<float> &vRotations);
+    glm::mat4* specificTreeRotation(std::vector<float> &vRotations);
+    glm::mat4* translateTreePosition();
 	glm::mat4* randomRotation();
 	void setMeshGroupAndAssimpIndex();
+
+    std::vector<Common::SForceDirection> getAngles() { return m_Angles; };
 
 	void UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int,int>>& vTreeFileAndFrameIndex);
 	/*void UpdataMeshTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);*/
@@ -77,7 +83,7 @@ private:
 	std::string m_Data;
 	unsigned int m_DataSize;
 	std::vector<std::vector<glm::vec3>> m_EachFrameOfGroupData;
-	//ËùÓĞµÄgroupÖĞÃæµÄ¶¥µãË÷Òı
+	//æ‰€æœ‰çš„groupä¸­é¢çš„é¡¶ç‚¹ç´¢å¼•
 	std::vector<std::vector<int>> m_GroupsIndex;
 
 	CVegaFemFactory* m_VegaFactory;
@@ -98,4 +104,7 @@ private:
 	int m_VerticesNumber;
 
 	int m_AssimpVerticesNumber;
+
+    std::vector<float> m_SetRotation;
+    std::vector<Common::SForceDirection> m_Angles;
 };

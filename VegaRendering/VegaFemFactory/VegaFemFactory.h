@@ -14,6 +14,7 @@
 #include "ExtraTool.h"
 #include "ModelDeformationTransform.h"
 #include <omp.h>
+#include "../Common/WindFiled.h"
 
 
 class CVegaFemFactory
@@ -77,7 +78,7 @@ public:
 	
 	void searchMatchedDeformationFrames(std::vector<glm::vec3> & vUdeltaDeformation,std::vector<glm::vec3> & vFrameUDeformationData);
 
-	void searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces, std::vector<std::vector<Common::SWindDirection>> &vForceDirection);
+	void searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces, std::vector<std::vector<Common::SForceDirection>> &vForceDirection);
 
 	void searchMatchedOneTreeFrameSequences(std::vector<int> & voMatchedFrameSequenceIndex, Common::SpKVFData& voSpKVData, std::vector<int>&voExtraForces, int &voCurrentFrameIndex, int& vIsFirstFrame);
 
@@ -149,7 +150,7 @@ private:
 	//第一个是文件的SpKVF的段索引号4，9，14，19，第二个值是当前索引下力的序列
 	std::vector<std::pair<int, std::vector<int>>> m_ForceSequence;
 	//spKVF文件的受力方向
-	std::vector<std::pair<int, std::vector<Common::SWindDirection>>> m_WindDirectionSequence;
+	std::vector<std::pair<int, std::vector<Common::SForceDirection>>> m_WindDirectionSequence;
 	//SpKVF的段索引号，当前索引下K矩阵
 	std::vector<std::pair<int, std::vector<std::vector<double>>* >> m_KMartixSequence;
 	//SpKVF的段索引号，当前索引下v矩阵
