@@ -113,7 +113,7 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 int main()
 {
 	CVegaFemFactory vFem("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt");
-	int numbercounter = 1;
+	int numbercounter =4;
 	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -305,7 +305,13 @@ int main()
 #pragma region load model
 	CSence ourModel("../../models/yellow_tree/tree_last.obj");
 
-	ourModel.setMeshRotation();
+    std::vector<float> SpecificRotation;
+    //方向是逆时针方向，采样数据是顺时针方向范围0-360
+    SpecificRotation.push_back(30);
+    SpecificRotation.push_back(0);
+    SpecificRotation.push_back(120);
+    SpecificRotation.push_back(90);
+	ourModel.setMeshRotation(SpecificRotation);
 
 	ourModel.setGroupsIndex(vFem);
 	ourModel.setVerticesNumber(vFem);
@@ -339,26 +345,57 @@ int main()
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 600));
 	}*/
 
+    std::vector<std::vector<SWaveFunctionPara>> OneDirectionWindRelatedMultipleTree;
 	std::vector<SWaveFunctionPara> OneDirectionWindPara;
 	//OneDirectionWindPara.push_back(SWaveFunctionPara(1010, 1, 0, 0));
-	OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
+	/*OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
 	OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0, 1000));
 	OneDirectionWindPara.push_back(SWaveFunctionPara(700, 1, 0.5, 500));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1));*/
     //OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1,1500));
 
-    //OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
-    //OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500));
-    //OneDirectionWindPara.push_back(SWaveFunctionPara(1200, 1, 0, 1000, 1, 1000));
-    //OneDirectionWindPara.push_back(SWaveFunctionPara(800, 1, 0.5, 400));
-    //OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0.25, 700, 1));
-	CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindPara, 6000, Common::SForceDirection(0,0),ourModel.getAngles()[0]);
+    OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1200, 1, 0, 1000, 1, 1000));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(800, 1, 0.5, 400));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0.25, 700, 1));
+    OneDirectionWindRelatedMultipleTree.push_back(OneDirectionWindPara);
+    OneDirectionWindPara.clear();
+  
+    OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0, 1000));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(700, 1, 0.5, 500));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1));
+    OneDirectionWindRelatedMultipleTree.push_back(OneDirectionWindPara);
+    OneDirectionWindPara.clear();
+
+    OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1200, 1, 0, 1000, 1, 1000));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(800, 1, 0.5, 400));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0.25, 700, 1));
+    OneDirectionWindRelatedMultipleTree.push_back(OneDirectionWindPara);
+    OneDirectionWindPara.clear();
+
+    OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1200, 1, 0, 1000, 1, 1000));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(800, 1, 0.5, 400));
+    OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0.25, 700, 1));
+    OneDirectionWindRelatedMultipleTree.push_back(OneDirectionWindPara);
+
+    for (int i = 0; i < OneDirectionWindRelatedMultipleTree.size(); i++)
+    {
+        CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindRelatedMultipleTree[i], 6000, Common::SForceDirection(0, 0), ourModel.getAngles()[i]);
+        vMultipleExtraForces.push_back(OnedirectionWind.getDirectionWindForces());
+        vMultipleExtraDirections.push_back(OnedirectionWind.getDirectionWindDirection());
+    }
+	
 
     /*OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1, 1500));
     CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindPara, 6000, Common::SForceDirection(0, 120));*/
 
-	vMultipleExtraForces.push_back(OnedirectionWind.getDirectionWindForces());
-	vMultipleExtraDirections.push_back(OnedirectionWind.getDirectionWindDirection());
+	
     //OnedirectionWind.saveForces2File("D:/GraduationProject/LargeScaleForest/models/yellow_tree/ForceSave/forces.txt");
 	//Size = Common::ProductFrameNumber;
 	/*Size = 180;*/

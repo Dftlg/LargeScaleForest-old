@@ -35,13 +35,8 @@ Common::SForceDirection CWindField::caculateRelativeDirection(Common::SForceDire
 {
     Common::SForceDirection tempDirection(0, 0);
     tempDirection.Phi = vWindDirection.Phi - vTreeRotationDirection.Phi;
-    std::cout << tempDirection.Phi;
-    std::cout << vWindDirection.Phi;
-    std::cout << vWindDirection.Phi;
-    if (tempDirection.Phi < 0)
-    {
-        tempDirection.Phi += 360;
-    }
+    std::cout << -tempDirection.Phi;
+    tempDirection.Phi = (-tempDirection.Phi);
     return tempDirection;
 }
 
