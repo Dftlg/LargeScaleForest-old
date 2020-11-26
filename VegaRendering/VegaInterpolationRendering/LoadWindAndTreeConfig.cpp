@@ -62,7 +62,7 @@ void CLoadWindAndTreeConfig::productMultipleTreeWindPara()
             for (int k = 0; k < m_EachTypeTreeNumber[i]; k++)
             {
                 m_ProductRotationAngle.push_back(m_TreeRotationAngle[i]);
-                m_ProductMultipleTreePara.push_back(m_MultipleTreePara[i]);
+                //m_ProductMultipleTreePara.push_back(m_MultipleTreePara[i]);
             }
         }
     }
