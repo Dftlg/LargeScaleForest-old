@@ -66,7 +66,7 @@ int SearchFrameStep = 0;
 //前一个std::vector表示匹配树的个数，后一个std::vector表示每一帧中需要的数据
 //vMultipleExtraForces 表示每一帧风的方向，每次用5帧来进行搜索
 //vWindDirection 表示每帧一个风的方向
-void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces, std::vector<std::vector<Common::SForceDirection>> & vWindDirection,std::vector<int> vTreesNumberSubjected2SameWind)
+void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces, std::vector<std::vector<Common::SForceDirection>> & vWindDirection,std::vector<int>& vTreesNumberSubjected2SameWind)
 {
 	while (true)
 	{
@@ -101,10 +101,10 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
         //在这里将重复的搜索数组复制多变
 		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
 
-        for (int DifferentTreeNumber = 0; DifferentTreeNumber < vTreesNumberSubjected2SameWind.size(); i++)
+        for (int DifferentTreeNumber = 0; DifferentTreeNumber < vTreesNumberSubjected2SameWind.size(); DifferentTreeNumber++)
         {
             std::pair<int, int> tempOneTreeFileAndFrameIndex = vVFF.getFileAndFrameIndex(DifferentTreeNumber, SearchFrameNumber % 5);
-            for (int k = 0; k < vTreesNumberSubjected2SameWind[i] ; k++)
+            for (int k = 0; k < vTreesNumberSubjected2SameWind[DifferentTreeNumber] ; k++)
             {
                 tempTreeFileAndFrameIndex.push_back(tempOneTreeFileAndFrameIndex);
             }
@@ -344,7 +344,7 @@ int main()
     //只计算了树受到不同的风力，若相同则直接取用已有数据
     for (int i = 0; i < OneDirectionWindRelatedMultipleTree.size(); i++)
     {
-        CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindRelatedMultipleTree[i], 6000, Common::SForceDirection(0, 0), ourModel.getAngles()[i]);
+        CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindRelatedMultipleTree[i], 6000, Common::SForceDirection(0, 0), windAndTreeConfig.getTreeRotationAngle()[i]);
         vMultipleExtraForces.push_back(OnedirectionWind.getDirectionWindForces());
         vMultipleExtraDirections.push_back(OnedirectionWind.getDirectionWindDirection());
     }

@@ -67,3 +67,14 @@ void CLoadWindAndTreeConfig::productMultipleTreeWindPara()
         }
     }
 }
+
+std::vector<Common::SForceDirection> CLoadWindAndTreeConfig::getTreeRotationAngle()
+{
+    std::vector<Common::SForceDirection> vectempForceDirection;
+    for (int i = 0; i < m_TreeRotationAngle.size(); i++)
+    {
+        Common::SForceDirection tempForceDirection(0, m_TreeRotationAngle[i]);
+        vectempForceDirection.push_back(tempForceDirection);
+    }
+    return vectempForceDirection;
+}

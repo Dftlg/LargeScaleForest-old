@@ -18,7 +18,7 @@ public:
     std::vector<std::vector<SWaveFunctionPara>> getMultipleTreeWindPara() { return m_MultipleTreePara; };
     std::vector<int> getMultipleTreeDuplicateNumber() { return m_EachTypeTreeNumber; };
     std::vector<float> getMultipleRotationAngle() { return m_ProductRotationAngle; };
-
+    std::vector<Common::SForceDirection> getTreeRotationAngle();
 private:
     std::vector<std::vector<SWaveFunctionPara>> m_MultipleTreePara;
     std::vector<float> m_TreeRotationAngle;
