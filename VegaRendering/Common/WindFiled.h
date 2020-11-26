@@ -46,6 +46,24 @@ struct SWaveFunctionPara
         Pulse = vPulse;
         DropNumber = vDropNumber;
 	}
+    SWaveFunctionPara(std::vector<std::string> &vPara)
+    {
+        Amplitude = atoi(vPara[0].c_str());
+        Frequency = atoi(vPara[1].c_str());
+        Phase = atof(vPara[2].c_str());
+        Ypluse = atoi(vPara[3].c_str());
+        Pulse = 0;
+        DropNumber = 0;
+        if (vPara.size() == 5)
+        {
+            Pulse = atoi(vPara[4].c_str());
+        }
+        else if(vPara.size()==6)
+        {
+            Pulse = atoi(vPara[4].c_str());
+            DropNumber= atoi(vPara[5].c_str());
+        }
+    }
 };
 
 class CWindField

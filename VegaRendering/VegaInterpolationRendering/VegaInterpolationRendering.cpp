@@ -12,6 +12,7 @@
 #include "VegaFemFactory.h"
 #include "../Common/SynchronisedQueue.h"
 #include "../Common/WindFiled.h"
+#include "LoadWindAndTreeConfig.h"
 //#include "TreeInstanceMesh.h"
 //#include "volumetricMeshLoader.h"
 //#include "tetMesh.h"
@@ -96,14 +97,16 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 			SearchFrameStep++;
 			//std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
 		}
+
+        //在这里将重复的搜索数组复制多变
 		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
 		for (int treenumber = 0; treenumber < Common::TreesNumber; treenumber++)
 		{
 			tempTreeFileAndFrameIndex.push_back(vVFF.getFileAndFrameIndex(treenumber, SearchFrameNumber % 5));
 
-			std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
+			//std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
 		SearchQueue.Enqueue(tempTreeFileAndFrameIndex);
 		SearchFrameNumber++;
 		tempTreeFileAndFrameIndex.clear();
@@ -113,7 +116,8 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 int main()
 {
 	CVegaFemFactory vFem("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt");
-	int numbercounter =4;
+    CLoadWindAndTreeConfig windAndTreeConfig(Common::TreesNumber, "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
+	int numbercounter =5;
 	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
 	for (int i = 0; i < numbercounter; i++)
 	{
@@ -305,12 +309,7 @@ int main()
 #pragma region load model
 	CSence ourModel("../../models/yellow_tree/tree_last.obj");
 
-    std::vector<float> SpecificRotation;
-    //方向是逆时针方向，采样数据是顺时针方向范围0-360
-    SpecificRotation.push_back(30);
-    SpecificRotation.push_back(0);
-    SpecificRotation.push_back(120);
-    SpecificRotation.push_back(90);
+    std::vector<float> SpecificRotation= windAndTreeConfig.getMultipleRotationAngle();
 	ourModel.setMeshRotation(SpecificRotation);
 
 	ourModel.setGroupsIndex(vFem);
@@ -328,61 +327,9 @@ int main()
 	//个数等于
 	std::vector<std::vector<int>> vMultipleExtraForces;
 	std::vector<std::vector<Common::SForceDirection>> vMultipleExtraDirections;
-	/*for (int i = 0; i < 15; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1350, 1, 0, 0, 600));
-	}
-	for (int i = 0; i < 15; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1015, 1, 0, 0, 600));
-	}
-	for (int i = 0; i < 10; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 600, 1, 0.25, 0, 600));
-	}
-	for (int i = 0; i < 10; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 600));
-	}*/
 
-    std::vector<std::vector<SWaveFunctionPara>> OneDirectionWindRelatedMultipleTree;
-	std::vector<SWaveFunctionPara> OneDirectionWindPara;
-	//OneDirectionWindPara.push_back(SWaveFunctionPara(1010, 1, 0, 0));
-	/*OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
-	OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0, 1000));
-	OneDirectionWindPara.push_back(SWaveFunctionPara(700, 1, 0.5, 500));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1));*/
-    //OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1,1500));
+    std::vector<std::vector<SWaveFunctionPara>> OneDirectionWindRelatedMultipleTree = windAndTreeConfig.getMultipleTreeWindPara();
 
-    OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1200, 1, 0, 1000, 1, 1000));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(800, 1, 0.5, 400));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0.25, 700, 1));
-    OneDirectionWindRelatedMultipleTree.push_back(OneDirectionWindPara);
-    OneDirectionWindPara.clear();
-  
-    OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0, 1000));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(700, 1, 0.5, 500));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500, 1));
-    OneDirectionWindRelatedMultipleTree.push_back(OneDirectionWindPara);
-    OneDirectionWindPara.clear();
-
-    OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1200, 1, 0, 1000, 1, 1000));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(800, 1, 0.5, 400));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0.25, 700, 1));
-    OneDirectionWindRelatedMultipleTree.push_back(OneDirectionWindPara);
-    OneDirectionWindPara.clear();
-
-    OneDirectionWindPara.push_back(SWaveFunctionPara(600, 1, 0, 0));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1500, 1, 0, 1500));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1200, 1, 0, 1000, 1, 1000));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(800, 1, 0.5, 400));
-    OneDirectionWindPara.push_back(SWaveFunctionPara(1000, 1, 0.25, 700, 1));
-    OneDirectionWindRelatedMultipleTree.push_back(OneDirectionWindPara);
 
     for (int i = 0; i < OneDirectionWindRelatedMultipleTree.size(); i++)
     {
@@ -548,7 +495,7 @@ int main()
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 	
-		Sleep(100);
+		//Sleep(100);
 		
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);

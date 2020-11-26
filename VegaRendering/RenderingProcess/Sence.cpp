@@ -21,7 +21,7 @@ void CSence::setMeshRotation(std::vector<float> &vRotations)
     glm::mat4*temp = translateTreePosition();
     m_SetRotation = vRotations;
     specificTreeRotation(m_SetRotation, temp);
-    randomRotation(temp);
+    //randomRotation(temp);
 
 	for (auto& Mesh : m_Meshes)
 	{
@@ -58,16 +58,16 @@ glm::mat4* CSence::translateTreePosition()
     glm::mat4* modelMatrices = new glm::mat4[Common::TreesNumber];
 
     std::vector<float> translate;
-    translate.push_back(0);
-    translate.push_back(2);
-    translate.push_back(4);
-    translate.push_back(6);
-    //std::vector<std::pair<double, double>> TreesPosition = RandomTreePositionGenerate(Common::TreesNumber);
+   /* translate.push_back(0);
+    translate.push_back(2);*/
+    //translate.push_back(4);
+    //translate.push_back(6);
+    std::vector<std::pair<double, double>> TreesPosition = RandomTreePositionGenerate(Common::TreesNumber);
     for (int i = 0; i < Common::TreesNumber; i++)
     {
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(translate[i], -0.5f,0));
-        //model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber / 2)*5.0, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2)*0.0));
+        //model = glm::translate(model, glm::vec3(translate[i], -0.5f,0));
+        model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber / 2)*0.75, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2)*0.75));
         modelMatrices[i] = model;
     }
     return modelMatrices;
