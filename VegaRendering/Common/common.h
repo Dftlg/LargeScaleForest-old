@@ -38,6 +38,10 @@ namespace Common
 
     const int TreesNumber = 5;
 
+    const int TreesTypeNumber = 1;
+
+    //int SecondTypeTreesNumber = 5;
+
 	static int MaxTimeStep = 60;
 
 	static int readFrames = 60;

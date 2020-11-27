@@ -2,14 +2,14 @@
 
 void CInitMultipleTypeTree::InitVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex, int vTypeTreeRelatedFileNumber)
 {
-    CVegaFemFactory vFem(vDirectoryName, vMutilVerticesBaseFile, vCorrectDeformationUVertexIndex);
-    std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
+    CVegaFemFactory* vFem=new CVegaFemFactory(vDirectoryName, vMutilVerticesBaseFile, vCorrectDeformationUVertexIndex);
+    std::vector<Common::SFileFrames> vtemp = vFem->searchFileFrameOnAttribute();
     m_MultipleEachTreeRelatedFileNumber.push_back(vTypeTreeRelatedFileNumber);
     for (int i = 0; i < vTypeTreeRelatedFileNumber; i++)
     {
         std::vector<Common::SFileFrames> temp;
         temp.push_back(vtemp[i]);
-        vFem.readFramesDeformationData(temp, i);
+        vFem->readFramesDeformationData(temp, i);
     }
     m_MultipleTypeFem.push_back(vFem);
 }
@@ -39,10 +39,10 @@ void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTre
     std::vector<float> SpecificRotation = m_MultipleTypeTree[vTreeTypeIndex].getMultipleRotationAngle();
     ourModel.setMeshRotation(SpecificRotation);
 
-    ourModel.setGroupsIndex(m_MultipleTypeFem[vTreeTypeIndex]);
-    ourModel.setVerticesNumber(m_MultipleTypeFem[vTreeTypeIndex]);
+    ourModel.setGroupsIndex(*(m_MultipleTypeFem[vTreeTypeIndex]));
+    ourModel.setVerticesNumber(*(m_MultipleTypeFem[vTreeTypeIndex]));
     ourModel.setMeshGroupAndAssimpIndex();
-    ourModel.initSSBODeformationDeltaU(m_MultipleTypeFem[vTreeTypeIndex], m_MultipleEachTreeRelatedFileNumber[vTreeTypeIndex]);
+    ourModel.initSSBODeformationDeltaU(*(m_MultipleTypeFem[vTreeTypeIndex]), m_MultipleEachTreeRelatedFileNumber[vTreeTypeIndex]);
     ourModel.initSSBODeformationU();
     ourModel.initSSBOTreeFileAndFrameIndex(m_MultipleEachTreeProductNumber[vTreeTypeIndex]);
     ourModel.setSSBO4UDeformationAndIndex(m_MultipleSceneShadowShader[vTreeTypeIndex]);
@@ -66,18 +66,18 @@ void CInitMultipleTypeTree::InitMultipleExtraWindData(int vTreeTypeIndex)
 
 void CInitMultipleTypeTree::InitFemFrameStruct(int vTreeTypeIndex)
 {
-    m_MultipleTypeFem[vTreeTypeIndex].initMatchedFrameStruct(m_MultipleExtraForces[vTreeTypeIndex].size());
-    m_MultipleTypeFem[vTreeTypeIndex].initKVFDataSearchRangeError();
+    m_MultipleTypeFem[vTreeTypeIndex]->initMatchedFrameStruct(m_MultipleExtraForces[vTreeTypeIndex].size());
+    m_MultipleTypeFem[vTreeTypeIndex]->initKVFDataSearchRangeError();
 }
 
 void CInitMultipleTypeTree::InitShadowCubeMapPara(float vNearPlane, float vFarPlane, int vSHADOW_WIDTH, int vSHADOW_HEIGHT, std::vector <glm::mat4>& vshadowTransforms, glm::vec3 * vlightVertices, glm::vec3 * vlightColors)
 {
-    float m_vNearPlane= vNearPlane;
-    float m_vFarPlane= vFarPlane;
-    int m_ShadowWidth= vSHADOW_WIDTH;
-    int m_ShadowHeight= vSHADOW_HEIGHT;
-    glm::vec3 m_LightVertice= vlightVertices[0];
-    std::vector <glm::mat4> m_ShadowTransforms= vshadowTransforms;
+    m_vNearPlane= vNearPlane;
+    m_vFarPlane= vFarPlane;
+    m_ShadowWidth= vSHADOW_WIDTH;
+    m_ShadowHeight= vSHADOW_HEIGHT;
+    m_LightVertice= vlightVertices[0];
+    m_ShadowTransforms= vshadowTransforms;
     for (int i = 0; i < 4; i++)
     {
         m_lightVertices[i] = vlightVertices[i];
@@ -89,9 +89,9 @@ void CInitMultipleTypeTree::InitShadowCubeMapPara(float vNearPlane, float vFarPl
 void CInitMultipleTypeTree::InitScenceShaderData(int vTreeTypeIndex)
 {
     //帧数
-    int frameNums = m_MultipleTypeFem[vTreeTypeIndex].getFileFrames(0)->Frames.size();
+    int frameNums = m_MultipleTypeFem[vTreeTypeIndex]->getFileFrames(0)->Frames.size();
     //obj model vertices
-    int vertexNums = m_MultipleTypeFem[vTreeTypeIndex].getFileFrames(0)->Frames[0].BaseFileDeformations.size();
+    int vertexNums = m_MultipleTypeFem[vTreeTypeIndex]->getFileFrames(0)->Frames[0].BaseFileDeformations.size();
     m_MultipleSceneDepthShader[vTreeTypeIndex].use();
     m_MultipleSceneDepthShader[vTreeTypeIndex].setInt("frameNums", frameNums);
     m_MultipleSceneDepthShader[vTreeTypeIndex].setInt("vertexNums", vertexNums);

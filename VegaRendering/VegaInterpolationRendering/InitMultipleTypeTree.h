@@ -19,7 +19,7 @@ class CInitMultipleTypeTree
 {
 public:
     CInitMultipleTypeTree()=default;
-    CInitMultipleTypeTree(int vTreeTypeNumber) { m_TreeTypeNumber = vTreeTypeNumber; };
+    CInitMultipleTypeTree(int vTreeTypeNumber) { m_TreeTypeNumber = vTreeTypeNumber; m_MultipleExtraForces.resize(vTreeTypeNumber); m_MultipleExtraDirections.resize(vTreeTypeNumber); };
     void InitVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex,int vTypeTreeRelatedFileNumber);
     void InitWindAndTree(int vTreeNumber, const std::string & vFilePath);
     void InitSceneShadowShader(const char* vVertexPath, const char* vFragmentPath);
@@ -35,17 +35,19 @@ public:
     void InitScenceShaderData(int vTreeTypeIndex);
     ~CInitMultipleTypeTree()=default;
 
-    CVegaFemFactory* getFemFactory(int vTreeTypeIndex) { return &m_MultipleTypeFem[vTreeTypeIndex]; };
+    CVegaFemFactory* getFemFactory(int vTreeTypeIndex) { return m_MultipleTypeFem[vTreeTypeIndex]; };
     CSence * getTreeModel(int vTreeTypeIndex) { return &m_MultipleTreeModel[vTreeTypeIndex]; };
     std::vector<std::vector<int>> * getExtraForces(int vTreeTypeIndex) { return &m_MultipleExtraForces[vTreeTypeIndex]; };
     std::vector<std::vector<Common::SForceDirection>> * getExtraDirection(int vTreeTypeIndex) { return &m_MultipleExtraDirections[vTreeTypeIndex]; };
     std::vector<int> *getTreesNumberSubjected2SameWind(int vTreeTypeIndex) { return &m_MultipleTreesNumberSubjected2SameWind[vTreeTypeIndex]; };
+    CShader * getScenceShadowShader(int vTreeTypeIndex) { return &m_MultipleSceneShadowShader[vTreeTypeIndex]; };
+    CShader * getScenceDepthShader(int vTreeTypeIndex) { return &m_MultipleSceneDepthShader[vTreeTypeIndex]; };
 
 private:
     void __LoadFemData();
     int m_TreeTypeNumber;
     //each type tree have one 
-    std::vector<CVegaFemFactory> m_MultipleTypeFem;
+    std::vector<CVegaFemFactory*> m_MultipleTypeFem;
     std::vector<CLoadWindAndTreeConfig> m_MultipleTypeTree;
     std::vector<int> m_MultipleEachTreeRelatedFileNumber;
     std::vector<int> m_MultipleEachTreeProductNumber;
