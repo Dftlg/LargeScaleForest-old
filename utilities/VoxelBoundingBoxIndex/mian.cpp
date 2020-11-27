@@ -252,8 +252,8 @@ int main()
 	//std::string cubicIndexFilePath1 = "D:/GraduationProject/LargeScaleForest/models/apricot_tree/KVFElement.txt";
 	//std::string cubicIndexFilePath2 = "D:/GraduationProject/Vega/models/10.20/stem_cubic_index.txt";
 	//std::string cubicIndexFilePath3 = "D:/GraduationProject/Vega/models/10.20/fibrous_all_cubic_index1.txt";
-	std::string cubicIndexOutputPath = "D:/GraduationProject/LargeScaleForest/models/apricot_tree/KVF_cubic_index_cubic_index.txt";
-	std::string cubicVerticesOputputPath = "D:/GraduationProject/LargeScaleForest/models/apricot_tree/KVF_cubic_index_vertices_index.bou";
+	std::string cubicIndexOutputPath = "D:/GraduationProject/LargeScaleForest/models/apricot_tree/_index_cubic_index.txt";
+	std::string cubicVerticesOputputPath = "D:/GraduationProject/LargeScaleForest/models/apricot_tree/_index_vertices_index.bou";
 
 #pragma region findCubicIndex
 	readDataFromVegFile(vegFilePath, elementVertices, elementIndex);
