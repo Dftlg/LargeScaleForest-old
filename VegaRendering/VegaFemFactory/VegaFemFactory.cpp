@@ -230,8 +230,7 @@ void CVegaFemFactory::readKVFFileData(const std::string & vFile, Common::SFileFr
 		int ElementNumber = atoi(lineString.c_str()) * 8 * 3;
 		Common::SpKVFData tempKVFData;
 
-		tempKVFData.Theta = vFileFrame.Theta;
-		tempKVFData.Phi = vFileFrame.Phi;
+		tempKVFData.WindDirection.push_back(Common::SWindDirecetion(vFileFrame.Theta, vFileFrame.Phi));
 
 		getline(KVFFile, lineString);
 		if (lineString == "FrameIndex")
@@ -852,7 +851,7 @@ void CVegaFemFactory::searchMatchedFrameSequences(std::vector<std::vector<int>> 
 			for (int k = 0; k < 5; k++)
 			{
 				m_TempSpKVFData[treeIndex].Forces.push_back(voExtraForces[treeIndex][k]);
-				m_TempSpKVFData[treeIndex].WindDirection.push_back(vForceDirection[treeIndex][k]);
+				//m_TempSpKVFData[treeIndex].WindDirection.push_back(vForceDirection[treeIndex][k]);
 			}
 			//可以并行
 			searchMatchedOneTreeFrameSequences(m_MultipleFramesIndex[treeIndex], m_TempSpKVFData[treeIndex], voExtraForces[treeIndex], m_CurrentFrameIndex[treeIndex], m_Flag[treeIndex]);

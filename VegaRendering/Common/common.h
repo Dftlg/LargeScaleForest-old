@@ -36,7 +36,7 @@ namespace Common
 
 	//const int TreesInstanceNumber = 1;
 
-	const int TreesNumber = 2;
+	const int TreesNumber = 1;
 
 	static int MaxTimeStep = 60;
 
@@ -53,7 +53,7 @@ namespace Common
 	//一个文件中存多少帧
 	static int SamplingFrameNumber = 180;
 
-	static int ProductFrameNumber = 180000;
+	static int ProductFrameNumber = 18000000;
 
 	//static int KErrorRange = 10;
 	static int ExpandForceError = 1;
@@ -200,6 +200,11 @@ namespace Common
 	{
 		int Theta;
 		int Phi;
+		SWindDirecetion(int vTheta, int vPhi)
+		{
+			Theta = vTheta;
+			Phi = vPhi;
+		}
 	};
 
 	//一个文件中帧的KVF数据，KVF数据既代表前面帧的结果，又可以用来判断后面帧的数据

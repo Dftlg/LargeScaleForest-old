@@ -40,6 +40,7 @@ public:
 	void initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber);
 	void setSSBO4UDeformationAndIndex(const CShader& vShader);
 	void initSSBODeformationU();
+	void initSSBOTreeRotationModel();
 	void initSSBOTreeFileAndFrameIndex(const int vTreeNumber);
 	void resetSSBO4UDeformation();
 
@@ -51,13 +52,23 @@ public:
 	void setFileDirectiory(std::string vFileDirectory) { m_FileDirectory = vFileDirectory; }
 	int getAssimpVerticesNumber() { return m_AssimpVerticesNumber; }
 	void draw(const CShader& vShader);
-	void setMeshRotation();
-	glm::mat4* randomRotation();
+	void setMeshRotation(std::vector<Common::SWindDirecetion>& vTreesWindDirection);
+	glm::mat4* randomRotation(std::vector<Common::SWindDirecetion>& vTreesWindDirection);
 	void setMeshGroupAndAssimpIndex();
 
 	void UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int,int>>& vTreeFileAndFrameIndex);
 	/*void UpdataMeshTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);*/
 	bool gammaCorrection;
+
+	//(1,0)
+	inline float getRotationAngle(float vXDisplacement, float vZDisplacement)
+	{
+		float dotAngle = acos((vXDisplacement) / sqrt(vXDisplacement*vXDisplacement + vZDisplacement * vZDisplacement)) * 180 / Common::Pi;
+		float crossAngle = asin(vZDisplacement / sqrt(vXDisplacement*vXDisplacement + vZDisplacement * vZDisplacement)) * 180 / Common::Pi;
+		if (crossAngle > 0)
+			return(360 - dotAngle);
+		return dotAngle;
+	}
 
 private:
 	void __changeObjMeshStruct2Charptr(int vOutputMaterials=1);
@@ -81,15 +92,19 @@ private:
 	std::vector<std::vector<int>> m_GroupsIndex;
 
 	CVegaFemFactory* m_VegaFactory;
+
 	glm::vec4 * m_DeltaDeformationU;
 
 	glm::vec4 * m_DeformationU;
 
 	glm::ivec2 * m_TreeFileAndFrameIndex;
 
+	glm::mat4 * m_TreeRotationMatrix;
+
 	unsigned int m_DeltaUSSBO;
 	unsigned int m_UdeformationSSBO;
 	unsigned int m_TreeFileAndFrameSSBO;
+	unsigned int m_TreeRotationModelSSBO;
 
 	int m_FrameNums;
 	int m_VertexNums;

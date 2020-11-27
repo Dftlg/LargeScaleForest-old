@@ -53,10 +53,11 @@ int SearchFrameStep = 0;
 
 void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces)
 {
+	std::vector<std::vector<Common::SWindDirecetion>> tempWindDirection;
 	while (true)
 	{
-		//当前12个帧段进行一次重置获取5个帧段号索引
-	/*	if (SearchFrameNumber %Size==0)
+		/*//当前12个帧段进行一次重置获取5个帧段号索引
+		if (SearchFrameNumber %Size==0)
 		{
 			std::cout << "search reset" << std::endl;
 			vVFF.resetTempMultipleTreeData(vMultipleExtraForces.size());
@@ -72,8 +73,8 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 				{
 					tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
 				}
-			}
-			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces);
+			}	
+			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces, tempWindDirection);
 			tempMultipleFiveForces.clear();
 			SearchFrameStep++;
 			//std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
@@ -82,7 +83,6 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 		for (int treenumber = 0; treenumber < Common::TreesNumber; treenumber++)
 		{
 			tempTreeFileAndFrameIndex.push_back(vVFF.getFileAndFrameIndex(treenumber, SearchFrameNumber % 5));
-
 			//std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
 		}
 		//std::cout << std::endl;
@@ -95,7 +95,7 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 int main()
 {
 	CVegaFemFactory vFem("G:/GraduationProject/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt");
-	int numbercounter = 3;
+	int numbercounter = 1;
 	std::vector<double> b{ 1000,1,0,0 };
 	std::vector<std::pair<int, int>> angle;
 	for (int i = 0; i < numbercounter; i++)
@@ -155,7 +155,7 @@ int main()
 		 				
 		 15.0f, -0.5f,  15.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
 		-15.0f, -0.5f, -15.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
-		 15.0f, -0.5f, -20.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
+		 15.0f, -0.5f, -15.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
 	};
 #pragma endregion
 
@@ -291,32 +291,31 @@ int main()
 	ourSkyBoxShader.setInt("skybox", 0);
 #pragma endregion
 
-#pragma region load model
-	CSence ourModel("../../models/yellow_tree/tree_last.obj");
-	ourModel.setMeshRotation();
-	ourModel.setGroupsIndex(vFem);
-	ourModel.setVerticesNumber(vFem);
-	ourModel.setMeshGroupAndAssimpIndex();
-	ourModel.initSSBODeformationDeltaU(vFem, numbercounter);
-	ourModel.initSSBODeformationU();
-	ourModel.initSSBOTreeFileAndFrameIndex(Common::TreesNumber);
-	ourModel.setSSBO4UDeformationAndIndex(ourSceneShadowShader);
-	ourModel.setSSBOUdeformationAndIndx4ShadowMapShader(ourSceneDepthShader);
-#pragma endregion
-
-
 
 	//个数等于
 	std::vector<std::vector<int>> vMultipleExtraForces;
-	for (int i = 0; i < 2; i++)
+	std::vector<Common::SWindDirecetion> treesWindDirection;
+	for (int i = 0; i < 1; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber,1000, 1, 0, 0, 6000));
+		treesWindDirection.push_back(Common::SWindDirecetion(0, 0));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 600000));
 	}
-	/*for (int i = 0; i < 15; i++)
+	/*for (int i = 0; i < 1; i++)
 	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1010, 1, 0.5, 0, 600));
+		treesWindDirection.push_back(Common::SWindDirecetion(0, 60));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 600000));
 	}
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 1; i++)
+	{
+		treesWindDirection.push_back(Common::SWindDirecetion(0, 60));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 600000));
+	}
+	for (int i = 0; i < 1; i++)
+	{
+		treesWindDirection.push_back(Common::SWindDirecetion(0, 60));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 600000));
+	}*/
+	/*for (int i = 0; i < 20; i++)
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 600, 1, 0.25, 0, 600));
 	}*/
@@ -324,6 +323,25 @@ int main()
 	{
 		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 600));
 	}*/
+
+#pragma region load model
+	CSence ourModel("../../models/yellow_tree/tree_last.obj");
+	
+	ourModel.setGroupsIndex(vFem);
+	ourModel.setVerticesNumber(vFem);
+	ourModel.setMeshGroupAndAssimpIndex();
+	ourModel.initSSBODeformationDeltaU(vFem, numbercounter);
+	ourModel.initSSBODeformationU();
+	ourModel.initSSBOTreeRotationModel();
+	ourModel.initSSBOTreeFileAndFrameIndex(Common::TreesNumber);
+	ourModel.setMeshRotation(treesWindDirection);
+	ourModel.setSSBO4UDeformationAndIndex(ourSceneShadowShader);
+	ourModel.setSSBOUdeformationAndIndx4ShadowMapShader(ourSceneDepthShader);
+#pragma endregion
+
+
+
+	
 
 	//Size = Common::ProductFrameNumber;
 	//Size = 180;
@@ -524,7 +542,7 @@ void renderTree(CShader & vShader, CSence& vModel)
 	vShader.setMat4("view", view);
 	vShader.setVec3("camPos", Camera.getPosition());
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, -0.3f, -2.0f));// translate it down so it's at the center of the scene
+	model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));// translate it down so it's at the center of the scene
 	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
 	vShader.setMat4("model", model);
 	vModel.draw(vShader);

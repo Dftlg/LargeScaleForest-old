@@ -36,6 +36,11 @@ layout (std430, binding=3) buffer IndexArray
 	ivec2 treeFrameIndex[];
 };
 
+layout (std430, binding=4) buffer TreeRotationModel
+{
+	mat4 treeModel[];
+};
+
 void main()
 {
 	v2f_TexCoords = aTexCoords; 
@@ -49,8 +54,8 @@ void main()
 	else
 	{
 		vec4 tempPos=vec4(aPos,1.0)+sum_u[gl_InstanceID*assimpvertexNums+positionIndex];
-		v2f_Normal = mat3(model)* mat3(instanceMatrix) * aNormal;
-		v2f_WorldPos = vec3(model *instanceMatrix* tempPos);
-	    gl_Position = projection * view * model * instanceMatrix * tempPos;
+		v2f_Normal = mat3(treeModel[gl_InstanceID]) * aNormal;
+		v2f_WorldPos = vec3(treeModel[gl_InstanceID]  * tempPos);
+	    gl_Position = projection * view * treeModel[gl_InstanceID]  * tempPos;
 	}
 }

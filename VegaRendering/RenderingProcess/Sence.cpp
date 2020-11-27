@@ -16,9 +16,9 @@ void CSence::draw(const CShader& vShader)
 
 }
 
-void CSence::setMeshRotation()
+void CSence::setMeshRotation(std::vector<Common::SWindDirecetion>& vTreesWindDirection)
 {
-	glm::mat4*temp = randomRotation();
+	glm::mat4*temp = randomRotation(vTreesWindDirection);
 
 	for (auto& Mesh : m_Meshes)
 	{
@@ -27,22 +27,58 @@ void CSence::setMeshRotation()
 }
 
 
-glm::mat4* CSence::randomRotation()
+glm::mat4* CSence::randomRotation(std::vector<Common::SWindDirecetion>& vTreesWindDirection)
 {
 	glm::mat4* modelMatrices = new glm::mat4[Common::TreesNumber];
+	glm::mat4* treeRotationMatrices = new glm::mat4[Common::TreesNumber];
 	std::vector<std::pair<double, double>> TreesPosition = RandomTreePositionGenerate(Common::TreesNumber);
 	//生成一个Common::TreesNumber*Common::TreesNumber大小的网格，在网格内产生树的位置，并在一个网格上继续增加随机位置
+	Common::SWindDirecetion windDirection = Common::SWindDirecetion(0, 0);
 	for (int i = 0; i < Common::TreesNumber; i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber/2)*5.0, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2)*0.0));
-		srand(time(0));
+		glm::mat4 rotationModel = glm::mat4(1.0f);
+		/*float xDisplacement = (TreesPosition[i].first - Common::TreesNumber / 2)*5.0;
+		float zDisplacement = TreesPosition[i].second - Common::TreesNumber / 2;*/
+		float xDisplacement = 0.0;
+		float zDisplacement = 0.0;
+		float rotationAngle;
+		if (i == 0)
+		{
+			xDisplacement = 0.0;
+			zDisplacement = 3.5f;
+		}
+		else if (i == 1)
+		{
+			xDisplacement = -3.5f;
+			zDisplacement = 0.0;
+		}
+		else if (i == 2)
+		{
+			xDisplacement = 3.5f;
+			zDisplacement = 0.0;
+		}
+		else
+		{
+			xDisplacement = 0.0;
+			zDisplacement = -3.5f;
+		}
+		rotationAngle = getRotationAngle(xDisplacement, zDisplacement);
+		rotationAngle += vTreesWindDirection[i].Phi;
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		rotationModel = glm::translate(rotationModel, glm::vec3(xDisplacement, -0.5f, zDisplacement));// translate it down so it's at the center of the scene
+		rotationModel = glm::scale(rotationModel, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
+		rotationModel = glm::rotate(rotationModel, glm::radians(rotationAngle), glm::vec3(0.0, 1.0, 0.0));
+		//rotationModel= glm::translate(model, glm::vec3(0.0f, 0.0f, zDisplacement));
+		//srand(time(0));
 		//float tempRandom = (float)RandomGenerate();	
 		//model = glm::rotate(model, glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
 		//glm::vec3 tempScale = GenerateRamdomScale();
 		//model = glm::scale(model, tempScale);
 		modelMatrices[i] = model;
+		treeRotationMatrices[i] = rotationModel;
 	}
+	m_TreeRotationMatrix = treeRotationMatrices;
 	return modelMatrices;
 }
 
@@ -416,6 +452,11 @@ void CSence::initSSBODeformationU()
 	m_DeformationU = new glm::vec4[Common::TreesNumber*m_AssimpVerticesNumber];
 }
 
+void CSence::initSSBOTreeRotationModel()
+{
+	m_TreeRotationMatrix = new glm::mat4[Common::TreesNumber];
+}
+
 void CSence::initSSBOTreeFileAndFrameIndex(const int vTreeNumber)
 {
 	m_TreeFileAndFrameIndex = new glm::ivec2[vTreeNumber];
@@ -472,7 +513,23 @@ void CSence::setSSBO4UDeformationAndIndex(const CShader& vShader)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, file_frame_ssbo_binding_point_index, m_TreeFileAndFrameSSBO);
 	//点和shader的连接
 	glShaderStorageBlockBinding(vShader.getID(), shader_file_frame_index, file_frame_ssbo_binding_point_index);
-	
+
+	//glm::mat4 model[2] = { glm::mat4(1.0f),glm::mat4(1.0f) };
+	//model[0] = glm::rotate(model[0], glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));
+	//设置旋转矩阵
+	GLuint shader_Tree_Model_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "TreeRotationModel");
+	GLint SSBOBinding3 = 0, BlockDataSize3 = 0;
+	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding3);
+	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize3);
+
+	glGenBuffers(1, &m_TreeRotationModelSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_TreeRotationModelSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::mat4)*(Common::TreesNumber), m_TreeRotationMatrix, GL_STATIC_DRAW);
+	GLuint file_treemodel_ssbo_binding_point_index = 4;
+	//点和SSBO的连接
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, file_treemodel_ssbo_binding_point_index, m_TreeRotationModelSSBO);
+	//点和shader的连接
+	//glShaderStorageBlockBinding(vShader.getID(), shader_Tree_Model_index, file_treemodel_ssbo_binding_point_index);
 }
 
 void CSence::setSSBOUdeformationAndIndx4ShadowMapShader(const CShader& vShader)
@@ -504,6 +561,14 @@ void CSence::setSSBOUdeformationAndIndx4ShadowMapShader(const CShader& vShader)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, file_frame_ssbo_binding_point_index, m_TreeFileAndFrameSSBO);
 	//点和shader的连接
 	glShaderStorageBlockBinding(vShader.getID(), shader_file_frame_index, file_frame_ssbo_binding_point_index);
+
+	//设置旋转矩阵
+	GLuint shader_tree_model_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "TreeRotationModel");
+	GLuint file_tree_ssbo_binding_point_index = 4;
+	//点和SSBO的连接
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, file_tree_ssbo_binding_point_index, m_TreeRotationModelSSBO);
+	//点和shader的连接
+	//glShaderStorageBlockBinding(vShader.getID(), shader_tree_model_index, file_tree_ssbo_binding_point_index);
 }
 
 void CSence::UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int, int>>& vTreeFileAndFrameIndex)
