@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="InitMultipleTypeTree.cpp" />
     <ClCompile Include="LoadWindAndTreeConfig.cpp" />
     <ClCompile Include="VegaInterpolationRendering.cpp" />
   </ItemGroup>
@@ -168,6 +169,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="InitMultipleTypeTree.h" />
     <ClInclude Include="LoadWindAndTreeConfig.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

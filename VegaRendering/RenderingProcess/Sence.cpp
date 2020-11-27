@@ -525,6 +525,7 @@ void CSence::setSSBOUdeformationAndIndx4ShadowMapShader(const CShader& vShader)
 	//shader和点连接
 	GLuint ssbo_binding_point_index = 1;
 	//点和SSBO的连接
+    //!!!!!!!使用了同一个BufferData
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, m_DeltaUSSBO);
 	//点和shader的连接
 	glShaderStorageBlockBinding(vShader.getID(), shader_index, ssbo_binding_point_index);

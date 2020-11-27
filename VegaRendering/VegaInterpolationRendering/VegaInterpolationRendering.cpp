@@ -13,6 +13,7 @@
 #include "../Common/SynchronisedQueue.h"
 #include "../Common/WindFiled.h"
 #include "LoadWindAndTreeConfig.h"
+#include "InitMultipleTypeTree.h"
 //#include "TreeInstanceMesh.h"
 //#include "volumetricMeshLoader.h"
 //#include "tetMesh.h"
@@ -104,20 +105,15 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
         for (int DifferentTreeNumber = 0; DifferentTreeNumber < vTreesNumberSubjected2SameWind.size(); DifferentTreeNumber++)
         {
             std::pair<int, int> tempOneTreeFileAndFrameIndex = vVFF.getFileAndFrameIndex(DifferentTreeNumber, SearchFrameNumber % 5);
+            //std::cout << tempOneTreeFileAndFrameIndex.first << "--" << tempOneTreeFileAndFrameIndex.second << "||";
+           
             for (int k = 0; k < vTreesNumberSubjected2SameWind[DifferentTreeNumber] ; k++)
             {
                 tempTreeFileAndFrameIndex.push_back(tempOneTreeFileAndFrameIndex);
-            }
-            
+            } 
         }
+        //std::cout << std::endl;
 
-		//for (int treenumber = 0; treenumber < Common::TreesNumber; treenumber++)
-		//{
-		//	tempTreeFileAndFrameIndex.push_back(vVFF.getFileAndFrameIndex(treenumber, SearchFrameNumber % 5));
-
-		//	//std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
-		//}
-		//std::cout << std::endl;
 		SearchQueue.Enqueue(tempTreeFileAndFrameIndex);
 		SearchFrameNumber++;
 		tempTreeFileAndFrameIndex.clear();
@@ -126,6 +122,7 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 
 int main()
 {
+    ////////////////////////////////////////////
 	CVegaFemFactory vFem("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt");
     CLoadWindAndTreeConfig windAndTreeConfig(Common::TreesNumber, "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
 	int numbercounter =5;
@@ -136,6 +133,9 @@ int main()
 		temp.push_back(vtemp[i]);
 		vFem.readFramesDeformationData(temp, i);
 	}
+    /*CInitMultipleTypeTree MultipleTypeTree(1);
+    MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt",5);*/
+
 
 #pragma region initialize and configure glfw
 	glfwInit();
@@ -164,12 +164,14 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 #pragma endregion
-
+    /////////////////////////////
 #pragma region build and compile shaders
 	CShader ourSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
 	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
 	//CShader ourLightShader("light.vert", "light.frag");
 	CShader ourSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+
+
 #pragma endregion
 
 #pragma region plane vertices data
@@ -316,6 +318,7 @@ int main()
 	ourSkyBoxShader.use();
 	ourSkyBoxShader.setInt("skybox", 0);
 #pragma endregion
+    ////////////////////////
 
 #pragma region load model
 	CSence ourModel("../../models/yellow_tree/tree_last.obj");
@@ -411,6 +414,8 @@ int main()
 			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 		}
+
+
 		ourSceneDepthShader.use();
 		ourSceneDepthShader.setFloat("far_plane", far_plane);
 		ourSceneDepthShader.setVec3("lightPos", lightVertices[0]);
@@ -484,7 +489,10 @@ int main()
 		//tree
 		ourSceneDepthShader.setInt("planeOrTree", 1);
 		renderTree(ourSceneDepthShader, ourModel);
+        //再调用另一棵树
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+       
 		
 		//2.render scene as normal 
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
@@ -502,6 +510,8 @@ int main()
 		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 		ourSceneShadowShader.setInt("planeOrTree", 1);
 		renderTree(ourSceneShadowShader, ourModel);
+
+
 		//skybox	
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);

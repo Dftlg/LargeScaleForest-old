@@ -21,6 +21,9 @@
     <ClCompile Include="LoadWindAndTreeConfig.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="InitMultipleTypeTree.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -38,6 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LoadWindAndTreeConfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="InitMultipleTypeTree.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

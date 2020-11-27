@@ -663,11 +663,11 @@ void idleFunction(void)
 		if (pulledVertex != -1)
 		{*/
 		//stem	
-	  pulledVertex[0] = 6172;
+	 /* pulledVertex[0] = 6172;
 
 
 	  pulledVertex[1] = 6552;
-	   pulledVertex[2] = 4214;
+	   pulledVertex[2] = 4214;*/
 	  /*pulledVertex[4] = 12203;
 	  pulledVertex[5] = 2768;
 	  pulledVertex[6] = 12015;
@@ -1617,9 +1617,11 @@ void initSimulation()
   preu= (double*)calloc(3 * n, sizeof(double));
 
   std::vector<std::vector<double>> tempConfig = GetForceConfigurate(outputFilename, ExternFileDirectory,Theta,Phi);
-  //6172,6552,2768
+  
   //1000
-  std::vector<int>pullVertexIndex = { 5828,6539,8117 };
+  //5828, 6539, 8117
+  //6172,6552,2768
+  std::vector<int>pullVertexIndex = { 6172,6552 };
   //std::vector<float>scale = { 1.0,0.8,0.08,0.05,-0.02,-0.05 };
   //600
   //std::vector<float>scale = { 1.0,0.8,0.05,0.03,-0.009,-0.03 };
@@ -1663,7 +1665,7 @@ void initSimulation()
   //StemExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
   //LeafExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
   
-  pullVertexInfo.StemPullVertexNum = 3;
+  pullVertexInfo.StemPullVertexNum = 2;
   pullVertexInfo.PullVertexIndex = pullVertexIndex;
   pullVertexInfo.StemExtraForces = StemExtraForces;
   pullVertexInfo.LeafExtraForces = LeafExtraForces;
@@ -2341,7 +2343,7 @@ int main(int argc, char* argv[])
 
   //configFilename = string("D:/GraduationProject/Vega/examples/simpleBridge_vox/simpleBridge_vox.config");
  /* configFilename = string("D:/GraduationProject/Vega/models/newgrass/voxelizegrass/voxelizegrass.config");*/
-  configFilename = string("../../models/yellow_tree/tree.config");
+  configFilename = string("../../models/mini_mapleTree/tree.config");
   printf("Loading scene configuration from %s.\n", configFilename.c_str());
 
   initConfigurations(); // parse the config file同时输出到cmd
