@@ -18,7 +18,7 @@ public:
 	unsigned int getIndicesSize() const { return m_Indices.size(); }
 	void draw(const CShader& vShader) const;
 	void reset(const std::vector<Common::SVertex>& vVertices, const std::vector<unsigned int>& vIndices, const std::vector<Common::STexture> vTestures);
-	void setRotation(glm::mat4* temp);
+	void setRotation(glm::mat4* temp, int vInstanceTreeNumber);
     void setSpecificRotation(glm::mat4 *temp);
 	void setGroupAndAssimpIndex(std::vector<int>& vGroupIndex,int vLastCapacity, int vNextCapacity);
 	//每个vector中size个数为需要渲染出的树的数量
@@ -48,6 +48,7 @@ private:
 	std::vector<int> m_AssimpGroupIndex;
 	glm::mat4* m_modelMatrices;
     glm::mat4* m_specificmodelRotationMatrices;
+    int m_InstanceTreeNumber;
 
 	int * m_TreeFileIndex;
 	int * m_FrameIndex;

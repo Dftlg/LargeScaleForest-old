@@ -19,7 +19,7 @@ class CInitMultipleTypeTree
 {
 public:
     CInitMultipleTypeTree()=default;
-    CInitMultipleTypeTree(int vTreeTypeNumber) { m_TreeTypeNumber = vTreeTypeNumber; m_MultipleExtraForces.resize(vTreeTypeNumber); m_MultipleExtraDirections.resize(vTreeTypeNumber); };
+    CInitMultipleTypeTree(int vTreeTypeNumber, int vAllTreeNumbers) ;
     void InitVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex,int vTypeTreeRelatedFileNumber);
     void InitWindAndTree(int vTreeNumber, const std::string & vFilePath);
     void InitSceneShadowShader(const char* vVertexPath, const char* vFragmentPath);
@@ -31,6 +31,7 @@ public:
 
     void InitFemFrameStruct(int vTreeTypeIndex);
     void InitShadowCubeMapPara(float vNearPlane, float vFarPlane, int vSHADOW_WIDTH, int vSHADOW_HEIGHT,  std::vector <glm::mat4>& vshadowTransforms,glm::vec3 * vlightVertices,glm::vec3 * vlightColors);
+   
 
     void InitScenceShaderData(int vTreeTypeIndex);
     ~CInitMultipleTypeTree()=default;
@@ -54,7 +55,9 @@ public:
     std::vector<int> getTreeTypeIndex() { return m_TreeTypeIndex; };
 
 private:
-    void __LoadFemData();
+
+    void __GenerateTreesPosition() { m_AllTreesPosition = RandomTreePositionGenerate(m_AllTreesNumber); };
+
     int m_TreeTypeNumber;
     //each type tree have one 
     std::vector<CVegaFemFactory*> m_MultipleTypeFem;
@@ -82,5 +85,9 @@ private:
 
     glm::vec3 m_lightVertices[4];
     glm::vec3 m_lightColors[4];
+
+    int m_AllTreesNumber;
+    std::vector<int> m_EachTypeTreesPositonArray;
+    std::vector<std::pair<double, double>> m_AllTreesPosition;
 };
 

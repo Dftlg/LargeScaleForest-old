@@ -14,6 +14,7 @@
 #include "../Common/WindFiled.h"
 #include "LoadWindAndTreeConfig.h"
 #include "InitMultipleTypeTree.h"
+#include "../Common/ExtraTool.h"
 //#include "TreeInstanceMesh.h"
 //#include "volumetricMeshLoader.h"
 //#include "tetMesh.h"
@@ -62,6 +63,8 @@ int Size = 0;
 int FrameNumber = 0;
 int SearchFrameNumber[Common::TreesTypeNumber] = { 0 };
 int SearchFrameStep[Common::TreesTypeNumber] = { 0 };
+
+int ALLTreeNumber = 0;
 
 
 //前一个std::vector表示匹配树的个数，后一个std::vector表示每一帧中需要的数据
@@ -340,17 +343,23 @@ int main()
 			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 		}
+        //生成树木的随机位置
+        
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            ALLTreeNumber +=Common::TreesNumbers[i];
+        }
+        CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, ALLTreeNumber);
 
-        CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber);
         MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
         MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 1);
-        MultipleTypeTree.InitWindAndTree(Common::TreesNumber, "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
+        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
         MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
         MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
 
         MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 1);
-        MultipleTypeTree.InitWindAndTree(Common::TreesNumber, "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
+        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[1], "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
         MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
         MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 1);

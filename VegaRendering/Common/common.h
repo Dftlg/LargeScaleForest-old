@@ -36,11 +36,11 @@ namespace Common
 
 	//const int TreesInstanceNumber = 1;
 
-    const int TreesNumber = 5;
+    //const int TreesNumber = 5;
 
     const int TreesTypeNumber = 2;
 
-   // const int TreesNumbers[TreesTypeNumber] = { 10,5 };
+    const int TreesNumbers[TreesTypeNumber] = { 10,5 };
     //int SecondTypeTreesNumber = 5;
 
 	static int MaxTimeStep = 60;

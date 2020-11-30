@@ -16,8 +16,10 @@ void CSence::draw(const CShader& vShader)
 
 }
 
-void CSence::setMeshRotation(std::vector<float> &vRotations)
+void CSence::setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations, int vTreesNumber)
 {
+    m_InstanceTreeNumber = vTreesNumber;
+    m_TransFormations = vTransFormations;
     glm::mat4*temp = translateTreePosition();
     m_SetRotation = vRotations;
     specificTreeRotation(m_SetRotation, temp);
@@ -25,7 +27,7 @@ void CSence::setMeshRotation(std::vector<float> &vRotations)
 
 	for (auto& Mesh : m_Meshes)
 	{
-		Mesh.setRotation(temp);
+		Mesh.setRotation(temp,m_InstanceTreeNumber);
 	}
 }
 
@@ -41,8 +43,8 @@ void CSence::setMeshRotation(std::vector<float> &vRotations)
 //
 void CSence::specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrces)
 {
-    glm::mat4* modelMatrices = new glm::mat4[Common::TreesNumber];
-    for (int i = 0; i < Common::TreesNumber; i++)
+    glm::mat4* modelMatrices = new glm::mat4[m_InstanceTreeNumber];
+    for (int i = 0; i < m_InstanceTreeNumber; i++)
     {
         //tempRandom = -120;
         //tempRandom = 0;
@@ -55,19 +57,13 @@ void CSence::specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmo
 
 glm::mat4* CSence::translateTreePosition()
 {
-    glm::mat4* modelMatrices = new glm::mat4[Common::TreesNumber];
+    glm::mat4* modelMatrices = new glm::mat4[m_InstanceTreeNumber];
 
-    std::vector<float> translate;
-   /* translate.push_back(0);
-    translate.push_back(2);*/
-    //translate.push_back(4);
-    //translate.push_back(6);
-    std::vector<std::pair<double, double>> TreesPosition = RandomTreePositionGenerate(Common::TreesNumber);
-    for (int i = 0; i < Common::TreesNumber; i++)
+    for (int i = 0; i < m_InstanceTreeNumber; i++)
     {
         glm::mat4 model = glm::mat4(1.0f);
         //model = glm::translate(model, glm::vec3(translate[i], -0.5f,0));
-        model = glm::translate(model, glm::vec3((TreesPosition[i].first - Common::TreesNumber / 2)*0.75, -0.5f, (TreesPosition[i].second - Common::TreesNumber / 2)*0.75));
+        model = glm::translate(model, glm::vec3((m_TransFormations[i].first - m_InstanceTreeNumber / 2)*0.75, -0.5f, (m_TransFormations[i].second - m_InstanceTreeNumber / 2)*0.75));
         modelMatrices[i] = model;
     }
     return modelMatrices;
@@ -76,7 +72,7 @@ glm::mat4* CSence::translateTreePosition()
 void CSence::randomRotation(glm::mat4* vmodelMatrces)
 {
 	//生成一个Common::TreesNumber*Common::TreesNumber大小的网格，在网格内产生树的位置，并在一个网格上继续增加随机位置
-	for (int i = 0; i < Common::TreesNumber; i++)
+	for (int i = 0; i < m_InstanceTreeNumber; i++)
 	{
 		srand(time(0));
         //因与搜索的风场与树角度有关，最好给定数据集，否则有可能产生搜索不到数据的情况
@@ -99,15 +95,6 @@ void CSence::setMeshGroupAndAssimpIndex()
 		Mesh.setGroupAndAssimpIndex(m_GroupsIndex[count],lastCapacity,nextCapacity);
 		m_AssimpVerticesNumber += nextCapacity;
 		count++;
-	}
-}
-
-//通过groups获取顶点个数，将输入的deformation划分。
-void CSence::SetParaMesh()
-{
-	for (auto i = 0; i < m_Mesh->getNumGroups(); i++)
-	{
-
 	}
 }
 
@@ -454,12 +441,17 @@ void CSence::initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber)
 void CSence::initSSBODeformationU()
 {
 	setMeshGroupAndAssimpIndex();
-	m_DeformationU = new glm::vec4[Common::TreesNumber*m_AssimpVerticesNumber];
+	m_DeformationU = new glm::vec4[m_InstanceTreeNumber*m_AssimpVerticesNumber];
 }
 
 void CSence::initSSBOTreeFileAndFrameIndex(const int vTreeNumber)
 {
 	m_TreeFileAndFrameIndex = new glm::ivec2[vTreeNumber];
+}
+
+void CSence::setTreeNumber(const int vInstanceTreeNumber)
+{
+    m_InstanceTreeNumber = vInstanceTreeNumber;
 }
 
 void CSence::setSSBO4GenBufferUDeformationAndIndex(CShader& vShader, const int vTreeTypeIndex)
@@ -492,7 +484,7 @@ void CSence::setSSBO4GenBufferUDeformationAndIndex(CShader& vShader, const int v
 
     glGenBuffers(1, &m_UdeformationSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_UdeformationSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(m_AssimpVerticesNumber*Common::TreesNumber), m_DeformationU, GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(m_AssimpVerticesNumber*m_InstanceTreeNumber), m_DeformationU, GL_DYNAMIC_DRAW);
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_SSBO_Binding_Point_Index[1], m_UdeformationSSBO);
 
@@ -503,7 +495,7 @@ void CSence::setSSBO4GenBufferUDeformationAndIndex(CShader& vShader, const int v
 
     glGenBuffers(1, &m_TreeFileAndFrameSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_TreeFileAndFrameSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::ivec2)*(Common::TreesNumber), m_TreeFileAndFrameIndex, GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::ivec2)*(m_InstanceTreeNumber), m_TreeFileAndFrameIndex, GL_DYNAMIC_DRAW);
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_SSBO_Binding_Point_Index[2], m_TreeFileAndFrameSSBO);
 }
@@ -548,7 +540,7 @@ void CSence::setSSBO4UDeformationAndIndex(CShader& vShader)
 
 	glGenBuffers(1, &m_UdeformationSSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_UdeformationSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(m_AssimpVerticesNumber*Common::TreesNumber), m_DeformationU, GL_DYNAMIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(m_AssimpVerticesNumber*m_InstanceTreeNumber), m_DeformationU, GL_DYNAMIC_DRAW);
 	GLuint deltassbo_binding_point_index = 2;
 	//点和SSBO的连接
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, deltassbo_binding_point_index, m_UdeformationSSBO);
@@ -563,7 +555,7 @@ void CSence::setSSBO4UDeformationAndIndex(CShader& vShader)
 
 	glGenBuffers(1, &m_TreeFileAndFrameSSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_TreeFileAndFrameSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::ivec2)*(Common::TreesNumber), m_TreeFileAndFrameIndex, GL_DYNAMIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::ivec2)*(m_InstanceTreeNumber), m_TreeFileAndFrameIndex, GL_DYNAMIC_DRAW);
 	GLuint file_frame_ssbo_binding_point_index = 3;
 	//点和SSBO的连接
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, file_frame_ssbo_binding_point_index, m_TreeFileAndFrameSSBO);
@@ -606,13 +598,13 @@ void CSence::setSSBOUdeformationAndIndx4ShadowMapShader(const CShader& vShader)
 
 void CSence::UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int, int>>& vTreeFileAndFrameIndex)
 {
-	for (int i = 0; i < Common::TreesNumber; i++)
+	for (int i = 0; i < m_InstanceTreeNumber; i++)
 	{
 		m_TreeFileAndFrameIndex[i] = glm::ivec2(vTreeFileAndFrameIndex[i].first, vTreeFileAndFrameIndex[i].second);
 	}
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_TreeFileAndFrameSSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_TreeFileAndFrameSSBO);
-	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::ivec2)*(Common::TreesNumber), m_TreeFileAndFrameIndex);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::ivec2)*(m_InstanceTreeNumber), m_TreeFileAndFrameIndex);
    // glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 }
@@ -620,6 +612,6 @@ void CSence::UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int, int>>& v
 void CSence::resetSSBO4UDeformation()
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_UdeformationSSBO);
-	m_DeformationU = new glm::vec4[Common::TreesNumber*m_AssimpVerticesNumber];
-	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*(m_AssimpVerticesNumber*Common::TreesNumber), m_DeformationU);
+	m_DeformationU = new glm::vec4[m_InstanceTreeNumber*m_AssimpVerticesNumber];
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4)*(m_AssimpVerticesNumber*m_InstanceTreeNumber), m_DeformationU);
 }

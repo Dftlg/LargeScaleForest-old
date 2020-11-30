@@ -36,6 +36,7 @@ public:
 	void SetParaMesh();
 	void setGroupsIndex(CVegaFemFactory& vfemFactoryObject);
 	void setVerticesNumber(CVegaFemFactory& vfemFactoryObject);
+    void setTreeNumber(const int vInstanceTreeNumber);
 	void setAssimpVerticesNumber();
 	void initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber);
 	void setSSBO4UDeformationAndIndex(CShader& vShader);
@@ -54,7 +55,7 @@ public:
 	void setFileDirectiory(std::string vFileDirectory) { m_FileDirectory = vFileDirectory; }
 	int getAssimpVerticesNumber() { return m_AssimpVerticesNumber; }
 	void draw(const CShader& vShader);
-	void setMeshRotation(std::vector<float> &vRotations);
+	void setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations,int vTreesNumber);
     //void setMeshRotation();
     void setMeshRotationRelationWindFieldAndTreeDirection(std::vector<float> &vRotations);
     void specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrces);
@@ -112,4 +113,6 @@ private:
 
     std::vector<float> m_SetRotation;
     std::vector<Common::SForceDirection> m_Angles;
+    std::vector<std::pair<double, double>> m_TransFormations;
+    int m_InstanceTreeNumber;
 };

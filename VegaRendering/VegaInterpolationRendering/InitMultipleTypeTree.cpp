@@ -1,5 +1,21 @@
 #include "InitMultipleTypeTree.h"
 
+CInitMultipleTypeTree::CInitMultipleTypeTree(int vTreeTypeNumber, int vAllTreeNumbers)
+{
+    m_TreeTypeNumber = vTreeTypeNumber;
+    m_AllTreesNumber = vAllTreeNumbers;
+    m_MultipleExtraForces.resize(vTreeTypeNumber);
+    m_MultipleExtraDirections.resize(vTreeTypeNumber);
+    __GenerateTreesPosition();
+    m_EachTypeTreesPositonArray.push_back(0);
+    int Sum = 0;
+    for (int i = 0; i < vTreeTypeNumber; i++)
+    {
+        Sum += Common::TreesNumbers[i];
+        m_EachTypeTreesPositonArray.push_back(Sum);
+    }
+}
+
 void CInitMultipleTypeTree::InitVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex, int vTypeTreeRelatedFileNumber)
 {
     CVegaFemFactory* vFem=new CVegaFemFactory(vDirectoryName, vMutilVerticesBaseFile, vCorrectDeformationUVertexIndex);
@@ -36,12 +52,19 @@ void CInitMultipleTypeTree::InitSceneDepthShader(const char* vVertexPath, const 
 void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTreeTypeIndex)
 {
     CSence* ourModel=new CSence(vModelPath);
+
+    ourModel->setTreeNumber(m_MultipleEachTreeProductNumber[vTreeTypeIndex]);
     std::vector<float> SpecificRotation = m_MultipleTypeTree[vTreeTypeIndex].getMultipleRotationAngle();
-    ourModel->setMeshRotation(SpecificRotation);
+    std::vector<std::pair<double, double>> tempTransFormation;
+    for (int i = m_EachTypeTreesPositonArray[vTreeTypeIndex]; i < m_EachTypeTreesPositonArray[vTreeTypeIndex + 1]; i++)
+        tempTransFormation.push_back(m_AllTreesPosition[i]);
+    
+    ourModel->setMeshRotation(SpecificRotation, tempTransFormation,Common::TreesNumbers[vTreeTypeIndex]);
 
     ourModel->setGroupsIndex(*(m_MultipleTypeFem[vTreeTypeIndex]));
     ourModel->setVerticesNumber(*(m_MultipleTypeFem[vTreeTypeIndex]));
     ourModel->setMeshGroupAndAssimpIndex();
+   
     ourModel->initSSBODeformationDeltaU(*(m_MultipleTypeFem[vTreeTypeIndex]), m_MultipleEachTreeRelatedFileNumber[vTreeTypeIndex]);
     ourModel->initSSBODeformationU();
     ourModel->initSSBOTreeFileAndFrameIndex(m_MultipleEachTreeProductNumber[vTreeTypeIndex]);

@@ -66,7 +66,7 @@ std::vector<std::pair<double,double>> RandomTreePositionGenerate(int vTreeNumber
 		std::pair<int, int> temppair(rand() % vTreeNumber, rand() % vTreeNumber);
 		tempTreePosition.push_back(temppair);
 
-		std::sort(tempTreePosition.begin(), tempTreePosition.end());
+		//std::sort(tempTreePosition.begin(), tempTreePosition.end());
 		tempTreePosition.erase(std::unique(tempTreePosition.begin(), tempTreePosition.end()), tempTreePosition.end());
 	}
 	for (auto i = 0; i < tempTreePosition.size(); i++)
