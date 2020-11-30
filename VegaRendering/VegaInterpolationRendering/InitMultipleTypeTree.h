@@ -35,13 +35,23 @@ public:
     void InitScenceShaderData(int vTreeTypeIndex);
     ~CInitMultipleTypeTree()=default;
 
-    CVegaFemFactory* getFemFactory(int vTreeTypeIndex) { return m_MultipleTypeFem[vTreeTypeIndex]; };
-    CSence * getTreeModel(int vTreeTypeIndex) { return &m_MultipleTreeModel[vTreeTypeIndex]; };
-    std::vector<std::vector<int>> * getExtraForces(int vTreeTypeIndex) { return &m_MultipleExtraForces[vTreeTypeIndex]; };
-    std::vector<std::vector<Common::SForceDirection>> * getExtraDirection(int vTreeTypeIndex) { return &m_MultipleExtraDirections[vTreeTypeIndex]; };
-    std::vector<int> *getTreesNumberSubjected2SameWind(int vTreeTypeIndex) { return &m_MultipleTreesNumberSubjected2SameWind[vTreeTypeIndex]; };
-    CShader * getScenceShadowShader(int vTreeTypeIndex) { return &m_MultipleSceneShadowShader[vTreeTypeIndex]; };
-    CShader * getScenceDepthShader(int vTreeTypeIndex) { return &m_MultipleSceneDepthShader[vTreeTypeIndex]; };
+    std::vector<CVegaFemFactory*> * getFemFactory() { return &m_MultipleTypeFem; };
+    std::vector<CSence*> * getTreeModel() { return &m_MultipleTreeModel; };
+    std::vector<std::vector<std::vector<int>>> * getExtraForces() { return &m_MultipleExtraForces; };
+    std::vector<std::vector<std::vector<Common::SForceDirection>>> * getExtraDirection() { return &m_MultipleExtraDirections; };
+    std::vector<std::vector<int>> *getTreesNumberSubjected2SameWind() { return &m_MultipleTreesNumberSubjected2SameWind; };
+    std::vector<CShader*> * getScenceShadowShader() { return &m_MultipleSceneShadowShader; };
+    std::vector<CShader*> * getScenceDepthShader() { return &m_MultipleSceneDepthShader; };
+
+    CVegaFemFactory* getSpecificFemFactory(int vTreeTypeIndex) { return m_MultipleTypeFem[vTreeTypeIndex]; };
+    CSence * getSpecificTreeModel(int vTreeTypeIndex) { return m_MultipleTreeModel[vTreeTypeIndex]; };
+    std::vector<std::vector<int>> * getSpecificExtraForces(int vTreeTypeIndex) { return &m_MultipleExtraForces[vTreeTypeIndex]; };
+    std::vector<std::vector<Common::SForceDirection>> * getSpecificExtraDirection(int vTreeTypeIndex) { return &m_MultipleExtraDirections[vTreeTypeIndex]; };
+    std::vector<int> *getSpecificTreesNumberSubjected2SameWind(int vTreeTypeIndex) { return &m_MultipleTreesNumberSubjected2SameWind[vTreeTypeIndex]; };
+    CShader * getSpecificScenceShadowShader(int vTreeTypeIndex) { return m_MultipleSceneShadowShader[vTreeTypeIndex]; };
+    CShader * getSpecificScenceDepthShader(int vTreeTypeIndex) { return m_MultipleSceneDepthShader[vTreeTypeIndex]; };
+
+    std::vector<int> getTreeTypeIndex() { return m_TreeTypeIndex; };
 
 private:
     void __LoadFemData();
@@ -51,14 +61,16 @@ private:
     std::vector<CLoadWindAndTreeConfig> m_MultipleTypeTree;
     std::vector<int> m_MultipleEachTreeRelatedFileNumber;
     std::vector<int> m_MultipleEachTreeProductNumber;
-    std::vector<CShader> m_MultipleSceneShadowShader;
-    std::vector<CShader> m_MultipleSceneDepthShader;
-    std::vector<CSence> m_MultipleTreeModel;
+    std::vector<CShader*> m_MultipleSceneShadowShader;
+    std::vector<CShader*> m_MultipleSceneDepthShader;
+    std::vector<CSence *> m_MultipleTreeModel;
 
     //第一个std::vector表示某棵树，第二个vector表示该棵树共有多少中不同的形变，第三个vector表示某一形变收到的外力
     std::vector<std::vector<std::vector<int>>> m_MultipleExtraForces;
     std::vector<std::vector<std::vector<Common::SForceDirection>>> m_MultipleExtraDirections;
     std::vector<std::vector<int>> m_MultipleTreesNumberSubjected2SameWind;
+
+    std::vector<int> m_TreeTypeIndex;
 
     //ShadowCubePara
     float m_vNearPlane;

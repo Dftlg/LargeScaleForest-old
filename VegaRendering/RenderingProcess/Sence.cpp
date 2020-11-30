@@ -448,7 +448,6 @@ void CSence::initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber)
 				count++;
 			}
 		}
-	std::cout<<"glm::vec4" << sizeof(glm::vec4) << std::endl;
 	std::cout<<"counter" << count << std::endl;
 }
 
@@ -463,14 +462,17 @@ void CSence::initSSBOTreeFileAndFrameIndex(const int vTreeNumber)
 	m_TreeFileAndFrameIndex = new glm::ivec2[vTreeNumber];
 }
 
-void CSence::setSSBO4UDeformationAndIndex(const CShader& vShader)
+void CSence::setSSBO4UDeformationAndIndex(CShader& vShader)
 {
 	//设置所有DeltaU数据
+    vShader.use();
 	GLuint shader_index = glGetProgramResourceIndex(vShader.getID(), GL_SHADER_STORAGE_BLOCK, "DeltaDeformationArray");
 	GLint SSBOBinding = 0, BlockDataSize = 0;
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding);
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize);
 
+    std::cout << "setSSBO4UDeformationAndIndex" << std::endl;
+    std::cout << "ShaderId" << vShader.getID() << std::endl;
 	std::cout << m_FrameNums * m_VertexNums*m_FileNumber << std::endl;
 	//初始化SSBO
 	glGenBuffers(1, &m_DeltaUSSBO);
@@ -513,7 +515,7 @@ void CSence::setSSBO4UDeformationAndIndex(const CShader& vShader)
 	//点和SSBO的连接
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, file_frame_ssbo_binding_point_index, m_TreeFileAndFrameSSBO);
 	//点和shader的连接
-	glShaderStorageBlockBinding(vShader.getID(), shader_file_frame_index, file_frame_ssbo_binding_point_index);
+	//glShaderStorageBlockBinding(vShader.getID(), shader_file_frame_index, file_frame_ssbo_binding_point_index);
 	
 }
 
@@ -556,7 +558,11 @@ void CSence::UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int, int>>& v
 		m_TreeFileAndFrameIndex[i] = glm::ivec2(vTreeFileAndFrameIndex[i].first, vTreeFileAndFrameIndex[i].second);
 	}
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_TreeFileAndFrameSSBO);
+   /* glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_DeltaUSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_UdeformationSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_TreeFileAndFrameSSBO);*/
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::ivec2)*(Common::TreesNumber), m_TreeFileAndFrameIndex);
+   // glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 }
 

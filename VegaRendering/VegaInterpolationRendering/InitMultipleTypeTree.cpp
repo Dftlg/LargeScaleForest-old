@@ -24,29 +24,30 @@ void CInitMultipleTypeTree::InitWindAndTree(int vTreeNumber, const std::string &
 
 void CInitMultipleTypeTree::InitSceneShadowShader(const char* vVertexPath, const char* vFragmentPath)
 {
-    CShader ourSceneShadowShader(vVertexPath, vFragmentPath);
+    CShader * ourSceneShadowShader=new CShader (vVertexPath, vFragmentPath);
     m_MultipleSceneShadowShader.push_back(ourSceneShadowShader);
 }
 void CInitMultipleTypeTree::InitSceneDepthShader(const char* vVertexPath, const char* vFragmentPath, const char* vGeometryPath)
 {
-    CShader ourSceneDepthShader(vVertexPath, vFragmentPath, vGeometryPath);
+    CShader * ourSceneDepthShader=new CShader(vVertexPath, vFragmentPath, vGeometryPath);
     m_MultipleSceneDepthShader.push_back(ourSceneDepthShader);
 }
 
 void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTreeTypeIndex)
 {
-    CSence ourModel(vModelPath);
+    CSence* ourModel=new CSence(vModelPath);
     std::vector<float> SpecificRotation = m_MultipleTypeTree[vTreeTypeIndex].getMultipleRotationAngle();
-    ourModel.setMeshRotation(SpecificRotation);
+    ourModel->setMeshRotation(SpecificRotation);
 
-    ourModel.setGroupsIndex(*(m_MultipleTypeFem[vTreeTypeIndex]));
-    ourModel.setVerticesNumber(*(m_MultipleTypeFem[vTreeTypeIndex]));
-    ourModel.setMeshGroupAndAssimpIndex();
-    ourModel.initSSBODeformationDeltaU(*(m_MultipleTypeFem[vTreeTypeIndex]), m_MultipleEachTreeRelatedFileNumber[vTreeTypeIndex]);
-    ourModel.initSSBODeformationU();
-    ourModel.initSSBOTreeFileAndFrameIndex(m_MultipleEachTreeProductNumber[vTreeTypeIndex]);
-    ourModel.setSSBO4UDeformationAndIndex(m_MultipleSceneShadowShader[vTreeTypeIndex]);
-    ourModel.setSSBOUdeformationAndIndx4ShadowMapShader(m_MultipleSceneDepthShader[vTreeTypeIndex]);
+    ourModel->setGroupsIndex(*(m_MultipleTypeFem[vTreeTypeIndex]));
+    ourModel->setVerticesNumber(*(m_MultipleTypeFem[vTreeTypeIndex]));
+    ourModel->setMeshGroupAndAssimpIndex();
+    ourModel->initSSBODeformationDeltaU(*(m_MultipleTypeFem[vTreeTypeIndex]), m_MultipleEachTreeRelatedFileNumber[vTreeTypeIndex]);
+    ourModel->initSSBODeformationU();
+    ourModel->initSSBOTreeFileAndFrameIndex(m_MultipleEachTreeProductNumber[vTreeTypeIndex]);
+    ourModel->setSSBO4UDeformationAndIndex(*(m_MultipleSceneShadowShader[vTreeTypeIndex]));
+    //ourModel->setSSBOUdeformationAndIndx4ShadowMapShader(*(m_MultipleSceneDepthShader[vTreeTypeIndex]));
+    m_TreeTypeIndex.push_back(vTreeTypeIndex);
     m_MultipleTreeModel.push_back(ourModel);
 }
 
@@ -92,35 +93,39 @@ void CInitMultipleTypeTree::InitScenceShaderData(int vTreeTypeIndex)
     int frameNums = m_MultipleTypeFem[vTreeTypeIndex]->getFileFrames(0)->Frames.size();
     //obj model vertices
     int vertexNums = m_MultipleTypeFem[vTreeTypeIndex]->getFileFrames(0)->Frames[0].BaseFileDeformations.size();
-    m_MultipleSceneDepthShader[vTreeTypeIndex].use();
-    m_MultipleSceneDepthShader[vTreeTypeIndex].setInt("frameNums", frameNums);
-    m_MultipleSceneDepthShader[vTreeTypeIndex].setInt("vertexNums", vertexNums);
-    m_MultipleSceneDepthShader[vTreeTypeIndex].setInt("assimpvertexNums", m_MultipleTreeModel[vTreeTypeIndex].getAssimpVerticesNumber());
-    m_MultipleSceneShadowShader[vTreeTypeIndex].use();
-    m_MultipleSceneShadowShader[vTreeTypeIndex].setInt("frameNums", frameNums);
-    m_MultipleSceneShadowShader[vTreeTypeIndex].setInt("vertexNums", vertexNums);
-    m_MultipleSceneShadowShader[vTreeTypeIndex].setInt("assimpvertexNums", m_MultipleTreeModel[vTreeTypeIndex].getAssimpVerticesNumber());
+    std::cout <<"vertexNums"<< vertexNums << std::endl;
+    m_MultipleSceneDepthShader[vTreeTypeIndex]->use();
+    m_MultipleSceneDepthShader[vTreeTypeIndex]->setInt("frameNums", frameNums);
+    m_MultipleSceneDepthShader[vTreeTypeIndex]->setInt("vertexNums", vertexNums);
+    m_MultipleSceneDepthShader[vTreeTypeIndex]->setInt("assimpvertexNums", m_MultipleTreeModel[vTreeTypeIndex]->getAssimpVerticesNumber());
+    std::cout << "SceneDepth AssimpVerticesvertexNums" << m_MultipleTreeModel[vTreeTypeIndex]->getAssimpVerticesNumber() << std::endl;
+
+    m_MultipleSceneShadowShader[vTreeTypeIndex]->use();
+    m_MultipleSceneShadowShader[vTreeTypeIndex]->setInt("frameNums", frameNums);
+    m_MultipleSceneShadowShader[vTreeTypeIndex]->setInt("vertexNums", vertexNums);
+    m_MultipleSceneShadowShader[vTreeTypeIndex]->setInt("assimpvertexNums", m_MultipleTreeModel[vTreeTypeIndex]->getAssimpVerticesNumber());
+    std::cout << "Scene AssimpVerticesvertexNums" << m_MultipleTreeModel[vTreeTypeIndex]->getAssimpVerticesNumber() << std::endl;
 
     //create depth cubemap transformation matrices and some value
-    m_MultipleSceneDepthShader[vTreeTypeIndex].use();
-    m_MultipleSceneDepthShader[vTreeTypeIndex].setFloat("far_plane", m_vFarPlane);
-    m_MultipleSceneDepthShader[vTreeTypeIndex].setVec3("lightPos", m_LightVertice);
+    m_MultipleSceneDepthShader[vTreeTypeIndex]->use();
+    m_MultipleSceneDepthShader[vTreeTypeIndex]->setFloat("far_plane", m_vFarPlane);
+    m_MultipleSceneDepthShader[vTreeTypeIndex]->setVec3("lightPos", m_LightVertice);
     for (unsigned int i = 0; i < 6; ++i)
     {
-        m_MultipleSceneDepthShader[vTreeTypeIndex].setMat4("shadowMatrices[" + std::to_string(i) + "]", m_ShadowTransforms[i]);
+        m_MultipleSceneDepthShader[vTreeTypeIndex]->setMat4("shadowMatrices[" + std::to_string(i) + "]", m_ShadowTransforms[i]);
     }
 
     //set light to fragment
-    m_MultipleSceneShadowShader[vTreeTypeIndex].use();
+    m_MultipleSceneShadowShader[vTreeTypeIndex]->use();
     for (unsigned int i = 0; i < sizeof(m_lightVertices) / sizeof(m_lightVertices[0]); ++i)
     {
         glm::vec3 newPos = m_lightVertices[i];
-        m_MultipleSceneShadowShader[vTreeTypeIndex].setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-        m_MultipleSceneShadowShader[vTreeTypeIndex].setVec3("lightColors[" + std::to_string(i) + "]", m_lightColors[i]);
+        m_MultipleSceneShadowShader[vTreeTypeIndex]->setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+        m_MultipleSceneShadowShader[vTreeTypeIndex]->setVec3("lightColors[" + std::to_string(i) + "]", m_lightColors[i]);
     }
-    m_MultipleSceneShadowShader[vTreeTypeIndex].setFloat("metallic", 0.04);
-    m_MultipleSceneShadowShader[vTreeTypeIndex].setFloat("roughness", 0.8);
-    m_MultipleSceneShadowShader[vTreeTypeIndex].setFloat("ao", 1.0f);
-    m_MultipleSceneShadowShader[vTreeTypeIndex].setInt("depthMap", 8);
-    m_MultipleSceneShadowShader[vTreeTypeIndex].setFloat("far_plane", m_vFarPlane);
+    m_MultipleSceneShadowShader[vTreeTypeIndex]->setFloat("metallic", 0.04);
+    m_MultipleSceneShadowShader[vTreeTypeIndex]->setFloat("roughness", 0.8);
+    m_MultipleSceneShadowShader[vTreeTypeIndex]->setFloat("ao", 1.0f);
+    m_MultipleSceneShadowShader[vTreeTypeIndex]->setInt("depthMap", 8);
+    m_MultipleSceneShadowShader[vTreeTypeIndex]->setFloat("far_plane", m_vFarPlane);
 }

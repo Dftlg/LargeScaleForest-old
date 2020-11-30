@@ -38,7 +38,7 @@ public:
 	void setVerticesNumber(CVegaFemFactory& vfemFactoryObject);
 	void setAssimpVerticesNumber();
 	void initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber);
-	void setSSBO4UDeformationAndIndex(const CShader& vShader);
+	void setSSBO4UDeformationAndIndex(CShader& vShader);
 	void initSSBODeformationU();
 	void initSSBOTreeFileAndFrameIndex(const int vTreeNumber);
 	void resetSSBO4UDeformation();

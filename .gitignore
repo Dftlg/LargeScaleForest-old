@@ -292,3 +292,8 @@ __pycache__/
 /models/8.10/test4/positionthe0phi0force130,1,0,0.spDemn
 *.spDemn
 /models/秋天黄叶/3d模型素材免费下载.url
+/VegaRendering/VegaInterpolationRendering/test_scene_shadows.vert
+/VegaRendering/VegaInterpolationRendering/test_scene_shadows.frag
+/VegaRendering/VegaInterpolationRendering/test_point_shadows_depth.vert
+/VegaRendering/VegaInterpolationRendering/test_point_shadows_depth.gs
+/VegaRendering/VegaInterpolationRendering/test_point_shadows_depth.frag
