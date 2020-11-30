@@ -45,7 +45,8 @@ void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTre
     ourModel->initSSBODeformationDeltaU(*(m_MultipleTypeFem[vTreeTypeIndex]), m_MultipleEachTreeRelatedFileNumber[vTreeTypeIndex]);
     ourModel->initSSBODeformationU();
     ourModel->initSSBOTreeFileAndFrameIndex(m_MultipleEachTreeProductNumber[vTreeTypeIndex]);
-    ourModel->setSSBO4UDeformationAndIndex(*(m_MultipleSceneShadowShader[vTreeTypeIndex]));
+    ourModel->setSSBO4GenBufferUDeformationAndIndex(*(m_MultipleSceneShadowShader[vTreeTypeIndex]), vTreeTypeIndex);
+   // ourModel->setSSBO4UDeformationAndIndex(*(m_MultipleSceneShadowShader[vTreeTypeIndex]));
     //ourModel->setSSBOUdeformationAndIndx4ShadowMapShader(*(m_MultipleSceneDepthShader[vTreeTypeIndex]));
     m_TreeTypeIndex.push_back(vTreeTypeIndex);
     m_MultipleTreeModel.push_back(ourModel);

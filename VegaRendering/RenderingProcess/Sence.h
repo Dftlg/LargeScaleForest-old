@@ -39,9 +39,12 @@ public:
 	void setAssimpVerticesNumber();
 	void initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber);
 	void setSSBO4UDeformationAndIndex(CShader& vShader);
+    void setSSBO4GenBufferUDeformationAndIndex(CShader& vShader,const int vTreeTypeIndex);
 	void initSSBODeformationU();
 	void initSSBOTreeFileAndFrameIndex(const int vTreeNumber);
 	void resetSSBO4UDeformation();
+
+    void UpdataSSBOBindingPointIndex();
 
 	void setSSBOUdeformationAndIndx4ShadowMapShader(const CShader& vShader);
 
@@ -96,6 +99,8 @@ private:
 	unsigned int m_DeltaUSSBO;
 	unsigned int m_UdeformationSSBO;
 	unsigned int m_TreeFileAndFrameSSBO;
+
+    std::vector<GLuint> m_SSBO_Binding_Point_Index;
 
 	int m_FrameNums;
 	int m_VertexNums;

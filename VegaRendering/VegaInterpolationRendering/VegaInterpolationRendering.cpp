@@ -120,72 +120,6 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 	}
 }
 
-//void InsertSearchTreeFrameIndex(std::vector<CVegaFemFactory*> &vVFF, std::vector<CSence> &vSence, std::vector<std::vector<std::vector<int>>>& vMultipleExtraForces, std::vector<std::vector<std::vector<Common::SForceDirection>>> & vWindDirection, std::vector<std::vector<int>>& vTreesNumberSubjected2SameWind, std::vector<int> & vTreeTypeIndex)
-//{
-//    while (true)
-//    {
-//        //当前12个帧段进行一次重置获取5个帧段号索引
-//        /*if (SearchFrameNumber %Size==0)
-//        {
-//            std::cout << "search reset" << std::endl;
-//            vVFF.resetTempMultipleTreeData(vMultipleExtraForces.size());
-//            SearchFrameStep = 0;
-//        }*/
-//        if (SearchFrameNumber % 5 == 0)
-//        {
-//           /* for (int i = 0; i < 2; i++)
-//            {
-//
-//            }*/
-//            //每5个力计算一次匹配的5帧
-//            for (auto TreeType = 0;TreeType < Common::TreesTypeNumber;TreeType++)
-//            {
-//                std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces[TreeType].size());
-//                std::vector<std::vector<Common::SForceDirection>> tempMultipleFiveWindDirection(vMultipleExtraForces[TreeType].size());
-//                for (int i = 0; i < vMultipleExtraForces.size(); i++)
-//                {
-//                    for (int k = (SearchFrameStep) * 5; k < (SearchFrameStep + 1) * 5; k++)
-//                    {
-//                        //int t=vMultipleExtraForces[i][k];
-//                        tempMultipleFiveForces[i].push_back(vMultipleExtraForces[TreeType][i][k]);
-//                        tempMultipleFiveWindDirection[i].push_back(vWindDirection[TreeType][i][k]);
-//                    }
-//                }
-//                vVFF[TreeType]->searchMatchedFrameSequences(tempMultipleFiveForces, tempMultipleFiveWindDirection);
-//                tempMultipleFiveForces.clear();
-//                tempMultipleFiveWindDirection.clear();
-//                SearchFrameStep++;
-//            }
-//            //std::vector<std::vector<int>> temp = vFem[].getMultipleFramesIndex();
-//        }
-//
-//        //在这里将重复的搜索数组复制多变
-//        for (auto TreeType = 0; TreeType < Common::TreesTypeNumber; TreeType++)
-//        {
-//            std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
-//
-//            std::cout << "TreeIndex" << TreeType << ": ";
-//            for (int DifferentTreeNumber = 0; DifferentTreeNumber < vTreesNumberSubjected2SameWind[TreeType].size(); DifferentTreeNumber++)
-//            {
-//                std::pair<int, int> tempOneTreeFileAndFrameIndex = vVFF[TreeType]->getFileAndFrameIndex(DifferentTreeNumber, SearchFrameNumber % 5);
-//                std::cout << tempOneTreeFileAndFrameIndex.first << "--" << tempOneTreeFileAndFrameIndex.second << "||";
-//
-//                for (int k = 0; k < vTreesNumberSubjected2SameWind[TreeType][DifferentTreeNumber]; k++)
-//                {
-//                    tempTreeFileAndFrameIndex.push_back(tempOneTreeFileAndFrameIndex);
-//                }
-//            }
-//            std::cout << std::endl;
-//
-//            SearchQueue[TreeType].Enqueue(tempTreeFileAndFrameIndex);
-//            
-//            tempTreeFileAndFrameIndex.clear();
-//        }
-//        std::cout << std::endl;
-//        SearchFrameNumber++;
-//    }
-//}
-
 int main()
 {
 
@@ -415,11 +349,11 @@ int main()
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
         MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
 
-        //MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 1);
-        //MultipleTypeTree.InitWindAndTree(Common::TreesNumber, "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
-        //MultipleTypeTree.InitSceneShadowShader("test_scene_shadows.vert", "test_scene_shadows.frag");
-        //MultipleTypeTree.InitSceneDepthShader("test_point_shadows_depth.vert", "test_point_shadows_depth.frag", "test_point_shadows_depth.gs");
-        //MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 1);
+        MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 1);
+        MultipleTypeTree.InitWindAndTree(Common::TreesNumber, "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
+        MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
+        MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+        MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 1);
         //MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 0);
         
         for (int i = 0; i < Common::TreesTypeNumber; i++)
@@ -437,7 +371,7 @@ int main()
 	//开启线程进行读取Tree索引
 	/*boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getFemFactory()), *(MultipleTypeTree.getTreeModel()), *(MultipleTypeTree.getExtraForces()), *(MultipleTypeTree.getExtraDirection()), *(MultipleTypeTree.getTreesNumberSubjected2SameWind()),MultipleTypeTree.getTreeTypeIndex());*/
      boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(0)), *(MultipleTypeTree.getSpecificTreeModel(0)), *(MultipleTypeTree.getSpecificExtraForces(0)), *(MultipleTypeTree.getSpecificExtraDirection(0)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(0)), 0);
-    //boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
+    boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
     //boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getFemFactory(1)), *(MultipleTypeTree.getTreeModel(1)), *(MultipleTypeTree.getExtraForces(1)), *(MultipleTypeTree.getExtraDirection(1)), *(MultipleTypeTree.getTreesNumberSubjected2SameWind(1)), 1);
 
 	glm::mat4 model = glm::mat4(1.0f);
@@ -467,21 +401,12 @@ int main()
 			std::cout << "Reset" << std::endl;
 		}*/
 		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
-        ////////////////////////////更改此处
-        /*bool Success = SearchQueue[1].TryDequeue(tempTreeFileAndFrameIndex);
-        MultipleTypeTree.getTreeModel(1)->UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
-        tempTreeFileAndFrameIndex.clear();*/
 
         for (int i = 0; i < Common::TreesTypeNumber; i++)
         {
             bool Success = SearchQueue[i].TryDequeue(tempTreeFileAndFrameIndex);
 
             std::cout << tempTreeFileAndFrameIndex[i].first << "--" << tempTreeFileAndFrameIndex[i].second << "||";
-
-            if (FrameNumber == 34)
-            {
-                std::cout<<"thisnumber"<<std::endl;
-            }
 
             MultipleTypeTree.getSpecificTreeModel(i)->UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
             tempTreeFileAndFrameIndex.clear();
@@ -504,6 +429,7 @@ int main()
         renderTree(*(MultipleTypeTree.getScenceDepthShader(1)), *(MultipleTypeTree.getTreeModel(1)));*/
         for (int i = 0; i < Common::TreesTypeNumber; i++)
         {
+            MultipleTypeTree.getSpecificTreeModel(i)->UpdataSSBOBindingPointIndex();
             MultipleTypeTree.getSpecificScenceDepthShader(i)->use();
             MultipleTypeTree.getSpecificScenceDepthShader(i)->setInt("planeOrTree", 1);
             renderTree(*(MultipleTypeTree.getSpecificScenceDepthShader(i)), *(MultipleTypeTree.getSpecificTreeModel(i)));
@@ -513,29 +439,30 @@ int main()
        
 		
 		//2.render scene as normal 
-		//glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//////plane  
-  //      MultipleTypeTree.getSpecificScenceShadowShader(0)->use();
-  //      MultipleTypeTree.getSpecificScenceShadowShader(0)->setInt("shadows", shadows);
-		//glActiveTexture(GL_TEXTURE8);
-		//glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-  //      MultipleTypeTree.getSpecificScenceShadowShader(0)->setInt("planeOrTree", -1);
-		//renderPlane(*(MultipleTypeTree.getSpecificScenceShadowShader(0)), planeVAO, floorTexture, opacityTexture);
-		////tree
-  //     /* MultipleTypeTree.getScenceShadowShader(1)->use();
-  //      glActiveTexture(GL_TEXTURE8);
-  //      glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-  //      MultipleTypeTree.getScenceShadowShader(1)->setInt("planeOrTree", 1);
-  //      renderTree(*(MultipleTypeTree.getScenceShadowShader(1)), *(MultipleTypeTree.getTreeModel(1)));*/
-  //      for (int i = 0; i < Common::TreesTypeNumber; i++)
-  //      {
-  //          MultipleTypeTree.getSpecificScenceShadowShader(i)->use();
-  //          glActiveTexture(GL_TEXTURE8);
-  //          glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-  //          MultipleTypeTree.getSpecificScenceShadowShader(i)->setInt("planeOrTree", 1);
-  //          renderTree(*(MultipleTypeTree.getSpecificScenceShadowShader(i)), *(MultipleTypeTree.getSpecificTreeModel(i)));
-  //      }
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		////plane  
+        MultipleTypeTree.getSpecificScenceShadowShader(0)->use();
+        MultipleTypeTree.getSpecificScenceShadowShader(0)->setInt("shadows", shadows);
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+        MultipleTypeTree.getSpecificScenceShadowShader(0)->setInt("planeOrTree", -1);
+		renderPlane(*(MultipleTypeTree.getSpecificScenceShadowShader(0)), planeVAO, floorTexture, opacityTexture);
+		//tree
+       /* MultipleTypeTree.getScenceShadowShader(1)->use();
+        glActiveTexture(GL_TEXTURE8);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+        MultipleTypeTree.getScenceShadowShader(1)->setInt("planeOrTree", 1);
+        renderTree(*(MultipleTypeTree.getScenceShadowShader(1)), *(MultipleTypeTree.getTreeModel(1)));*/
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            MultipleTypeTree.getSpecificTreeModel(i)->UpdataSSBOBindingPointIndex();
+            MultipleTypeTree.getSpecificScenceShadowShader(i)->use();
+            glActiveTexture(GL_TEXTURE8);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+            MultipleTypeTree.getSpecificScenceShadowShader(i)->setInt("planeOrTree", 1);
+            renderTree(*(MultipleTypeTree.getSpecificScenceShadowShader(i)), *(MultipleTypeTree.getSpecificTreeModel(i)));
+        }
 
 
 		//skybox	

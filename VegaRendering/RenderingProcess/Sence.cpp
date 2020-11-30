@@ -462,6 +462,59 @@ void CSence::initSSBOTreeFileAndFrameIndex(const int vTreeNumber)
 	m_TreeFileAndFrameIndex = new glm::ivec2[vTreeNumber];
 }
 
+void CSence::setSSBO4GenBufferUDeformationAndIndex(CShader& vShader, const int vTreeTypeIndex)
+{
+    std::cout << "setSSBO4UDeformationAndIndex" << std::endl;
+    std::cout << "ShaderId" << vShader.getID() << std::endl;
+    std::cout << m_FrameNums * m_VertexNums*m_FileNumber << std::endl;
+
+    for (auto i = 0; i < 3; i++)
+        m_SSBO_Binding_Point_Index.push_back(3 * vTreeTypeIndex + i);
+
+    vShader.use();
+    //设置所有DeltaU数据
+    GLint SSBOBinding = 0, BlockDataSize = 0;
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding);
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize);
+
+    //初始化SSBO
+    glGenBuffers(1, &m_DeltaUSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_DeltaUSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(m_FrameNums*m_VertexNums*m_FileNumber), m_DeltaDeformationU, GL_STATIC_DRAW);
+
+    //SSBOBuffer connect bindingpoint
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_SSBO_Binding_Point_Index[0], m_DeltaUSSBO);
+
+    //设置DelataU用来存储生成树的当前型变量
+    GLint SSBOBindingfirst = 0, BlockDataSizefirst = 0;
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBindingfirst);
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSizefirst);
+
+    glGenBuffers(1, &m_UdeformationSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_UdeformationSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4)*(m_AssimpVerticesNumber*Common::TreesNumber), m_DeformationU, GL_DYNAMIC_DRAW);
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_SSBO_Binding_Point_Index[1], m_UdeformationSSBO);
+
+    //设置TreeFile和FrameIndex
+    GLint SSBOBinding2 = 0, BlockDataSize2 = 0;
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &SSBOBinding2);
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &BlockDataSize2);
+
+    glGenBuffers(1, &m_TreeFileAndFrameSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_TreeFileAndFrameSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::ivec2)*(Common::TreesNumber), m_TreeFileAndFrameIndex, GL_DYNAMIC_DRAW);
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_SSBO_Binding_Point_Index[2], m_TreeFileAndFrameSSBO);
+}
+
+void CSence::UpdataSSBOBindingPointIndex()
+{
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_DeltaUSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_UdeformationSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_TreeFileAndFrameSSBO);
+}
+
 void CSence::setSSBO4UDeformationAndIndex(CShader& vShader)
 {
 	//设置所有DeltaU数据
@@ -557,10 +610,8 @@ void CSence::UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int, int>>& v
 	{
 		m_TreeFileAndFrameIndex[i] = glm::ivec2(vTreeFileAndFrameIndex[i].first, vTreeFileAndFrameIndex[i].second);
 	}
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_TreeFileAndFrameSSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_TreeFileAndFrameSSBO);
-   /* glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_DeltaUSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_UdeformationSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_TreeFileAndFrameSSBO);*/
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::ivec2)*(Common::TreesNumber), m_TreeFileAndFrameIndex);
    // glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
