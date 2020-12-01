@@ -83,9 +83,11 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 		for (int treenumber = 0; treenumber < Common::TreesNumber; treenumber++)
 		{
 			tempTreeFileAndFrameIndex.push_back(vVFF.getFileAndFrameIndex(treenumber, SearchFrameNumber % 5));
-			//std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
+			if(SearchFrameNumber<500)
+				vVFF.writeFindFrameIndex2File("G:/GraduationProject/yellow_tree/xyz/FileAndFrameIndex.txt", tempTreeFileAndFrameIndex[treenumber]);
+			std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
 		}
-		//std::cout << std::endl;
+		std::cout << std::endl;
 		SearchQueue.Enqueue(tempTreeFileAndFrameIndex);
 		SearchFrameNumber++;
 		tempTreeFileAndFrameIndex.clear();
@@ -95,7 +97,7 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
 int main()
 {
 	CVegaFemFactory vFem("G:/GraduationProject/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt");
-	int numbercounter = 1;
+	int numbercounter = 6;
 	std::vector<double> b{ 1000,1,0,0 };
 	std::vector<std::pair<int, int>> angle;
 	for (int i = 0; i < numbercounter; i++)
@@ -103,13 +105,13 @@ int main()
 		angle.push_back(std::make_pair(0, i * 60));
 	}
 	//std::vector<Common::SFileFrames> vtemp = vFem.searchFileFramesOnAnimation(angle[i].first, angle[i].second, b);
-	//std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
+	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
 	for (int i = 0; i < numbercounter; i++)
 	{
-		std::vector<Common::SFileFrames> vtemp = vFem.searchFileFramesOnAnimation(angle[i].first, angle[i].second, b);
-		/*std::vector<Common::SFileFrames> temp;
-		temp.push_back(vtemp[i]);*/
-		vFem.readFramesDeformationData(vtemp, i);
+		//std::vector<Common::SFileFrames> vtemp = vFem.searchFileFramesOnAnimation(angle[i].first, angle[i].second, b);
+		std::vector<Common::SFileFrames> temp;
+		temp.push_back(vtemp[i]);
+		vFem.readFramesDeformationData(temp, i);
 	}
 
 #pragma region initialize and configure glfw
@@ -298,7 +300,7 @@ int main()
 	for (int i = 0; i < 1; i++)
 	{
 		treesWindDirection.push_back(Common::SWindDirecetion(0, 0));
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 600000));
+		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1150, 1, 0, 0, 600000));
 	}
 	/*for (int i = 0; i < 1; i++)
 	{

@@ -57,6 +57,18 @@ void CVegaFemFactory::write2File(const std::string & vPath, std::vector <std::pa
 	outFile.close();
 }
 
+void CVegaFemFactory::writeFindFrameIndex2File(const std::string & vPath, std::pair<int, int>& vTempTreeFileAndFrameIndex)
+{
+	std::ofstream outFile;
+	outFile.open(vPath, std::ios::in | std::ios::app);
+	if (!outFile)
+	{
+		std::cout << "Can't open the file!!!" << std::endl;
+		return;
+	}
+	outFile << vTempTreeFileAndFrameIndex.first << " " << vTempTreeFileAndFrameIndex.second << std::endl;
+}
+
 
 //对于搜索出的SFileFrames加载数据
 void CVegaFemFactory::readFramesDeformationData(std::vector<Common::SFileFrames>& vSearchFrames, int vSearchConnectionIndex)

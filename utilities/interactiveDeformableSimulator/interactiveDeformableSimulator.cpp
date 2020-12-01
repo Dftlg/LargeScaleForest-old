@@ -688,7 +688,7 @@ void idleFunction(void)
 	  //stem
 	  for (int i = 0; i < pullVertexInfo.StemPullVertexNum; i++)
 	  {
-		  camera->setWorldCoorinateSystemForce(pullVertexInfo.StemExtraForces[subTimestepCounter], 0, 120, externalForce);
+		  camera->setWorldCoorinateSystemForce(pullVertexInfo.StemExtraForces[subTimestepCounter], 0, 0, externalForce);
 		  std::copy(externalForce, externalForce + 3, vForce);
 		  for (int j = 0; j < 3; j++)
 		  {
@@ -788,7 +788,7 @@ void idleFunction(void)
       }
 	  subTimestepCounter++;
     }
-	if (subTimestepCounter > 180)
+	if (subTimestepCounter > 500)
 	{
 		exit(1);
 	}
@@ -1616,22 +1616,22 @@ void initSimulation()
   std::vector<double> tempConfig = GetForceConfigurate(outputFilename);
   //6172,6552,2768
   //1000
-  std::vector<int>pullVertexIndex = { 8198,6527 };
+  std::vector<int>pullVertexIndex = { 5828,6539,8117 };
   //std::vector<float>scale = { 1.0,0.8,0.08,0.05,-0.02,-0.05 };
   //600
   //std::vector<float>scale = { 1.0,0.8,0.05,0.03,-0.009,-0.03 };
   //3000
   std::vector<float>scale = { 1.0,1.0,1.0,0.01,-0.009,-0.009 };
-  StemExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
-  LeafExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
+  StemExtraForces = GenerateSamplingForce(18000, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 600);
+  LeafExtraForces = GenerateSamplingForce(18000, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 600);
   
-  pullVertexInfo.StemPullVertexNum = 2;
+  pullVertexInfo.StemPullVertexNum = 3;
   pullVertexInfo.PullVertexIndex = pullVertexIndex;
   pullVertexInfo.StemExtraForces = StemExtraForces;
   pullVertexInfo.LeafExtraForces = LeafExtraForces;
   pullVertexInfo.Scale = scale;
 
-  for (int i = 0; i < pullVertexInfo.StemExtraForces.size(); i++)
+  for (int i = 0; i < pullVertexInfo.StemPullVertexNum; i++)
   {
 	  constantpulledVertex[i] = pullVertexInfo.PullVertexIndex[i];
   }
@@ -2302,7 +2302,7 @@ int main(int argc, char* argv[])
 
   //configFilename = string("D:/GraduationProject/Vega/examples/simpleBridge_vox/simpleBridge_vox.config");
  /* configFilename = string("D:/GraduationProject/Vega/models/newgrass/voxelizegrass/voxelizegrass.config");*/
-  configFilename = string("../../models/apricot_tree/tree.config");
+  configFilename = string("../../models/yellow_tree/tree.config");
   printf("Loading scene configuration from %s.\n", configFilename.c_str());
 
   initConfigurations(); // parse the config file同时输出到cmd
