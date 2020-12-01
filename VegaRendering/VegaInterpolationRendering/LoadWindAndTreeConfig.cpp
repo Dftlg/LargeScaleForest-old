@@ -5,6 +5,7 @@ CLoadWindAndTreeConfig::CLoadWindAndTreeConfig(int vTreeNumber, const std::strin
     m_TreeNumber = vTreeNumber;
     readTreeParaConfig(vFilePath);
     productMultipleTreeWindPara();
+    __productEachFormNumberArray();
 }
 
 void CLoadWindAndTreeConfig::readTreeParaConfig(const std::string &vFilePath)
@@ -77,4 +78,14 @@ std::vector<Common::SForceDirection> CLoadWindAndTreeConfig::getTreeRotationAngl
         vectempForceDirection.push_back(tempForceDirection);
     }
     return vectempForceDirection;
+}
+
+void CLoadWindAndTreeConfig::__productEachFormNumberArray()
+{
+    int sum = 0;
+    for (int i = 0; i < m_EachTypeTreeNumber.size(); i++)
+    {
+        sum += m_EachTypeTreeNumber[i];
+        m_TypeOfTreeEachFormNumber.push_back(sum);
+    }
 }

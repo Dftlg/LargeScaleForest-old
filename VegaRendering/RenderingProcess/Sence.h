@@ -55,12 +55,14 @@ public:
 	void setFileDirectiory(std::string vFileDirectory) { m_FileDirectory = vFileDirectory; }
 	int getAssimpVerticesNumber() { return m_AssimpVerticesNumber; }
 	void draw(const CShader& vShader);
-	void setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations,int vTreesNumber);
+	void setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations,float vScaleNumber,int vTreesNumber);
     //void setMeshRotation();
+    void setScaleMesh(float vScale, glm::mat4 * vmodelMatrices);
     void setMeshRotationRelationWindFieldAndTreeDirection(std::vector<float> &vRotations);
     void specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrces);
     glm::mat4* translateTreePosition();
-	void randomRotation(glm::mat4* vmodelMatrces);
+    void randomScaleMesh(glm::mat4 * vmodelMatrices);
+	void randomRotation(glm::mat4* vmodelMatrices);
 	void setMeshGroupAndAssimpIndex();
 
     std::vector<Common::SForceDirection> getAngles() { return m_Angles; };

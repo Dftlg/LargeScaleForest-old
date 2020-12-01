@@ -59,7 +59,7 @@ void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTre
     for (int i = m_EachTypeTreesPositonArray[vTreeTypeIndex]; i < m_EachTypeTreesPositonArray[vTreeTypeIndex + 1]; i++)
         tempTransFormation.push_back(m_AllTreesPosition[i]);
     
-    ourModel->setMeshRotation(SpecificRotation, tempTransFormation,Common::TreesNumbers[vTreeTypeIndex]);
+    ourModel->setMeshRotation(SpecificRotation, tempTransFormation,Common::ScaleTree[vTreeTypeIndex],Common::TreesNumbers[vTreeTypeIndex]);
 
     ourModel->setGroupsIndex(*(m_MultipleTypeFem[vTreeTypeIndex]));
     ourModel->setVerticesNumber(*(m_MultipleTypeFem[vTreeTypeIndex]));

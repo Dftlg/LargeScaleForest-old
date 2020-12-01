@@ -16,7 +16,7 @@ void CSence::draw(const CShader& vShader)
 
 }
 
-void CSence::setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations, int vTreesNumber)
+void CSence::setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations, float vScaleNumber, int vTreesNumber)
 {
     m_InstanceTreeNumber = vTreesNumber;
     m_TransFormations = vTransFormations;
@@ -24,7 +24,7 @@ void CSence::setMeshRotation(std::vector<float> &vRotations, std::vector<std::pa
     m_SetRotation = vRotations;
     specificTreeRotation(m_SetRotation, temp);
     //randomRotation(temp);
-
+    setScaleMesh(vScaleNumber, temp);
 	for (auto& Mesh : m_Meshes)
 	{
 		Mesh.setRotation(temp,m_InstanceTreeNumber);
@@ -41,17 +41,30 @@ void CSence::setMeshRotation(std::vector<float> &vRotations, std::vector<std::pa
 //    }
 //}
 //
-void CSence::specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrces)
+void CSence::setScaleMesh(float vScale, glm::mat4 * vmodelMatrices)
 {
-    glm::mat4* modelMatrices = new glm::mat4[m_InstanceTreeNumber];
     for (int i = 0; i < m_InstanceTreeNumber; i++)
     {
-        //tempRandom = -120;
-        //tempRandom = 0;
-        //m_Angles.push_back(Common::SForceDirection(0, tempRandom));
+        vmodelMatrices[i] = glm::scale(vmodelMatrices[i], glm::vec3(vScale, vScale, vScale));
+    }
+}
 
+void CSence::randomScaleMesh(glm::mat4 * vmodelMatrices)
+{
+    for (int i = 0; i < m_InstanceTreeNumber; i++)
+    {
+        glm::vec3 tempScale = GenerateRamdomScale();
+        vmodelMatrices[i] = glm::scale(vmodelMatrices[i], tempScale);
+    } 
+}
+
+
+void CSence::specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrices)
+{
+    for (int i = 0; i < m_InstanceTreeNumber; i++)
+    {
         m_Angles.push_back(Common::SForceDirection(0, vRotations[i]));
-        vmodelMatrces[i] = glm::rotate(vmodelMatrces[i], glm::radians(vRotations[i]), glm::vec3(0.0, 1.0, 0.0));
+        vmodelMatrices[i] = glm::rotate(vmodelMatrices[i], glm::radians(vRotations[i]), glm::vec3(0.0, 1.0, 0.0));
     }
 }
 
@@ -63,13 +76,13 @@ glm::mat4* CSence::translateTreePosition()
     {
         glm::mat4 model = glm::mat4(1.0f);
         //model = glm::translate(model, glm::vec3(translate[i], -0.5f,0));
-        model = glm::translate(model, glm::vec3((m_TransFormations[i].first - m_InstanceTreeNumber / 2)*0.75, -0.5f, (m_TransFormations[i].second - m_InstanceTreeNumber / 2)*0.75));
+        model = glm::translate(model, glm::vec3((m_TransFormations[i].first - Common::AllTreesNumber / 2)*0.5, -0.5f, (m_TransFormations[i].second - Common::AllTreesNumber / 2)*0.5));
         modelMatrices[i] = model;
     }
     return modelMatrices;
 }
 
-void CSence::randomRotation(glm::mat4* vmodelMatrces)
+void CSence::randomRotation(glm::mat4* vmodelMatrices)
 {
 	//生成一个Common::TreesNumber*Common::TreesNumber大小的网格，在网格内产生树的位置，并在一个网格上继续增加随机位置
 	for (int i = 0; i < m_InstanceTreeNumber; i++)
@@ -77,10 +90,10 @@ void CSence::randomRotation(glm::mat4* vmodelMatrces)
 		srand(time(0));
         //因与搜索的风场与树角度有关，最好给定数据集，否则有可能产生搜索不到数据的情况
 		float tempRandom = (float)RandomGenerate();
-        vmodelMatrces[i] = glm::rotate(vmodelMatrces[i], glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
-		//glm::vec3 tempScale = GenerateRamdomScale();
-        //vmodelMatrces[i] = glm::scale(model, vmodelMatrces[i]);
-		//model = glm::scale(model, tempScale);
+        vmodelMatrices[i] = glm::rotate(vmodelMatrices[i], glm::radians(tempRandom), glm::vec3(0.0, 1.0, 0.0));
+		/*glm::vec3 tempScale = GenerateRamdomScale();
+        vmodelMatrces[i] = glm::scale(model, vmodelMatrces[i]);
+		model = glm::scale(model, tempScale);*/
 	}
 }
 

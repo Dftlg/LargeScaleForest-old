@@ -58,6 +58,8 @@ float grasstime = 0.0f;
 
 SynchronisedQueue<std::vector<std::pair<int, int>>> SearchQueue[Common::TreesTypeNumber];
 
+std::vector<std::vector<int>> EachFormNumberArray;
+
 int i = 0;
 int Size = 0;
 int FrameNumber = 0;
@@ -352,13 +354,13 @@ int main()
         CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, ALLTreeNumber);
 
         MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
-        MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 1);
+        MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 5);
         MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
         MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
         MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
 
-        MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 1);
+        MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 3);
         MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[1], "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
         MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
@@ -373,7 +375,10 @@ int main()
         }
         
 	#pragma endregion
-
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            EachFormNumberArray.push_back(MultipleTypeTree.getSpecificLoadWindAndTree(i).getEachFormNumberArray());
+        }
 
 
 
@@ -415,8 +420,12 @@ int main()
         {
             bool Success = SearchQueue[i].TryDequeue(tempTreeFileAndFrameIndex);
 
-            std::cout << tempTreeFileAndFrameIndex[i].first << "--" << tempTreeFileAndFrameIndex[i].second << "||";
-
+            std::cout << "[";
+            for (int k = 0; k < EachFormNumberArray[i].size(); k++)
+            {
+                std::cout << tempTreeFileAndFrameIndex[EachFormNumberArray[i][k]-1].first << "--" << tempTreeFileAndFrameIndex[EachFormNumberArray[i][k]-1].second << "||";
+            }
+            std::cout << "]";
             MultipleTypeTree.getSpecificTreeModel(i)->UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
             tempTreeFileAndFrameIndex.clear();
         }
@@ -478,7 +487,7 @@ int main()
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 	
-		//Sleep(100);
+		Sleep(100);
 		
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);
