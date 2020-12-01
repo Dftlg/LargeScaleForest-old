@@ -11,20 +11,59 @@
 #include <boost/tokenizer.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+#include "ExtraTool.h"
+#include "common.h"
+#include <fstream>
+#include<sstream>
 
 struct SWaveFunctionPara
 {
-	//���
+	//振幅
 	int Amplitude;
 	
-	//Ƶ��
+	//频率
 	int Frequency;
 
-	//��λ
-	int Phase;
+	//相位
+	double Phase;
 	
-	//ƫ��
+	//偏距
 	int Ypluse;
+
+    //是否进行脉冲函数处理
+    int Pulse;
+
+    //对与脉冲函数中下方的函数直线进行上下的浮动调整
+    int DropNumber;
+
+	SWaveFunctionPara() = default;
+	SWaveFunctionPara(int vAmplitude, int vFrequency, double vPhase, int vYpluse,int vPulse=0,int vDropNumber=0)
+	{
+		Amplitude = vAmplitude;
+		Frequency = vFrequency;
+		Phase = vPhase;
+		Ypluse = vYpluse;
+        Pulse = vPulse;
+        DropNumber = vDropNumber;
+	}
+    SWaveFunctionPara(std::vector<std::string> &vPara)
+    {
+        Amplitude = atoi(vPara[0].c_str());
+        Frequency = atoi(vPara[1].c_str());
+        Phase = atof(vPara[2].c_str());
+        Ypluse = atoi(vPara[3].c_str());
+        Pulse = 0;
+        DropNumber = 0;
+        if (vPara.size() == 5)
+        {
+            Pulse = atoi(vPara[4].c_str());
+        }
+        else if(vPara.size()==6)
+        {
+            Pulse = atoi(vPara[4].c_str());
+            DropNumber= atoi(vPara[5].c_str());
+        }
+    }
 };
 
 class CWindField
@@ -32,14 +71,19 @@ class CWindField
 public:
 	CWindField()=default;
 	//direction wind
-	CWindField(const int vSize,const std::vector<SWaveFunctionPara> vSwavePara,const int vWavelength);
+    //最后一个参数为场景中的风场方向
+	CWindField(const int vSize,const std::vector<SWaveFunctionPara> vSwavePara,const int vWavelength,Common::SForceDirection vWindDirection,Common::SForceDirection vTreeRotationDirection);
 	//specific wind source
 	CWindField(const glm::vec3 vWindCenter, const std::vector<SWaveFunctionPara> vSwavePara, int AmplitudeInWindCenter, int Sphere4Influence);
 	~CWindField()=default;
 
-	std::vector<int> getDirectionWindForces() { return Forces[0]; };
+    Common::SForceDirection caculateRelativeDirection(Common::SForceDirection &vWindDirection, Common::SForceDirection &vTreeRotationDirection);
+	std::vector<int> getDirectionWindForces() { return m_Forces[0]; };
+	std::vector<Common::SForceDirection> getDirectionWindDirection() { return m_RelativeDirectionOfWindAndTree[0]; };
 
 	std::vector<int> getSpecificWindSourceForces(glm::vec3 vObjectPosition);
+
+    void saveForces2File(const std::string filePath);
 
 private:
 	glm::vec3 m_WindCenter;
@@ -47,5 +91,6 @@ private:
 	std::vector<SWaveFunctionPara> m_WavePara;
 	int AmplitudeWindCenter;
 
-	std::vector<std::vector<int>> Forces;
+	std::vector<std::vector<int>> m_Forces;
+	std::vector<std::vector<Common::SForceDirection>> m_RelativeDirectionOfWindAndTree;
 };

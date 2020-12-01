@@ -3,18 +3,25 @@
 
 int MaxElement(std::vector<int> &vDataSet)
 {
-	std::vector<int>::iterator result;
-	result = std::max_element(vDataSet.begin(), vDataSet.end());
-	return std::distance(vDataSet.begin(), result);
+	int max=*(std::max_element(vDataSet.begin(), vDataSet.end()));
+	return max;
 }
 
 int MinElement(std::vector<int> &vDataSet)
 {
-	std::vector<int>::iterator result;
-	result = std::min_element(vDataSet.begin(), vDataSet.end());
-	return std::distance(vDataSet.begin(), result);
+	int min=*(std::min_element(vDataSet.begin(), vDataSet.end()));
+	return min;
 }
 
+bool isDataExist(int number, std::vector<int> &vDataSet)
+{
+	for (auto tempdata : vDataSet)
+		if (tempdata == number)
+			return true;
+	return false;
+}
+
+//æ”¹æˆ0-360
 int RandomGenerate()
 {
 	LARGE_INTEGER seed;
@@ -59,7 +66,7 @@ std::vector<std::pair<double,double>> RandomTreePositionGenerate(int vTreeNumber
 		std::pair<int, int> temppair(rand() % vTreeNumber, rand() % vTreeNumber);
 		tempTreePosition.push_back(temppair);
 
-		std::sort(tempTreePosition.begin(), tempTreePosition.end());
+		//std::sort(tempTreePosition.begin(), tempTreePosition.end());
 		tempTreePosition.erase(std::unique(tempTreePosition.begin(), tempTreePosition.end()), tempTreePosition.end());
 	}
 	for (auto i = 0; i < tempTreePosition.size(); i++)
@@ -76,7 +83,7 @@ std::vector<std::pair<double,double>> RandomTreePositionGenerate(int vTreeNumber
 	return tempTreedoublePosition;
 }
 
-//²ÉÑùÆµÂÊ£¬Õñ·ù£¬ÆµÂÊ£¬ÏàÎ»£¬Æ«¾à
+//é‡‡æ ·é¢‘ç‡ï¼ŒæŒ¯å¹…ï¼Œé¢‘ç‡ï¼Œç›¸ä½ï¼Œåè·
 std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency, double vPhase,int vYpluse,int wavelength)
 {
 	double angle = 0.0;
@@ -89,23 +96,39 @@ std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency
 	return tempForces;
 }
 
-std::vector<double> GetForceConfigurate(const std::string& vFilePath)
+std::vector<std::vector<double>> GetForceConfigurate(const std::string& vFilePath,const std::string &vExternFile,int &vTheta,int &vPhi)
 {
 	std::vector<std::string> ForceConfig;
-	std::vector<double> tempConfig;
+	std::vector <std::vector<double>> tempConfig;
+	int thetaPos = vFilePath.find("the");
+	int phiPos = vFilePath.find("phi");
 	int forcePos = vFilePath.find("force");
-	std::string tempFile = vFilePath.substr(forcePos+5);
-	boost::split(ForceConfig, tempFile, boost::is_any_of(","), boost::token_compress_off);
-	std::vector<std::string>::iterator it;
-	for (it = ForceConfig.begin(); it != ForceConfig.end(); ++it)
+	int IndexPos = vFilePath.find("Index");
+	int endPos = vFilePath.find(".");
+	vTheta = std::stoi(vFilePath.substr(thetaPos + 3, phiPos - thetaPos - 3));
+	vPhi = std::stoi(vFilePath.substr(phiPos + 3, forcePos - phiPos - 3));
+	int vforceNumber = std::stoi(vFilePath.substr(forcePos + 5, IndexPos - forcePos - 5));
+
+	std::string forceFileName = vExternFile +"/"+ vFilePath.substr(IndexPos + 5, endPos - IndexPos - 5) + ".txt";
+
+	std::ifstream positionFile(forceFileName, std::ios::in);
+	std::string lineString;
+	while (getline(positionFile, lineString))
 	{
-		tempConfig.push_back(std::stof(*it));
+		boost::split(ForceConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
+		std::vector<double> tempCon;
+		std::vector<std::string>::iterator it;
+		for (it = ForceConfig.begin(); it != ForceConfig.end(); ++it)
+		{
+			tempCon.push_back(std::stof(*it));
+		}
+		tempConfig.push_back(tempCon);
 	}
 	return tempConfig;
 	
 }
 
-//ÊäÈëÊı¾İ£¬¿ØÖÆ·¶Î§ÔÚÊı¾İµÄÖÜÎ§Ã¿´ÎÀ©´ó10ÀıÈç£º10,100,0.1,0.001£¬¿ØÖÆÆä·¶Î§µÄ±¶ÂÊ
+//è¾“å…¥æ•°æ®ï¼Œæ§åˆ¶èŒƒå›´åœ¨æ•°æ®çš„å‘¨å›´æ¯æ¬¡æ‰©å¤§10ä¾‹å¦‚ï¼š10,100,0.1,0.001ï¼Œæ§åˆ¶å…¶èŒƒå›´çš„å€ç‡
 double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
 {
 	float tempNumber = abs(vNumber);

@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <GL/glew.h>
 #include<glm/glm.hpp>
 #include<glm/gtc/type_ptr.hpp>
@@ -11,6 +11,19 @@
 #include "Mesh.h"
 #include "VegaFemFactory.h"
 #include "../Common/SynchronisedQueue.h"
+#include "../Common/WindFiled.h"
+#include "LoadWindAndTreeConfig.h"
+#include "InitMultipleTypeTree.h"
+#include "../Common/ExtraTool.h"
+//#include "TreeInstanceMesh.h"
+//#include "volumetricMeshLoader.h"
+//#include "tetMesh.h"
+//#include <vector>
+//#include <string>
+//#include <cstdio>
+//#include <cassert>
+//#include <float.h>
+//#include "sceneObjectDeformable.h"
 
 void renderPlane(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId);
 void renderTree(CShader& vShader, CSence& vModel);
@@ -43,76 +56,75 @@ float LastFrame = 0.0f;
 int windactive = 0;
 float grasstime = 0.0f;
 
-SynchronisedQueue<std::vector<std::pair<int, int>>> SearchQueue;
+SynchronisedQueue<std::vector<std::pair<int, int>>> SearchQueue[Common::TreesTypeNumber];
 
 int i = 0;
 int Size = 0;
 int FrameNumber = 0;
-int SearchFrameNumber = 0;
-int SearchFrameStep = 0;
+int SearchFrameNumber[Common::TreesTypeNumber] = { 0 };
+int SearchFrameStep[Common::TreesTypeNumber] = { 0 };
 
-void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces)
+int ALLTreeNumber = 0;
+
+
+//前一个std::vector表示匹配树的个数，后一个std::vector表示每一帧中需要的数据
+//vMultipleExtraForces 表示每一帧风的方向，每次用5帧来进行搜索
+//vWindDirection 表示每帧一个风的方向
+void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vector<std::vector<int>>& vMultipleExtraForces, std::vector<std::vector<Common::SForceDirection>> & vWindDirection,std::vector<int>& vTreesNumberSubjected2SameWind,int vTreeTypeIndex)
 {
-	std::vector<std::vector<Common::SWindDirecetion>> tempWindDirection;
 	while (true)
 	{
-		/*//当前12个帧段进行一次重置获取5个帧段号索引
-		if (SearchFrameNumber %Size==0)
+		//当前12个帧段进行一次重置获取5个帧段号索引
+		/*if (SearchFrameNumber %Size==0)
 		{
 			std::cout << "search reset" << std::endl;
 			vVFF.resetTempMultipleTreeData(vMultipleExtraForces.size());
 			SearchFrameStep = 0;
 		}*/
-		if (SearchFrameNumber % 5 == 0)
+		if (SearchFrameNumber[vTreeTypeIndex] % 5 == 0)
 		{
 			//每5个力计算一次匹配的5帧
 			std::vector<std::vector<int>> tempMultipleFiveForces(vMultipleExtraForces.size());
+			std::vector<std::vector<Common::SForceDirection>> tempMultipleFiveWindDirection(vMultipleExtraForces.size());
 			for (int i = 0; i < vMultipleExtraForces.size(); i++)
 			{
-				for (int k = (SearchFrameStep) * 5; k < (SearchFrameStep + 1) * 5; k++)
+				for (int k = (SearchFrameStep[vTreeTypeIndex]) * 5; k < (SearchFrameStep[vTreeTypeIndex] + 1) * 5; k++)
 				{
+					//int t=vMultipleExtraForces[i][k];
 					tempMultipleFiveForces[i].push_back(vMultipleExtraForces[i][k]);
+					tempMultipleFiveWindDirection[i].push_back(vWindDirection[i][k]);
 				}
-			}	
-			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces, tempWindDirection);
+			}
+			vVFF.searchMatchedFrameSequences(tempMultipleFiveForces, tempMultipleFiveWindDirection);
 			tempMultipleFiveForces.clear();
-			SearchFrameStep++;
+			tempMultipleFiveWindDirection.clear();
+			SearchFrameStep[vTreeTypeIndex]++;
 			//std::vector<std::vector<int>> temp = vFem.getMultipleFramesIndex();
 		}
+
+        //在这里将重复的搜索数组复制多变
 		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
-		for (int treenumber = 0; treenumber < Common::TreesNumber; treenumber++)
-		{
-			tempTreeFileAndFrameIndex.push_back(vVFF.getFileAndFrameIndex(treenumber, SearchFrameNumber % 5));
-			if(SearchFrameNumber<500)
-				vVFF.writeFindFrameIndex2File("G:/GraduationProject/yellow_tree/xyz/FileAndFrameIndex.txt", tempTreeFileAndFrameIndex[treenumber]);
-			std::cout << tempTreeFileAndFrameIndex[treenumber].first << "--" << tempTreeFileAndFrameIndex[treenumber].second << "||";
-		}
-		std::cout << std::endl;
-		SearchQueue.Enqueue(tempTreeFileAndFrameIndex);
-		SearchFrameNumber++;
+
+        //std::cout << "TreeIndex" << vTreeTypeIndex << ": ";
+        for (int DifferentTreeNumber = 0; DifferentTreeNumber < vTreesNumberSubjected2SameWind.size(); DifferentTreeNumber++)
+        {
+            std::pair<int, int> tempOneTreeFileAndFrameIndex = vVFF.getFileAndFrameIndex(DifferentTreeNumber, SearchFrameNumber[vTreeTypeIndex] % 5);
+            //std::cout << tempOneTreeFileAndFrameIndex.first << "--" << tempOneTreeFileAndFrameIndex.second << "||";
+           
+            for (int k = 0; k < vTreesNumberSubjected2SameWind[DifferentTreeNumber] ; k++)
+            {
+                tempTreeFileAndFrameIndex.push_back(tempOneTreeFileAndFrameIndex);
+            } 
+        }
+       // std::cout << std::endl;
+		SearchQueue[vTreeTypeIndex].Enqueue(tempTreeFileAndFrameIndex);
+		SearchFrameNumber[vTreeTypeIndex]++;
 		tempTreeFileAndFrameIndex.clear();
 	}
 }
 
 int main()
 {
-	CVegaFemFactory vFem("G:/GraduationProject/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt");
-	int numbercounter = 6;
-	std::vector<double> b{ 1000,1,0,0 };
-	std::vector<std::pair<int, int>> angle;
-	for (int i = 0; i < numbercounter; i++)
-	{
-		angle.push_back(std::make_pair(0, i * 60));
-	}
-	//std::vector<Common::SFileFrames> vtemp = vFem.searchFileFramesOnAnimation(angle[i].first, angle[i].second, b);
-	std::vector<Common::SFileFrames> vtemp = vFem.searchFileFrameOnAttribute();
-	for (int i = 0; i < numbercounter; i++)
-	{
-		//std::vector<Common::SFileFrames> vtemp = vFem.searchFileFramesOnAnimation(angle[i].first, angle[i].second, b);
-		std::vector<Common::SFileFrames> temp;
-		temp.push_back(vtemp[i]);
-		vFem.readFramesDeformationData(temp, i);
-	}
 
 #pragma region initialize and configure glfw
 	glfwInit();
@@ -141,11 +153,11 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 #pragma endregion
-
+    /////////////////////////////
 #pragma region build and compile shaders
-	CShader ourSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
-	CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
-	CShader ourSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+    CShader ourSkyBoxShader("skybox.vert", "skybox.frag");
+
+
 #pragma endregion
 
 #pragma region plane vertices data
@@ -157,7 +169,7 @@ int main()
 		 				
 		 15.0f, -0.5f,  15.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,
 		-15.0f, -0.5f, -15.0f,   0.0f, 1.0f, 0.0f,   0.0f, 2.0f,
-		 15.0f, -0.5f, -15.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
+		 15.0f, -0.5f, -20.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f,
 	};
 #pragma endregion
 
@@ -293,77 +305,6 @@ int main()
 	ourSkyBoxShader.setInt("skybox", 0);
 #pragma endregion
 
-
-	//个数等于
-	std::vector<std::vector<int>> vMultipleExtraForces;
-	std::vector<Common::SWindDirecetion> treesWindDirection;
-	for (int i = 0; i < 1; i++)
-	{
-		treesWindDirection.push_back(Common::SWindDirecetion(0, 0));
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1150, 1, 0, 0, 600000));
-	}
-	/*for (int i = 0; i < 1; i++)
-	{
-		treesWindDirection.push_back(Common::SWindDirecetion(0, 60));
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 600000));
-	}
-	for (int i = 0; i < 1; i++)
-	{
-		treesWindDirection.push_back(Common::SWindDirecetion(0, 60));
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 600000));
-	}
-	for (int i = 0; i < 1; i++)
-	{
-		treesWindDirection.push_back(Common::SWindDirecetion(0, 60));
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 1000, 1, 0, 0, 600000));
-	}*/
-	/*for (int i = 0; i < 20; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 600, 1, 0.25, 0, 600));
-	}*/
-	/*for (int i = 0; i < 15; i++)
-	{
-		vMultipleExtraForces.push_back(GenerateSamplingForce(Common::ProductFrameNumber, 2500, 1, 0.25, 0, 600));
-	}*/
-
-#pragma region load model
-	CSence ourModel("../../models/yellow_tree/tree_last.obj");
-	
-	ourModel.setGroupsIndex(vFem);
-	ourModel.setVerticesNumber(vFem);
-	ourModel.setMeshGroupAndAssimpIndex();
-	ourModel.initSSBODeformationDeltaU(vFem, numbercounter);
-	ourModel.initSSBODeformationU();
-	ourModel.initSSBOTreeRotationModel();
-	ourModel.initSSBOTreeFileAndFrameIndex(Common::TreesNumber);
-	ourModel.setMeshRotation(treesWindDirection);
-	ourModel.setSSBO4UDeformationAndIndex(ourSceneShadowShader);
-	ourModel.setSSBOUdeformationAndIndx4ShadowMapShader(ourSceneDepthShader);
-#pragma endregion
-
-
-
-	
-
-	//Size = Common::ProductFrameNumber;
-	//Size = 180;
-	vFem.initMatchedFrameStruct(vMultipleExtraForces.size());
-	vFem.initKVFDataSearchRangeError();
-
-	//帧数
-	int frameNums = vFem.getFileFrames(0)->Frames.size();
-	//obj model vertices
-	int vertexNums = vFem.getFileFrames(0)->Frames[0].BaseFileDeformations.size();
-	ourSceneDepthShader.use();
-	ourSceneDepthShader.setInt("frameNums", frameNums);
-	ourSceneDepthShader.setInt("vertexNums", vertexNums);
-	ourSceneDepthShader.setInt("assimpvertexNums", ourModel.getAssimpVerticesNumber());
-	ourSceneShadowShader.use();
-	ourSceneShadowShader.setInt("frameNums", frameNums);
-	ourSceneShadowShader.setInt("vertexNums", vertexNums);
-	ourSceneShadowShader.setInt("assimpvertexNums", ourModel.getAssimpVerticesNumber());
-#pragma endregion	
-
 #pragma region configure depth map FBO
 	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 	unsigned int depthMapFBO;
@@ -387,6 +328,7 @@ int main()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #pragma endregion
 
+
 #pragma region create depth cubemap transformation matrices and some value
 		float near_plane = 1.0f;
 		float far_plane = 80.0f;
@@ -401,35 +343,45 @@ int main()
 			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 			shadowTransforms.push_back(shadowProj * glm::lookAt(lightVertices[i], lightVertices[i] + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 		}
-		ourSceneDepthShader.use();
-		ourSceneDepthShader.setFloat("far_plane", far_plane);
-		ourSceneDepthShader.setVec3("lightPos", lightVertices[0]);
-		for (unsigned int i = 0; i < 6; ++i)
-		{
-			ourSceneDepthShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
-		}
+        //生成树木的随机位置
+        
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            ALLTreeNumber +=Common::TreesNumbers[i];
+        }
+        CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, ALLTreeNumber);
 
+        MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
+        MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 1);
+        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
+        MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
+        MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+        MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
+
+        MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 1);
+        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[1], "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
+        MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
+        MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+        MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 1);
+        //MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 0);
+        
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            MultipleTypeTree.InitMultipleExtraWindData(i);
+            MultipleTypeTree.InitFemFrameStruct(i);
+            MultipleTypeTree.InitScenceShaderData(i);
+        }
+        
 	#pragma endregion
 
-#pragma region set light to fragment
-	ourSceneShadowShader.use();
-	for (unsigned int i = 0; i < sizeof(lightVertices) / sizeof(lightVertices[0]); ++i)
-	{
-		glm::vec3 newPos = lightVertices[i];
-		ourSceneShadowShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-		ourSceneShadowShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
-	}
-	ourSceneShadowShader.setFloat("metallic", 0.04);
-	ourSceneShadowShader.setFloat("roughness", 0.8);
-	ourSceneShadowShader.setFloat("ao", 1.0f);
-	ourSceneShadowShader.setInt("depthMap", 8);
-	ourSceneShadowShader.setFloat("far_plane", far_plane);
 
-#pragma endregion
 
 
 	//开启线程进行读取Tree索引
-	boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex,vFem, ourModel, vMultipleExtraForces);
+	/*boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getFemFactory()), *(MultipleTypeTree.getTreeModel()), *(MultipleTypeTree.getExtraForces()), *(MultipleTypeTree.getExtraDirection()), *(MultipleTypeTree.getTreesNumberSubjected2SameWind()),MultipleTypeTree.getTreeTypeIndex());*/
+     boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(0)), *(MultipleTypeTree.getSpecificTreeModel(0)), *(MultipleTypeTree.getSpecificExtraForces(0)), *(MultipleTypeTree.getSpecificExtraDirection(0)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(0)), 0);
+    boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
+    //boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getFemFactory(1)), *(MultipleTypeTree.getTreeModel(1)), *(MultipleTypeTree.getExtraForces(1)), *(MultipleTypeTree.getExtraDirection(1)), *(MultipleTypeTree.getTreesNumberSubjected2SameWind(1)), 1);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
@@ -458,9 +410,17 @@ int main()
 			std::cout << "Reset" << std::endl;
 		}*/
 		std::vector<std::pair<int, int>> tempTreeFileAndFrameIndex;
-		bool Success = SearchQueue.TryDequeue(tempTreeFileAndFrameIndex);
-		ourModel.UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
-		tempTreeFileAndFrameIndex.clear();
+
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            bool Success = SearchQueue[i].TryDequeue(tempTreeFileAndFrameIndex);
+
+            std::cout << tempTreeFileAndFrameIndex[i].first << "--" << tempTreeFileAndFrameIndex[i].second << "||";
+
+            MultipleTypeTree.getSpecificTreeModel(i)->UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
+            tempTreeFileAndFrameIndex.clear();
+        }
+        std::cout << std::endl;
 		FrameNumber++;
 
 		// 1. render scene to depth cubemap
@@ -468,35 +428,57 @@ int main()
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		//plane
-		ourSceneDepthShader.use();
-		ourSceneDepthShader.setInt("planeOrTree", -1);
-		renderPlane(ourSceneDepthShader, planeVAO, floorTexture, opacityTexture);
+
+        MultipleTypeTree.getSpecificScenceDepthShader(0)->use();
+        MultipleTypeTree.getSpecificScenceDepthShader(0)->setInt("planeOrTree", -1);
+        //这地方是错的把。。。
+		renderPlane(*(MultipleTypeTree.getSpecificScenceDepthShader(0)), planeVAO, floorTexture, opacityTexture);
 		//tree
-		ourSceneDepthShader.setInt("planeOrTree", 1);
-		renderTree(ourSceneDepthShader, ourModel);
+        /*MultipleTypeTree.getScenceDepthShader(1)->setInt("planeOrTree", 1);
+        renderTree(*(MultipleTypeTree.getScenceDepthShader(1)), *(MultipleTypeTree.getTreeModel(1)));*/
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            MultipleTypeTree.getSpecificTreeModel(i)->UpdataSSBOBindingPointIndex();
+            MultipleTypeTree.getSpecificScenceDepthShader(i)->use();
+            MultipleTypeTree.getSpecificScenceDepthShader(i)->setInt("planeOrTree", 1);
+            renderTree(*(MultipleTypeTree.getSpecificScenceDepthShader(i)), *(MultipleTypeTree.getSpecificTreeModel(i)));
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        }
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+       
 		
 		//2.render scene as normal 
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//plane
-		ourSceneShadowShader.use();
-		ourSceneShadowShader.setInt("shadows", shadows);
+		////plane  
+        MultipleTypeTree.getSpecificScenceShadowShader(0)->use();
+        MultipleTypeTree.getSpecificScenceShadowShader(0)->setInt("shadows", shadows);
 		glActiveTexture(GL_TEXTURE8);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-		ourSceneShadowShader.setInt("planeOrTree", -1);
-		renderPlane(ourSceneShadowShader, planeVAO, floorTexture, opacityTexture);
+        MultipleTypeTree.getSpecificScenceShadowShader(0)->setInt("planeOrTree", -1);
+		renderPlane(*(MultipleTypeTree.getSpecificScenceShadowShader(0)), planeVAO, floorTexture, opacityTexture);
 		//tree
-		ourSceneShadowShader.use();
-		glActiveTexture(GL_TEXTURE8);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-		ourSceneShadowShader.setInt("planeOrTree", 1);
-		renderTree(ourSceneShadowShader, ourModel);
+       /* MultipleTypeTree.getScenceShadowShader(1)->use();
+        glActiveTexture(GL_TEXTURE8);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+        MultipleTypeTree.getScenceShadowShader(1)->setInt("planeOrTree", 1);
+        renderTree(*(MultipleTypeTree.getScenceShadowShader(1)), *(MultipleTypeTree.getTreeModel(1)));*/
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            MultipleTypeTree.getSpecificTreeModel(i)->UpdataSSBOBindingPointIndex();
+            MultipleTypeTree.getSpecificScenceShadowShader(i)->use();
+            glActiveTexture(GL_TEXTURE8);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+            MultipleTypeTree.getSpecificScenceShadowShader(i)->setInt("planeOrTree", 1);
+            renderTree(*(MultipleTypeTree.getSpecificScenceShadowShader(i)), *(MultipleTypeTree.getSpecificTreeModel(i)));
+        }
+
+
 		//skybox	
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 	
-		Sleep(100);
+		//Sleep(100);
 		
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);
@@ -509,7 +491,7 @@ int main()
 	glDeleteBuffers(1, &planeVBO);
 	glDeleteBuffers(1, &skyboxVBO);
 	//glDeleteBuffers(1, &SSBO);
-	ourModel.Clear();
+    MultipleTypeTree.getSpecificTreeModel(0)->Clear();
 	glfwTerminate();
 	return 0;
 }
@@ -544,7 +526,7 @@ void renderTree(CShader & vShader, CSence& vModel)
 	vShader.setMat4("view", view);
 	vShader.setVec3("camPos", Camera.getPosition());
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));// translate it down so it's at the center of the scene
+	model = glm::translate(model, glm::vec3(0.0f, -0.3f, -2.0f));// translate it down so it's at the center of the scene
 	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
 	vShader.setMat4("model", model);
 	vModel.draw(vShader);

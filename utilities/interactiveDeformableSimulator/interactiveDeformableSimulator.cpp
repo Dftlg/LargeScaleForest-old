@@ -169,9 +169,9 @@ int lockScene=0;
 int pauseSimulation=0;
 int singleStepMode=0;
 Lighting * lighting = nullptr;
-//¼ÓÔØ°üÎ§Íø¸ñ
+//åŠ è½½åŒ…å›´ç½‘æ ¼
 SceneObjectDeformable * deformableObjectRenderingMesh = nullptr;
-//Ô´ÎÄ¼ş
+//æºæ–‡ä»¶
 SceneObjectDeformable * secondaryDeformableObjectRenderingMesh = nullptr;
 SceneObject * extraSceneGeometry = nullptr;
 char groundPlaneString[128];
@@ -211,6 +211,7 @@ float deformableObjectCompliance = 1.0; // scales all user forces by the provide
 char fixedVerticesKVFFileName[4096];
 char uDeformationoutputFileName[4096];
 char ObjectVertexIndexInElement[4096];
+char ExternFileDirectory[4096];
 
 // adjusts the stiffness of the object to cause all frequencies scale by the provided factor:
 // keep it to 1.0 (except for experts)
@@ -275,9 +276,11 @@ int FramesNumber = 0;
 int Amplitude = 0;
 int Frequency = 0;
 int vYpluse = 0;
+int Theta = 0;
+int Phi = 0;
 
 int numForceLoads = 0;
-//¼ÓÔØÁ¦Ä£ĞÍ
+//åŠ è½½åŠ›æ¨¡å‹
 double * forceLoads = nullptr;
 IntegratorBase * integratorBase = nullptr;
 ImplicitNewmarkSparse * implicitNewmarkSparse = nullptr;
@@ -389,7 +392,7 @@ void RenderGroundPlane(double groundPlaneHeight, double rPlane, double gPlane, d
   glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
-//äÖÈ¾º¯Êı
+//æ¸²æŸ“å‡½æ•°
 // graphics loop function.
 void displayFunction(void)
 {
@@ -409,7 +412,7 @@ void displayFunction(void)
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
   glStencilFunc(GL_ALWAYS, 0, ~(0u));
-  // render embedded triangle mesh »æÖÆÃ¿Ò»Ö¡µÄobjÄ£ĞÍ
+  // render embedded triangle mesh ç»˜åˆ¶æ¯ä¸€å¸§çš„objæ¨¡å‹
   if (renderSecondaryDeformableObject)
     secondaryDeformableObjectRenderingMesh->Render();
 
@@ -432,7 +435,7 @@ void displayFunction(void)
       glEnable(GL_LIGHTING);
     }
 
-	//Íâ²¿°üÎ§Íø¸ñ
+	//å¤–éƒ¨åŒ…å›´ç½‘æ ¼
    glColor3f(0.0, 0.0, 0.0);
    deformableObjectRenderingMesh->Render();
 
@@ -479,7 +482,7 @@ void displayFunction(void)
   glStencilFunc(GL_ALWAYS, 1, ~(0u));
   glColor3f(0,0,0);
 
-  //ÏÔÊ¾°üÎ§Íø¸ñ±ß¿ò
+  //æ˜¾ç¤ºåŒ…å›´ç½‘æ ¼è¾¹æ¡†
   /*if (renderWireframe)
 	deformableObjectRenderingMesh->RenderEdges();*/
 
@@ -594,11 +597,11 @@ void distributeForce(int vPullVertex, double * f_ext, double* externalForce)
 	affectedVertices.insert(vPullVertex);
 	lastLayerVertices.insert(vPullVertex);
 
-	//Á¦Ó°ÏìÖÜÎ§µÄµãÊıÁ¿
+	//åŠ›å½±å“å‘¨å›´çš„ç‚¹æ•°é‡
 	for (int j = 1; j < forceNeighborhoodSize; j++)
 	{
 		// linear kernel
-		  //¶ÔÍâÎ§µãµÄÓ°ÏìÁ¦£¬¶ÔÍâÎ§Ã¿²ãÊÜÁ¦Ã¿´Îµİ¼õ°Ù·ÖÖ®20
+		  //å¯¹å¤–å›´ç‚¹çš„å½±å“åŠ›ï¼Œå¯¹å¤–å›´æ¯å±‚å—åŠ›æ¯æ¬¡é€’å‡ç™¾åˆ†ä¹‹20
 		double forceMagnitude = 1.0 * (forceNeighborhoodSize - j) / forceNeighborhoodSize;
 
 		set<int> newAffectedVertices;
@@ -660,11 +663,11 @@ void idleFunction(void)
 		if (pulledVertex != -1)
 		{*/
 		//stem	
-	  pulledVertex[0] = 6172;
+	 /* pulledVertex[0] = 6172;
 
 
 	  pulledVertex[1] = 6552;
-	   pulledVertex[2] = 4214;
+	   pulledVertex[2] = 4214;*/
 	  /*pulledVertex[4] = 12203;
 	  pulledVertex[5] = 2768;
 	  pulledVertex[6] = 12015;
@@ -678,7 +681,7 @@ void idleFunction(void)
 	 
 	  double externalForce[3];
 
-	  //¼ÆËãÍâÁ¦
+	  //è®¡ç®—å¤–åŠ›
 	 /* camera->CameraVector2WorldVector_OrientationOnly3D(
 		  forceX, forceY, 0, externalForce);*/
 	 // camera->setWorldCoorinateSystemForce(StemExtraForces[subTimestepCounter], 0, 0, externalForce);
@@ -688,7 +691,7 @@ void idleFunction(void)
 	  //stem
 	  for (int i = 0; i < pullVertexInfo.StemPullVertexNum; i++)
 	  {
-		  camera->setWorldCoorinateSystemForce(pullVertexInfo.StemExtraForces[subTimestepCounter], 0, 0, externalForce);
+		  camera->setWorldCoorinateSystemForce(pullVertexInfo.StemExtraForces[subTimestepCounter], Theta, Phi, externalForce);
 		  std::copy(externalForce, externalForce + 3, vForce);
 		  for (int j = 0; j < 3; j++)
 		  {
@@ -754,7 +757,7 @@ void idleFunction(void)
 			integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
 			TempExtraForces.clear();
 		}
-		//¼ÆËãÓÉÁ¦²úÉúµÄ½áµãÎ»ÒÆĞÎ±ä
+		//è®¡ç®—ç”±åŠ›äº§ç”Ÿçš„ç»“ç‚¹ä½ç§»å½¢å˜
       int code = integratorBase->DoTimestep();
 	  /*std::vector<int> tempvec = { 0,4,1677 };*/
 
@@ -792,7 +795,7 @@ void idleFunction(void)
 	{
 		exit(1);
 	}
-	//ÓÃÓÚÅĞ¶ÏÎÄ¼şÁ¦µÄÊıÁ¿
+	//ç”¨äºåˆ¤æ–­æ–‡ä»¶åŠ›çš„æ•°é‡
     //timestepCounter++;
 
     totalDynamicsCounter.StopCounter();
@@ -800,7 +803,7 @@ void idleFunction(void)
 
     memcpy(u, integratorBase->Getq(), sizeof(double) * 3 * n);
 
-	//¼ÆËãÃ¿Ò»Ö¡²úÉúµÄdeltaĞÎ±ä
+	//è®¡ç®—æ¯ä¸€å¸§äº§ç”Ÿçš„deltaå½¢å˜
 	for (int i = 0; i < 3 * n; i++)
 	{
 		deltau[i] = u[i] - preu[i];
@@ -824,7 +827,7 @@ void idleFunction(void)
       while (1.0 * graphicFrame / elapsedTime >= 30.0);
     }
   }
-  //Íâ²¿µÄÁùÃæÌåÍø¸ñ·¢ÉúÎ»ÒÆĞÎ±ä(¶Ô¶¥µã½øĞĞÎ»ÒÆ)
+  //å¤–éƒ¨çš„å…­é¢ä½“ç½‘æ ¼å‘ç”Ÿä½ç§»å½¢å˜(å¯¹é¡¶ç‚¹è¿›è¡Œä½ç§»)
   deformableObjectRenderingMesh->SetVertexDeformations(u);
 
 
@@ -838,7 +841,7 @@ void idleFunction(void)
     PerformanceCounter interpolationCounter;
 
     VolumetricMesh::interpolate(u, uSecondary, secondaryDeformableObjectRenderingMesh->Getn(), secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices, secondaryDeformableObjectRenderingMesh_interpolation_vertices, secondaryDeformableObjectRenderingMesh_interpolation_weights);
-	//ÄÚ²¿µÄÈı½ÇĞÎÍø¸ñ·¢ÉúĞÎ±ä
+	//å†…éƒ¨çš„ä¸‰è§’å½¢ç½‘æ ¼å‘ç”Ÿå½¢å˜
     secondaryDeformableObjectRenderingMesh->SetVertexDeformations(uSecondary);
 
 	
@@ -849,15 +852,15 @@ void idleFunction(void)
 	CModelDeformationTransform deformationsave;
 	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter);
 
-	//Ã¿uDeformationSamplingÖ¡´æ´¢×îÖÕµÄĞÎ±äÊı¾İU
-	if (subTimestepCounter % Common::uDeformationSampling == 0)
+	//æ¯uDeformationSamplingå¸§å­˜å‚¨æœ€ç»ˆçš„å½¢å˜æ•°æ®U
+	/*if (subTimestepCounter % Common::uDeformationSampling == 0)
 	{
 		deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), uDeformationoutputFileName, subTimestepCounter);
 		TempExtraForces.clear();
-	}
-	//´æ´¢deltaUµÄĞÎ±äÊı¾İ
+	}*/
+	//å­˜å‚¨deltaUçš„å½¢å˜æ•°æ®
 	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
-	//´æ´¢UµÄĞÎ±äÊı¾İ
+	//å­˜å‚¨Uçš„å½¢å˜æ•°æ®
 	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter - 1);
 
 
@@ -868,7 +871,7 @@ void idleFunction(void)
 	//if (strcmp(outputFilename, "__none") != 0)
 	//{
 	//	char s[4096];
-	//	//Ğ´Èë¿É²é¿´µÄÎ»ÒÆÎÄ¼ş
+	//	//å†™å…¥å¯æŸ¥çœ‹çš„ä½ç§»æ–‡ä»¶
 	////sprintf(s, "%s.u.%04d.txt", "P", subTimestepCounter);
 	//	FILE * file = fopen(outputFilename, "a");
 	//	//printf("Saving deformation to %s.\n", s);
@@ -1342,7 +1345,7 @@ void initSimulation()
     int verbose = 0;
     volumetricMesh = VolumetricMeshLoader::load(volumetricMeshFilename, fileFormat, verbose);
 
-	/*******************½«¹Ì¶¨½áµã×ª»»Îª¹Ì¶¨element*********************/
+	/*******************å°†å›ºå®šç»“ç‚¹è½¬æ¢ä¸ºå›ºå®šelement*********************/
 	//volumetricMesh->checkPoint4Element("D:/GraduationProject/Vega/models/newgrass/voxelizegrass/vertexindex.txt", "D:/GraduationProject/Vega/models/newgrass/voxelizegrass/elementindex.txt");
    
 	if (volumetricMesh == nullptr)
@@ -1357,7 +1360,7 @@ void initSimulation()
 
     // create the mass matrix
     int inflate3Dim = true; // necessary so that the returned matrix is 3n x 3n
-	//ÖÊÁ¿¾ØÕóÒÀ¿¿²ÄÁÏÃÜ¶È½øĞĞ¼ÆËã
+	//è´¨é‡çŸ©é˜µä¾é ææ–™å¯†åº¦è¿›è¡Œè®¡ç®—
     GenerateMassMatrix::computeMassMatrix(volumetricMesh, &massMatrix, inflate3Dim);
 
     // create the internal forces for STVK and linear FEM materials
@@ -1400,7 +1403,7 @@ void initSimulation()
       printf("Loading mass spring system from a tet mesh file...\n");
       MassSpringSystemFromTetMeshConfigFile massSpringSystemFromTetMeshConfigFile;
       MassSpringSystemTetMeshConfiguration massSpringSystemTetMeshConfiguration;
-	  //»ñÈ¡turtle.massspring
+	  //è·å–turtle.massspring
       if (massSpringSystemFromTetMeshConfigFile.GenerateMassSpringSystem(massSpringSystemTetMeshConfigFilename, &massSpringSystem, &massSpringSystemTetMeshConfiguration) != 0)
       {
         printf("Error initializing the mass spring system.\n");
@@ -1493,7 +1496,7 @@ void initSimulation()
   LaplacianDampingMatrix->ScalarMultiply(dampingLaplacianCoef);
 
   // initialize the rendering mesh for the volumetric mesh
-  //¼ÓÔØ°üÎ§Íø¸ñµÄobjÄ£Ê½voxelizesurfacegrass.obj
+  //åŠ è½½åŒ…å›´ç½‘æ ¼çš„objæ¨¡å¼voxelizesurfacegrass.obj
   if (strcmp(renderingMeshFilename, "__none") == 0)
   {
     printf("Error: rendering mesh was not specified.\n");
@@ -1508,7 +1511,7 @@ void initSimulation()
   deformableObjectRenderingMesh->SetMaterialAlpha(0.5);
 
   // initialize the embedded triangle rendering mesh 
-  //¼ÓÔØÔ­objÎÄ¼ş
+  //åŠ è½½åŸobjæ–‡ä»¶
   secondaryDeformableObjectRenderingMesh = nullptr;
   if (strcmp(secondaryRenderingMeshFilename, "__none") != 0)
   {
@@ -1524,7 +1527,7 @@ void initSimulation()
 	deltaSecondaryu= (double*)calloc(3 * secondaryDeformableObjectRenderingMesh->Getn(), sizeof(double));
 
     // load interpolation structure
-	//¼ÓÔØ²åÖµ½á¹¹
+	//åŠ è½½æ’å€¼ç»“æ„
     if (strcmp(secondaryRenderingMeshInterpolationFilename, "__none") == 0)
     {
       printf("Error: no secondary rendering mesh interpolation filename specified.\n");
@@ -1583,16 +1586,16 @@ void initSimulation()
   {
 	  KVFVertices.push_back(fixedKVFVertices[i]);
   }
-  //´æ´¢ÅĞ¶ÏÌåËØĞÎ±ä¶¥µãË÷Òı
+  //å­˜å‚¨åˆ¤æ–­ä½“ç´ å½¢å˜é¡¶ç‚¹ç´¢å¼•
   volumetricMesh->SaveObjectVertexsintElement(KVFVertices, secondaryDeformableObjectRenderingMesh->Getn(), secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices, secondaryDeformableObjectRenderingMesh_interpolation_vertices, ObjectVertexIndexInElement);
 
   printf("Loaded %d fixed vertices. They are:\n",numFixedVertices);
   ListIO::print(numFixedVertices,fixedVertices);
   // create 0-indexed fixed DOFs
-  //Ã¿¸ö¶¥µãÈı¸ö·½ÏòµÄDOF
+  //æ¯ä¸ªé¡¶ç‚¹ä¸‰ä¸ªæ–¹å‘çš„DOF
   int numFixedDOFs = 3 * numFixedVertices;
   int * fixedDOFs = (int*) malloc (sizeof(int) * numFixedDOFs);
-  //½«¹Ì¶¨µÄÄ³¸ö¶¥µãµÄÈıÎ¬È«²¿Ñ¡È¡³öÀ´
+  //å°†å›ºå®šçš„æŸä¸ªé¡¶ç‚¹çš„ä¸‰ç»´å…¨éƒ¨é€‰å–å‡ºæ¥
   for(int i=0; i<numFixedVertices; i++)
   {
     fixedDOFs[3*i+0] = 3*fixedVertices[i]-3;
@@ -1613,19 +1616,56 @@ void initSimulation()
   deltau = (double*)calloc(3 * n, sizeof(double));
   preu= (double*)calloc(3 * n, sizeof(double));
 
-  std::vector<double> tempConfig = GetForceConfigurate(outputFilename);
-  //6172,6552,2768
+  std::vector<std::vector<double>> tempConfig = GetForceConfigurate(outputFilename, ExternFileDirectory,Theta,Phi);
+  
   //1000
-  std::vector<int>pullVertexIndex = { 5828,6539,8117 };
+  //5828, 6539, 8117
+  //6172,6552,2768
+  std::vector<int>pullVertexIndex = { 6172,6552 };
   //std::vector<float>scale = { 1.0,0.8,0.08,0.05,-0.02,-0.05 };
   //600
   //std::vector<float>scale = { 1.0,0.8,0.05,0.03,-0.009,-0.03 };
   //3000
   std::vector<float>scale = { 1.0,1.0,1.0,0.01,-0.009,-0.009 };
-  StemExtraForces = GenerateSamplingForce(18000, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 600);
-  LeafExtraForces = GenerateSamplingForce(18000, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 600);
+  StemExtraForces.resize(180, 0);
+  LeafExtraForces.resize(180, 0);
+  for (int i = 0; i < tempConfig.size(); i++)
+  {
+	  std::vector<int> tempStemForces= GenerateSamplingForce(180, tempConfig[i][0], tempConfig[i][1], tempConfig[i][2], tempConfig[i][3], 6);
+	  std::vector<int> tempLeafForces = GenerateSamplingForce(180, tempConfig[i][0], tempConfig[i][1], tempConfig[i][2], tempConfig[i][3], 6);
+	  for (int k = 0; k < tempStemForces.size(); k++)
+	  {
+          std::cout << tempConfig[i].size() << std::endl;
+          if (tempConfig[i].size() ==5 )
+          {
+              if (tempStemForces[k] < tempConfig[i][3])
+              {
+                  tempStemForces[k] = tempConfig[i][3];
+                  tempLeafForces[k]= tempConfig[i][3];
+              }
+             
+          }
+          if (tempConfig[i].size() == 6)
+          {
+              if (tempStemForces[k] < tempConfig[i][3])
+              {
+                  tempStemForces[k] = tempConfig[i][3];
+                  tempLeafForces[k] = tempConfig[i][3];
+
+                  tempStemForces[k] -= tempConfig[i][5];
+                  tempLeafForces[k] -= tempConfig[i][5];
+              }
+
+          }
+		  StemExtraForces[k] += tempStemForces[k];
+		  LeafExtraForces[k] += tempLeafForces[k];
+	  }
+
+  }
+  //StemExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
+  //LeafExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
   
-  pullVertexInfo.StemPullVertexNum = 3;
+  pullVertexInfo.StemPullVertexNum = 2;
   pullVertexInfo.PullVertexIndex = pullVertexIndex;
   pullVertexInfo.StemExtraForces = StemExtraForces;
   pullVertexInfo.LeafExtraForces = LeafExtraForces;
@@ -1701,7 +1741,7 @@ void initSimulation()
   {
     printf("Force model: COROTLINFEM\n");
 
-	//Çó½âK¾ØÕó
+	//æ±‚è§£KçŸ©é˜µ
     CorotationalLinearFEM * corotationalLinearFEM = new CorotationalLinearFEM(volumetricMesh);
 
     corotationalLinearFEMStencilForceModel = new CorotationalLinearFEMStencilForceModel(corotationalLinearFEM);
@@ -1748,7 +1788,7 @@ void initSimulation()
         break;
       }
 	  /******************************/
-	  //³¬µ¯ĞÔ²ÄÁÏ
+	  //è¶…å¼¹æ€§ææ–™
       case INV_NEOHOOKEAN:
         isotropicMaterial = new NeoHookeanIsotropicMaterial(tetMesh, enableCompressionResistance, compressionResistance);
         printf("Invertible material: neo-Hookean.\n");
@@ -1908,6 +1948,7 @@ void initConfigurations()
   configFile.addOptionOptional("fixedVerticesFilename", fixedVerticesFilename, "__none");
 
   configFile.addOptionOptional("fixedVerticesKVFFileName", fixedVerticesKVFFileName, "__none");
+  configFile.addOptionOptional("ExternFileDirectory", ExternFileDirectory, "_none");
   configFile.addOptionOptional("uDeformationoutputFileName", uDeformationoutputFileName, "__none");
   configFile.addOptionOptional("ObjectVertexIndexInElement", ObjectVertexIndexInElement, "__none");
 
@@ -2283,7 +2324,7 @@ int main(int argc, char* argv[])
   }*/
 
   // parse command line options
-  //ºóÃæµÚ¶ş¸öÅäÖÃ²ÎÊı
+  //åé¢ç¬¬äºŒä¸ªé…ç½®å‚æ•°
  /* char * configFilenameC = argv[1];
   opt_t opttable[] =
   {
@@ -2302,10 +2343,10 @@ int main(int argc, char* argv[])
 
   //configFilename = string("D:/GraduationProject/Vega/examples/simpleBridge_vox/simpleBridge_vox.config");
  /* configFilename = string("D:/GraduationProject/Vega/models/newgrass/voxelizegrass/voxelizegrass.config");*/
-  configFilename = string("../../models/yellow_tree/tree.config");
+  configFilename = string("../../models/mini_mapleTree/tree.config");
   printf("Loading scene configuration from %s.\n", configFilename.c_str());
 
-  initConfigurations(); // parse the config fileÍ¬Ê±Êä³öµ½cmd
+  initConfigurations(); // parse the config fileåŒæ—¶è¾“å‡ºåˆ°cmd
   //strcpy(outputFilename, "D:/GraduationProject/Vega/models/newgrass/voxelizegrass/force/fo");
   //strcpy(forceLoadsFilename, "D:/GraduationProject/Vega/models/newgrass/voxelizegrass/force/fo.f.0031");
   initGLUT(argc, argv, windowTitleBase , windowWidth, windowHeight, &windowID);

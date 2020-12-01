@@ -36,13 +36,16 @@ public:
 	void SetParaMesh();
 	void setGroupsIndex(CVegaFemFactory& vfemFactoryObject);
 	void setVerticesNumber(CVegaFemFactory& vfemFactoryObject);
+    void setTreeNumber(const int vInstanceTreeNumber);
 	void setAssimpVerticesNumber();
 	void initSSBODeformationDeltaU(CVegaFemFactory & vFem, int vFileNumber);
-	void setSSBO4UDeformationAndIndex(const CShader& vShader);
+	void setSSBO4UDeformationAndIndex(CShader& vShader);
+    void setSSBO4GenBufferUDeformationAndIndex(CShader& vShader,const int vTreeTypeIndex);
 	void initSSBODeformationU();
-	void initSSBOTreeRotationModel();
 	void initSSBOTreeFileAndFrameIndex(const int vTreeNumber);
 	void resetSSBO4UDeformation();
+
+    void UpdataSSBOBindingPointIndex();
 
 	void setSSBOUdeformationAndIndx4ShadowMapShader(const CShader& vShader);
 
@@ -52,23 +55,19 @@ public:
 	void setFileDirectiory(std::string vFileDirectory) { m_FileDirectory = vFileDirectory; }
 	int getAssimpVerticesNumber() { return m_AssimpVerticesNumber; }
 	void draw(const CShader& vShader);
-	void setMeshRotation(std::vector<Common::SWindDirecetion>& vTreesWindDirection);
-	glm::mat4* randomRotation(std::vector<Common::SWindDirecetion>& vTreesWindDirection);
+	void setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations,int vTreesNumber);
+    //void setMeshRotation();
+    void setMeshRotationRelationWindFieldAndTreeDirection(std::vector<float> &vRotations);
+    void specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrces);
+    glm::mat4* translateTreePosition();
+	void randomRotation(glm::mat4* vmodelMatrces);
 	void setMeshGroupAndAssimpIndex();
+
+    std::vector<Common::SForceDirection> getAngles() { return m_Angles; };
 
 	void UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int,int>>& vTreeFileAndFrameIndex);
 	/*void UpdataMeshTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);*/
 	bool gammaCorrection;
-
-	//(1,0)
-	inline float getRotationAngle(float vXDisplacement, float vZDisplacement)
-	{
-		float dotAngle = acos((vXDisplacement) / sqrt(vXDisplacement*vXDisplacement + vZDisplacement * vZDisplacement)) * 180 / Common::Pi;
-		float crossAngle = asin(vZDisplacement / sqrt(vXDisplacement*vXDisplacement + vZDisplacement * vZDisplacement)) * 180 / Common::Pi;
-		if (crossAngle > 0)
-			return(360 - dotAngle);
-		return dotAngle;
-	}
 
 private:
 	void __changeObjMeshStruct2Charptr(int vOutputMaterials=1);
@@ -88,23 +87,21 @@ private:
 	std::string m_Data;
 	unsigned int m_DataSize;
 	std::vector<std::vector<glm::vec3>> m_EachFrameOfGroupData;
-	//À˘”–µƒgroup÷–√Êµƒ∂•µ„À˜“˝
+	//ÊâÄÊúâÁöÑgroup‰∏≠Èù¢ÁöÑÈ°∂ÁÇπÁ¥¢Âºï
 	std::vector<std::vector<int>> m_GroupsIndex;
 
 	CVegaFemFactory* m_VegaFactory;
-
 	glm::vec4 * m_DeltaDeformationU;
 
 	glm::vec4 * m_DeformationU;
 
 	glm::ivec2 * m_TreeFileAndFrameIndex;
 
-	glm::mat4 * m_TreeRotationMatrix;
-
 	unsigned int m_DeltaUSSBO;
 	unsigned int m_UdeformationSSBO;
 	unsigned int m_TreeFileAndFrameSSBO;
-	unsigned int m_TreeRotationModelSSBO;
+
+    std::vector<GLuint> m_SSBO_Binding_Point_Index;
 
 	int m_FrameNums;
 	int m_VertexNums;
@@ -113,4 +110,9 @@ private:
 	int m_VerticesNumber;
 
 	int m_AssimpVerticesNumber;
+
+    std::vector<float> m_SetRotation;
+    std::vector<Common::SForceDirection> m_Angles;
+    std::vector<std::pair<double, double>> m_TransFormations;
+    int m_InstanceTreeNumber;
 };

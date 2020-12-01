@@ -36,7 +36,12 @@ namespace Common
 
 	//const int TreesInstanceNumber = 1;
 
-	const int TreesNumber = 1;
+    //const int TreesNumber = 5;
+
+    const int TreesTypeNumber = 2;
+
+    const int TreesNumbers[TreesTypeNumber] = { 10,5 };
+    //int SecondTypeTreesNumber = 5;
 
 	static int MaxTimeStep = 60;
 
@@ -50,7 +55,7 @@ namespace Common
 
 	static int CorrectuDeformationFrame = 20;
 
-	//Ò»¸öÎÄ¼şÖĞ´æ¶àÉÙÖ¡
+	//ä¸€ä¸ªæ–‡ä»¶ä¸­å­˜å¤šå°‘å¸§
 	static int SamplingFrameNumber = 180;
 
 	static int ProductFrameNumber = 18000000;
@@ -110,7 +115,7 @@ namespace Common
 		SVertex Vertex;
 		float MassValue;
 		glm::vec3 Velocity;
-		//¸Ã¶¨ÒåÌæ»»Î»ÖÃ
+		//è¯¥å®šä¹‰æ›¿æ¢ä½ç½®
 		//glm::vec3 Gravity = glm::vec3(0.0, 0.0, 0.0);
 		std::vector<SAssociatedMassPoint> AssociatedMassPoint;
 	};
@@ -166,7 +171,7 @@ namespace Common
 
 	const size_t NumOfAxis = 3;
 
-	//Ã¿Ò»Ö¡ÖĞµÄÄ³Ò»¸ögroup£¬ÓÉ¶¥µã¼¯ºÏ×é³É
+	//æ¯ä¸€å¸§ä¸­çš„æŸä¸€ä¸ªgroupï¼Œç”±é¡¶ç‚¹é›†åˆç»„æˆ
 	struct SFileDataGroup
 	{
 		unsigned int GroupIndex;
@@ -180,14 +185,14 @@ namespace Common
 		}
 	};
 
-	//Ò»¸öÎÄ¼şÖĞµÄÃ¿Ò»Ö¡
+	//ä¸€ä¸ªæ–‡ä»¶ä¸­çš„æ¯ä¸€å¸§
 	struct SFileData
 	{
 		unsigned int FrameIndex;
 		bool FileDeformationExist = false;
-		//Ô­Ê¼deltaU
+		//åŸå§‹deltaU
 		std::vector<glm::vec3> BaseFileDeformations;
-		//°´ÕÕÃæ¶¥µãË³ĞòÅÅÁĞµÄu
+		//æŒ‰ç…§é¢é¡¶ç‚¹é¡ºåºæ’åˆ—çš„u
 		std::vector<SFileDataGroup> FileDeformation;
 		SFileData() = default;
 		SFileData(unsigned int vFrameIndex)
@@ -196,25 +201,26 @@ namespace Common
 		}
 	};
 
-	struct SWindDirecetion
+	struct SForceDirection
 	{
 		int Theta;
 		int Phi;
-		SWindDirecetion(int vTheta, int vPhi)
+		SForceDirection() = default;
+		SForceDirection(int vTheta, int vPhi)
 		{
 			Theta = vTheta;
 			Phi = vPhi;
 		}
 	};
 
-	//Ò»¸öÎÄ¼şÖĞÖ¡µÄKVFÊı¾İ£¬KVFÊı¾İ¼È´ú±íÇ°ÃæÖ¡µÄ½á¹û£¬ÓÖ¿ÉÒÔÓÃÀ´ÅĞ¶ÏºóÃæÖ¡µÄÊı¾İ
-	//Ê÷Ä¾³¯ÏòÄ¬ÈÏ¶¼ÎªÏòÓÒ
+	//ä¸€ä¸ªæ–‡ä»¶ä¸­å¸§çš„KVFæ•°æ®ï¼ŒKVFæ•°æ®æ—¢ä»£è¡¨å‰é¢å¸§çš„ç»“æœï¼Œåˆå¯ä»¥ç”¨æ¥åˆ¤æ–­åé¢å¸§çš„æ•°æ®
+	//æ ‘æœ¨æœå‘é»˜è®¤éƒ½ä¸ºå‘å³
 	struct SpKVFData
 	{
 		int FrameIndex;
 
-		//·çµÄ·½Ïò
-		std::vector<SWindDirecetion> WindDirection;
+		//é£çš„æ–¹å‘
+		std::vector<SForceDirection> WindDirection;
 
 		std::vector<int> Forces;
 		std::vector<int> KLengths;
@@ -235,21 +241,21 @@ namespace Common
 		}
 	};
 
-	//Ã¿Ò»¸öÊÇÒ»¸öÎÄ¼ş
+	//æ¯ä¸€ä¸ªæ˜¯ä¸€ä¸ªæ–‡ä»¶
 	struct SFileFrames
 	{
-		//ÎÄ¼şµÄÃû×Ö
+		//æ–‡ä»¶çš„åå­—
 		std::string FileName;
-		//ÎÄ¼şµÄ¾ø¶ÔÂ·¾¶
+		//æ–‡ä»¶çš„ç»å¯¹è·¯å¾„
 		std::string FilePath;
 		bool isLoadDataSet = false;
 		int Theta;
 		int Phi;
-		std::vector<double> ForceFluctuationSequence;
-		//delta UÊı¾İ
+		std::vector<std::vector<double>> ForceFluctuationSequence;
+		//delta Uæ•°æ®
 		std::vector<SFileData> Frames;
 		std::vector<SpKVFData> KVFFrameDatas;
-		//U Êı¾İ
+		//U æ•°æ®
 		std::vector<SpDeformation> Deformations;
 		SFileFrames() = default;
 		SFileFrames(std::string vIndex, std::string vFilePath)

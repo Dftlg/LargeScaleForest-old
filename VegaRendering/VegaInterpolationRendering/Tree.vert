@@ -5,6 +5,7 @@ layout (location = 2) in vec2 aTexCoords;
 layout (location = 3) in int faceId;
 layout (location = 4) in mat4 instanceMatrix;
 layout (location = 8 ) in int positionIndex;
+//layout (location = 9) in mat4 specificRotationMatrix;
 
 
 out vec2 v2f_TexCoords;

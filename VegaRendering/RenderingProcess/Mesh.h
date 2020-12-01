@@ -18,14 +18,16 @@ public:
 	unsigned int getIndicesSize() const { return m_Indices.size(); }
 	void draw(const CShader& vShader) const;
 	void reset(const std::vector<Common::SVertex>& vVertices, const std::vector<unsigned int>& vIndices, const std::vector<Common::STexture> vTestures);
-	void setRotation(glm::mat4* temp);
+	void setRotation(glm::mat4* temp, int vInstanceTreeNumber);
+    void setSpecificRotation(glm::mat4 *temp);
 	void setGroupAndAssimpIndex(std::vector<int>& vGroupIndex,int vLastCapacity, int vNextCapacity);
-	//Ã¿¸övectorÖĞsize¸öÊıÎªĞèÒªäÖÈ¾³öµÄÊ÷µÄÊıÁ¿
+	//æ¯ä¸ªvectorä¸­sizeä¸ªæ•°ä¸ºéœ€è¦æ¸²æŸ“å‡ºçš„æ ‘çš„æ•°é‡
 	/*void setTreeAndFrameIndex(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);
 	void UpdataInstanceTreeFileIndexMesh(std::vector<int>& vTreeFileIndex, std::vector<int>& vFrameIndex);*/
 
 private:
 	unsigned int m_InstanceVBO;
+    unsigned int m_InstanceSpecificRotationVBO;
 	unsigned int m_GroupIndexVBO;
 	unsigned int m_AssimpGroupIndexVBO;
 	unsigned int m_InstanceTreeFileVBO;
@@ -33,6 +35,7 @@ private:
 	
 	void __setupMesh();
 	void __setupInstanceMesh();
+    void __setupInstanceSpecificRotationMesh();
 	void __setupGroupIndexMesh();
 	void __setupAssimpGroupIndex();
 	void __setupInstanceTreeFileIndexMesh();
@@ -44,6 +47,8 @@ private:
 	std::vector<int> m_GroupIndex;
 	std::vector<int> m_AssimpGroupIndex;
 	glm::mat4* m_modelMatrices;
+    glm::mat4* m_specificmodelRotationMatrices;
+    int m_InstanceTreeNumber;
 
 	int * m_TreeFileIndex;
 	int * m_FrameIndex;

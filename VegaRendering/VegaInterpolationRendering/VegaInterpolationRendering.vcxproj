@@ -139,6 +139,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="InitMultipleTypeTree.cpp" />
+    <ClCompile Include="LoadWindAndTreeConfig.cpp" />
     <ClCompile Include="VegaInterpolationRendering.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +169,10 @@
     <ProjectReference Include="..\VegaFemFactory\VegaFemFactory.vcxproj">
       <Project>{4d8480d7-7834-40a2-97ea-e34a72da8a63}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InitMultipleTypeTree.h" />
+    <ClInclude Include="LoadWindAndTreeConfig.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
