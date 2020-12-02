@@ -107,6 +107,7 @@ void CModelDeformationTransform::SaveDeformationVertexFromBaseModel(const double
 			{
 				fprintf(file, "%.10lf %.10lf %.10lf ", u[3 * i + 0], u[3 * i + 1], u[3 * i + 2]);
 			}
+			//fprintf(file, "%.10lf %.10lf %.10lf ", u[3 * 32464 + 0], u[3 * 32464 + 1], u[3 * 32464 + 2]);
 			fprintf(file, "\n");
 		}
 		fclose(file);

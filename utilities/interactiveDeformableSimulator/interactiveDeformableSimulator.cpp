@@ -1674,7 +1674,7 @@ void initSimulation()
   pullVertexInfo.LeafExtraForces = LeafExtraForces;
   pullVertexInfo.Scale = scale;
 
-  for (int i = 0; i < pullVertexInfo.StemExtraForces.size(); i++)
+  for (int i = 0; i < pullVertexInfo.StemPullVertexNum; i++)
   {
 	  constantpulledVertex[i] = pullVertexInfo.PullVertexIndex[i];
   }
