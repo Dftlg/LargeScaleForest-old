@@ -38,9 +38,9 @@ namespace Common
 
     //const int TreesNumber = 5;
 
-    const int TreesTypeNumber = 2;
+    const int TreesTypeNumber = 3;
 
-    const int TreesNumbers[TreesTypeNumber] = { 60,35 };
+    const int TreesNumbers[TreesTypeNumber] = { 60,35,10 };
     //int SecondTypeTreesNumber = 5;
 
 	static int MaxTimeStep = 60;
