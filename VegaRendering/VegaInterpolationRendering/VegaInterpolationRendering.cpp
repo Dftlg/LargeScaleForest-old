@@ -63,8 +63,9 @@ std::vector<std::vector<int>> EachFormNumberArray;
 int i = 0;
 int Size = 0;
 int FrameNumber = 0;
-int SearchFrameNumber[Common::TreesTypeNumber] = { 0 };
-int SearchFrameStep[Common::TreesTypeNumber] = { 0 };
+////each time change
+int SearchFrameNumber[Common::TreesTypeNumber] = { 0,0 };
+int SearchFrameStep[Common::TreesTypeNumber] = { 0,0 };
 
 int ALLTreeNumber = 0;
 
@@ -362,11 +363,11 @@ int main()
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
         MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
 
-        //MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 1);
-        //MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
-        //MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
-        //MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
-        ////MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 1);
+        MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 2);
+        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[1], "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
+        MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
+        MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+        MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 1);
         //MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 0);
 
         /*MultipleTypeTree.InitVegaFemFactory("../../models/apricot_tree/deltaU", "../../models/apricot_tree/tree.obj", "../../models/apricot_tree/ObjectVertexIndex.txt", 1);
@@ -394,7 +395,7 @@ int main()
         /////each time change
 	/*boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getFemFactory()), *(MultipleTypeTree.getTreeModel()), *(MultipleTypeTree.getExtraForces()), *(MultipleTypeTree.getExtraDirection()), *(MultipleTypeTree.getTreesNumberSubjected2SameWind()),MultipleTypeTree.getTreeTypeIndex());*/
      boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(0)), *(MultipleTypeTree.getSpecificTreeModel(0)), *(MultipleTypeTree.getSpecificExtraForces(0)), *(MultipleTypeTree.getSpecificExtraDirection(0)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(0)), 0);
-    //boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
+    boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
