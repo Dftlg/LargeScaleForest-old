@@ -1,4 +1,4 @@
- #include <iostream>
+#include <iostream>
 #include <GL/glew.h>
 #include<glm/glm.hpp>
 #include<glm/gtc/type_ptr.hpp>
@@ -15,6 +15,15 @@
 #include "LoadWindAndTreeConfig.h"
 #include "InitMultipleTypeTree.h"
 #include "../Common/ExtraTool.h"
+//#include "TreeInstanceMesh.h"
+//#include "volumetricMeshLoader.h"
+//#include "tetMesh.h"
+//#include <vector>
+//#include <string>
+//#include <cstdio>
+//#include <cassert>
+//#include <float.h>
+//#include "sceneObjectDeformable.h"
 
 void renderPlane(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId);
 void renderTree(CShader& vShader, CSence& vModel);
@@ -49,11 +58,14 @@ float grasstime = 0.0f;
 
 SynchronisedQueue<std::vector<std::pair<int, int>>> SearchQueue[Common::TreesTypeNumber];
 
+std::vector<std::vector<int>> EachFormNumberArray;
+
 int i = 0;
 int Size = 0;
 int FrameNumber = 0;
-int SearchFrameNumber[Common::TreesTypeNumber] = { 0 };
-int SearchFrameStep[Common::TreesTypeNumber] = { 0 };
+////each time change
+int SearchFrameNumber[Common::TreesTypeNumber] = { 0,0 };
+int SearchFrameStep[Common::TreesTypeNumber] = { 0,0 };
 
 int ALLTreeNumber = 0;
 
@@ -101,8 +113,7 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
         {
             std::pair<int, int> tempOneTreeFileAndFrameIndex = vVFF.getFileAndFrameIndex(DifferentTreeNumber, SearchFrameNumber[vTreeTypeIndex] % 5);
             //std::cout << tempOneTreeFileAndFrameIndex.first << "--" << tempOneTreeFileAndFrameIndex.second << "||";
-			//if(SearchFrameNumber[vTreeTypeIndex]<500)
-				//vVFF.writeFindFrameIndex2File("G:/GraduationProject/yellow_tree/xyz/FileAndFrameIndex.txt", tempOneTreeFileAndFrameIndex);
+           
             for (int k = 0; k < vTreesNumberSubjected2SameWind[DifferentTreeNumber] ; k++)
             {
                 tempTreeFileAndFrameIndex.push_back(tempOneTreeFileAndFrameIndex);
@@ -370,12 +381,15 @@ int main()
         }
         
 	#pragma endregion
-
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            EachFormNumberArray.push_back(MultipleTypeTree.getSpecificLoadWindAndTree(i).getEachFormNumberArray());
+        }
 
 
 
 	//开启线程进行读取Tree索引
-		/////////////////////////////////////////////////////
+        /////each time change
 	/*boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getFemFactory()), *(MultipleTypeTree.getTreeModel()), *(MultipleTypeTree.getExtraForces()), *(MultipleTypeTree.getExtraDirection()), *(MultipleTypeTree.getTreesNumberSubjected2SameWind()),MultipleTypeTree.getTreeTypeIndex());*/
      boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(0)), *(MultipleTypeTree.getSpecificTreeModel(0)), *(MultipleTypeTree.getSpecificExtraForces(0)), *(MultipleTypeTree.getSpecificExtraDirection(0)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(0)), 0);
 	 boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
@@ -413,8 +427,12 @@ int main()
         {
             bool Success = SearchQueue[i].TryDequeue(tempTreeFileAndFrameIndex);
 
-            std::cout << tempTreeFileAndFrameIndex[i].first << "--" << tempTreeFileAndFrameIndex[i].second << "||";
-
+            std::cout << "[";
+            for (int k = 0; k < EachFormNumberArray[i].size(); k++)
+            {
+                std::cout << tempTreeFileAndFrameIndex[EachFormNumberArray[i][k]-1].first << "--" << tempTreeFileAndFrameIndex[EachFormNumberArray[i][k]-1].second << "||";
+            }
+            std::cout << "]";
             MultipleTypeTree.getSpecificTreeModel(i)->UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
             tempTreeFileAndFrameIndex.clear();
         }

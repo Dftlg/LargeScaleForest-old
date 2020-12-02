@@ -19,7 +19,12 @@ public:
     std::vector<int> getMultipleTreeDuplicateNumber() { return m_EachTypeTreeNumber; };
     std::vector<float> getMultipleRotationAngle() { return m_ProductRotationAngle; };
     std::vector<Common::SForceDirection> getTreeRotationAngle();
+    std::vector<int> getEachFormNumberArray() { return m_TypeOfTreeEachFormNumber; };
+
 private:
+
+    void __productEachFormNumberArray();
+
     std::vector<std::vector<SWaveFunctionPara>> m_MultipleTreePara;
     std::vector<float> m_TreeRotationAngle;
     std::vector<int> m_EachTypeTreeNumber;
@@ -28,6 +33,9 @@ private:
 
     //reproduce TreeRotationAngle
     std::vector<float> m_ProductRotationAngle;
+
+    std::vector<int> m_TypeOfTreeEachFormNumber;
+
     int m_TreeNumber;
 };
 

@@ -1621,12 +1621,15 @@ void initSimulation()
   //1000
   //5828, 6539, 8117
   //6172,6552,2768
-  std::vector<int>pullVertexIndex = { 6172,6552 };
+  //6270,5852
+  //std::vector<int>pullVertexIndex = { 6172,6552,2768 };
+  std::vector<int>pullVertexIndex = { 6270,5852 ,11542 };
   //std::vector<float>scale = { 1.0,0.8,0.08,0.05,-0.02,-0.05 };
   //600
   //std::vector<float>scale = { 1.0,0.8,0.05,0.03,-0.009,-0.03 };
   //3000
-  std::vector<float>scale = { 1.0,1.0,1.0,0.01,-0.009,-0.009 };
+  std::vector<float>scale = { 1.0,1.0,0.1,0.1,-0.009,-0.009 };
+  //std::vector<float>scale = { 1.0,1.0,1.0,0.01,-0.009,-0.009 };
   StemExtraForces.resize(180, 0);
   LeafExtraForces.resize(180, 0);
   for (int i = 0; i < tempConfig.size(); i++)
@@ -2343,7 +2346,7 @@ int main(int argc, char* argv[])
 
   //configFilename = string("D:/GraduationProject/Vega/examples/simpleBridge_vox/simpleBridge_vox.config");
  /* configFilename = string("D:/GraduationProject/Vega/models/newgrass/voxelizegrass/voxelizegrass.config");*/
-  configFilename = string("../../models/mini_mapleTree/tree.config");
+  configFilename = string("../../models/apricot_tree/tree.config");
   printf("Loading scene configuration from %s.\n", configFilename.c_str());
 
   initConfigurations(); // parse the config file同时输出到cmd

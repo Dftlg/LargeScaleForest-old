@@ -43,6 +43,7 @@ public:
     std::vector<std::vector<int>> *getTreesNumberSubjected2SameWind() { return &m_MultipleTreesNumberSubjected2SameWind; };
     std::vector<CShader*> * getScenceShadowShader() { return &m_MultipleSceneShadowShader; };
     std::vector<CShader*> * getScenceDepthShader() { return &m_MultipleSceneDepthShader; };
+   
 
     CVegaFemFactory* getSpecificFemFactory(int vTreeTypeIndex) { return m_MultipleTypeFem[vTreeTypeIndex]; };
     CSence * getSpecificTreeModel(int vTreeTypeIndex) { return m_MultipleTreeModel[vTreeTypeIndex]; };
@@ -51,6 +52,7 @@ public:
     std::vector<int> *getSpecificTreesNumberSubjected2SameWind(int vTreeTypeIndex) { return &m_MultipleTreesNumberSubjected2SameWind[vTreeTypeIndex]; };
     CShader * getSpecificScenceShadowShader(int vTreeTypeIndex) { return m_MultipleSceneShadowShader[vTreeTypeIndex]; };
     CShader * getSpecificScenceDepthShader(int vTreeTypeIndex) { return m_MultipleSceneDepthShader[vTreeTypeIndex]; };
+    CLoadWindAndTreeConfig getSpecificLoadWindAndTree(int vTreeTypeIndex) { return m_MultipleTypeTree[vTreeTypeIndex];}
 
     std::vector<int> getTreeTypeIndex() { return m_TreeTypeIndex; };
 
