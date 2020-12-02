@@ -43,6 +43,6 @@ int main()
 		temp.push_back(vtemp[i]);
 		vFem.readFramesDeformationData(temp, i);
 	}
-	writePointPosition2File("G:/GraduationProject/yellow_tree/xyz/FileAndFrameIndex.txt","G:/GraduationProject/yellow_tree/xyz/Interpolation_1150_32464_deltaU.txt",32464,vFem);
+	writePointPosition2File("G:/GraduationProject/yellow_tree/xyz/FileAndFrameIndex.txt", "G:/GraduationProject/yellow_tree/xyz/Interpolation_1150_33971_deltaU.txt", 33971, vFem);
 	return 0;
 }

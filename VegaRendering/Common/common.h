@@ -32,7 +32,7 @@ namespace Common
 
 	static bool InstanceTrees = true;
 
-	static int ProductForceNumber = 5;
+	//static int ProductForceNumber = 5;
 
 	//const int TreesInstanceNumber = 1;
 
@@ -40,7 +40,7 @@ namespace Common
 
     const int TreesTypeNumber = 2;
 
-    const int TreesNumbers[TreesTypeNumber] = { 10,5 };
+    const int TreesNumbers[TreesTypeNumber] = { 60,35 };
     //int SecondTypeTreesNumber = 5;
 
 	static int MaxTimeStep = 60;

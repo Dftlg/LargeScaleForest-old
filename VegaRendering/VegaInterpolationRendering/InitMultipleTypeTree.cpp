@@ -83,7 +83,7 @@ void CInitMultipleTypeTree::InitMultipleExtraWindData(int vTreeTypeIndex)
     //只计算了树受到不同的风力，若相同则直接取用已有数据
     for (int i = 0; i < OneDirectionWindRelatedMultipleTree.size(); i++)
     {
-        CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindRelatedMultipleTree[i], 6000, Common::SForceDirection(0, 0), m_MultipleTypeTree[vTreeTypeIndex].getTreeRotationAngle()[i]);
+        CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindRelatedMultipleTree[i], 600000, Common::SForceDirection(0, 0), m_MultipleTypeTree[vTreeTypeIndex].getTreeRotationAngle()[i]);
         m_MultipleExtraForces[vTreeTypeIndex].push_back(OnedirectionWind.getDirectionWindForces());
         m_MultipleExtraDirections[vTreeTypeIndex].push_back(OnedirectionWind.getDirectionWindDirection());
     }

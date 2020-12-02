@@ -1,4 +1,4 @@
-#include <iostream>
+ #include <iostream>
 #include <GL/glew.h>
 #include<glm/glm.hpp>
 #include<glm/gtc/type_ptr.hpp>
@@ -15,15 +15,6 @@
 #include "LoadWindAndTreeConfig.h"
 #include "InitMultipleTypeTree.h"
 #include "../Common/ExtraTool.h"
-//#include "TreeInstanceMesh.h"
-//#include "volumetricMeshLoader.h"
-//#include "tetMesh.h"
-//#include <vector>
-//#include <string>
-//#include <cstdio>
-//#include <cassert>
-//#include <float.h>
-//#include "sceneObjectDeformable.h"
 
 void renderPlane(CShader& vShader, const unsigned int& VAOId, const unsigned int& vTextureId, const unsigned int& vTextureOpacityId);
 void renderTree(CShader& vShader, CSence& vModel);
@@ -110,8 +101,8 @@ void InsertSearchTreeFrameIndex(CVegaFemFactory &vVFF, CSence vSence, std::vecto
         {
             std::pair<int, int> tempOneTreeFileAndFrameIndex = vVFF.getFileAndFrameIndex(DifferentTreeNumber, SearchFrameNumber[vTreeTypeIndex] % 5);
             //std::cout << tempOneTreeFileAndFrameIndex.first << "--" << tempOneTreeFileAndFrameIndex.second << "||";
-			if(SearchFrameNumber[vTreeTypeIndex]<500)
-				vVFF.writeFindFrameIndex2File("", tempOneTreeFileAndFrameIndex);
+			//if(SearchFrameNumber[vTreeTypeIndex]<500)
+				//vVFF.writeFindFrameIndex2File("G:/GraduationProject/yellow_tree/xyz/FileAndFrameIndex.txt", tempOneTreeFileAndFrameIndex);
             for (int k = 0; k < vTreesNumberSubjected2SameWind[DifferentTreeNumber] ; k++)
             {
                 tempTreeFileAndFrameIndex.push_back(tempOneTreeFileAndFrameIndex);
@@ -351,21 +342,27 @@ int main()
             ALLTreeNumber +=Common::TreesNumbers[i];
         }
         CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, ALLTreeNumber);
-
+		//////////////////////////////////////////
         MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
-        MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 1);
-        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
+		MultipleTypeTree.InitVegaFemFactory("G:/GraduationProject/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 5);
+        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "G:/GraduationProject/yellow_tree/WindAndTreeConfig/Config.txt");
         MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
         MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
 
-        MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 1);
-        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[1], "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
+        MultipleTypeTree.InitVegaFemFactory("G:/GraduationProject/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 6);
+        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[1], "G:/GraduationProject/mini_mapleTree/WindAndTreeConfig/Config.txt");
         MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
         MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 1);
         //MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 0);
-        
+
+		/*MultipleTypeTree.InitVegaFemFactory("G:/GraduationProject/apricot_tree/deltaU", "../../models/apricot_tree/tree.obj", "../../models/apricot_tree/ObjectVertexIndex.txt", 1);
+		MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "G:/GraduationProject/apricot_tree/WindAndTreeConfig/Config.txt");
+		MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
+		MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+		MultipleTypeTree.InitTreeModel("../../models/apricot_tree/tree.obj", 2); 
+        */
         for (int i = 0; i < Common::TreesTypeNumber; i++)
         {
             MultipleTypeTree.InitMultipleExtraWindData(i);
@@ -379,6 +376,7 @@ int main()
 
 
 	//开启线程进行读取Tree索引
+		/////////////////////////////////////////////////////
 	/*boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getFemFactory()), *(MultipleTypeTree.getTreeModel()), *(MultipleTypeTree.getExtraForces()), *(MultipleTypeTree.getExtraDirection()), *(MultipleTypeTree.getTreesNumberSubjected2SameWind()),MultipleTypeTree.getTreeTypeIndex());*/
      boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(0)), *(MultipleTypeTree.getSpecificTreeModel(0)), *(MultipleTypeTree.getSpecificExtraForces(0)), *(MultipleTypeTree.getSpecificExtraDirection(0)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(0)), 0);
     boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
@@ -479,7 +477,7 @@ int main()
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 	
-		//Sleep(100);
+		Sleep(100);
 		
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);

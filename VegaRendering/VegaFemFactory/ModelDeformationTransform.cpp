@@ -99,15 +99,15 @@ void CModelDeformationTransform::SaveDeformationVertexFromBaseModel(const double
 		}
 		else
 		{
-			/*sprintf(s, "Position%d", vtimeStepCounter);
+			sprintf(s, "Position%d", vtimeStepCounter);
 			fprintf(file, "%s \n", s);
 			sprintf(s, "%d", vDeformationSize);
 			fprintf(file, "%s \n", s);
 			for (unsigned int i = 0; i < vDeformationSize; i++)
 			{
 				fprintf(file, "%.10lf %.10lf %.10lf ", u[3 * i + 0], u[3 * i + 1], u[3 * i + 2]);
-			}*/
-			fprintf(file, "%.10lf %.10lf %.10lf ", u[3 * 32464 + 0], u[3 * 32464 + 1], u[3 * 32464 + 2]);
+			}
+			//fprintf(file, "%.10lf %.10lf %.10lf ", u[3 * 32464 + 0], u[3 * 32464 + 1], u[3 * 32464 + 2]);
 			fprintf(file, "\n");
 		}
 		fclose(file);

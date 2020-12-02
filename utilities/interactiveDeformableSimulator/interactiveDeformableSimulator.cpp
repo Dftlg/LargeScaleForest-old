@@ -791,7 +791,7 @@ void idleFunction(void)
       }
 	  subTimestepCounter++;
     }
-	if (subTimestepCounter > 500)
+	if (subTimestepCounter > 180)
 	{
 		exit(1);
 	}

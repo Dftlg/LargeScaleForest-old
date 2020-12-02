@@ -442,6 +442,7 @@ void CSence::initSSBODeformationU()
 {
 	setMeshGroupAndAssimpIndex();
 	m_DeformationU = new glm::vec4[m_InstanceTreeNumber*m_AssimpVerticesNumber];
+	memset(m_DeformationU, 0, sizeof(glm::vec4)*m_InstanceTreeNumber*m_AssimpVerticesNumber);
 }
 
 void CSence::initSSBOTreeFileAndFrameIndex(const int vTreeNumber)
