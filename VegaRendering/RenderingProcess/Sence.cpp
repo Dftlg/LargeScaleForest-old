@@ -22,7 +22,7 @@ void CSence::setMeshRotation(std::vector<float> &vRotations, std::vector<std::pa
     m_TransFormations = vTransFormations;
     glm::mat4*temp = translateTreePosition();
     m_SetRotation = vRotations;
-    specificTreeRotation(m_SetRotation, temp);
+    //specificTreeRotation(m_SetRotation, temp);
     //randomRotation(temp);
     setScaleMesh(vScaleNumber, temp);
 	for (auto& Mesh : m_Meshes)
@@ -76,7 +76,7 @@ glm::mat4* CSence::translateTreePosition()
     {
         glm::mat4 model = glm::mat4(1.0f);
         //model = glm::translate(model, glm::vec3(translate[i], -0.5f,0));
-        model = glm::translate(model, glm::vec3((m_TransFormations[i].first - Common::AllTreesNumber / 2)*0.5, -0.5f, (m_TransFormations[i].second - Common::AllTreesNumber / 2)*0.5));
+        model = glm::translate(model, glm::vec3((m_TransFormations[i].first - Common::AllTreesNumber / 2)*0.4, -0.5f, (m_TransFormations[i].second - Common::AllTreesNumber / 2)*0.4));
         modelMatrices[i] = model;
     }
     return modelMatrices;
