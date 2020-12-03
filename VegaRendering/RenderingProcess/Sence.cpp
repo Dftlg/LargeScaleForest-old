@@ -21,13 +21,22 @@ void CSence::setMeshRotation(std::vector<float> &vRotations, std::vector<std::pa
 	m_InstanceTreeNumber = vTreesNumber;
 	m_TransFormations = vTransFormations;
 	glm::mat4*temp = translateTreePosition();
+	
 	m_SetRotation = vRotations;
 	specificTreeRotation(m_SetRotation, temp);
 	//randomRotation(temp);
-
+	setScaleMesh(vScaleNumber, temp);
 	for (auto& Mesh : m_Meshes)
 	{
 		Mesh.setRotation(temp, m_InstanceTreeNumber);
+	}
+}
+
+void CSence::setScaleMesh(float vScale, glm::mat4 * vmodelMatrices)
+{
+	for (int i = 0; i < m_InstanceTreeNumber; i++)
+	{
+		vmodelMatrices[i] = glm::scale(vmodelMatrices[i], glm::vec3(vScale, vScale, vScale));
 	}
 }
 
@@ -41,6 +50,7 @@ void CSence::setMeshRotation(std::vector<float> &vRotations, std::vector<std::pa
 //    }
 //}
 //
+
 void CSence::specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrces)
 {
 	glm::mat4* modelMatrices = new glm::mat4[m_InstanceTreeNumber];
@@ -63,7 +73,8 @@ glm::mat4* CSence::translateTreePosition()
 	{
 		glm::mat4 model = glm::mat4(1.0f);
 		//model = glm::translate(model, glm::vec3(translate[i], -0.5f,0));
-		model = glm::translate(model, glm::vec3((m_TransFormations[i].first - m_InstanceTreeNumber / 2)*0.75, -0.5f, (m_TransFormations[i].second - m_InstanceTreeNumber / 2)*0.75));
+		//0.45
+		model = glm::translate(model, glm::vec3((m_TransFormations[i].first - Common::AllTreesNumber / 2)*0.075, -0.5f, (m_TransFormations[i].second - Common::AllTreesNumber / 2)*0.075));
 		modelMatrices[i] = model;
 	}
 	return modelMatrices;
@@ -81,6 +92,15 @@ void CSence::randomRotation(glm::mat4* vmodelMatrces)
 		//glm::vec3 tempScale = GenerateRamdomScale();
 		//vmodelMatrces[i] = glm::scale(model, vmodelMatrces[i]);
 		//model = glm::scale(model, tempScale);
+	}
+}
+
+void CSence::randomScaleMesh(glm::mat4 * vmodelMatrices)
+{
+	for (int i = 0; i < m_InstanceTreeNumber; i++)
+	{
+		glm::vec3 tempScale = GenerateRamdomScale();
+		vmodelMatrices[i] = glm::scale(vmodelMatrices[i], tempScale);
 	}
 }
 

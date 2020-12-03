@@ -64,8 +64,8 @@ int i = 0;
 int Size = 0;
 int FrameNumber = 0;
 ////each time change
-int SearchFrameNumber[Common::TreesTypeNumber] = { 0,0 };
-int SearchFrameStep[Common::TreesTypeNumber] = { 0,0 };
+int SearchFrameNumber[Common::TreesTypeNumber] = { 0,0,0 };
+int SearchFrameStep[Common::TreesTypeNumber] = { 0,0,0};
 
 int ALLTreeNumber = 0;
 
@@ -427,16 +427,16 @@ int main()
         {
             bool Success = SearchQueue[i].TryDequeue(tempTreeFileAndFrameIndex);
 
-            std::cout << "[";
+            /*std::cout << "[";
             for (int k = 0; k < EachFormNumberArray[i].size(); k++)
             {
                 std::cout << tempTreeFileAndFrameIndex[EachFormNumberArray[i][k]-1].first << "--" << tempTreeFileAndFrameIndex[EachFormNumberArray[i][k]-1].second << "||";
             }
-            std::cout << "]";
+            std::cout << "]";*/
             MultipleTypeTree.getSpecificTreeModel(i)->UpdataSSBOMeshTreeAndFrameIndex(tempTreeFileAndFrameIndex);
             tempTreeFileAndFrameIndex.clear();
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
 		FrameNumber++;
 
 		// 1. render scene to depth cubemap
@@ -494,7 +494,7 @@ int main()
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 	
-		Sleep(100);
+		//Sleep(100);
 		
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);

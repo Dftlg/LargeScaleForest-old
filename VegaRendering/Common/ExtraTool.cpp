@@ -42,7 +42,7 @@ glm::vec3 GenerateRamdomScale()
 	srand(seed.QuadPart);
 	int randomNumber = rand();
 	float scalenumber = randomNumber % 1000 / (float)1000;
-	while (scalenumber < 0.6)
+	while (scalenumber < 0.92)
 	{
 		QueryPerformanceFrequency(&seed);
 		QueryPerformanceCounter(&seed);
@@ -55,21 +55,49 @@ glm::vec3 GenerateRamdomScale()
 
 std::vector<std::pair<double,double>> RandomTreePositionGenerate(int vTreeNumber)
 {
+	std::vector<int> tempTreeXPosition;
+	std::vector<int> tempTreeYPosition;
 	std::vector<std::pair<int, int>> tempTreePosition;
 	std::vector<std::pair<double, double>> tempTreedoublePosition(vTreeNumber);
-	while (tempTreePosition.size()!=vTreeNumber)
-	{
-		LARGE_INTEGER seed;
-		QueryPerformanceFrequency(&seed);
-		QueryPerformanceCounter(&seed);
-		srand(seed.QuadPart);
-		std::pair<int, int> temppair(rand() % vTreeNumber, rand() % vTreeNumber);
-		tempTreePosition.push_back(temppair);
 
-		//std::sort(tempTreePosition.begin(), tempTreePosition.end());
-		tempTreePosition.erase(std::unique(tempTreePosition.begin(), tempTreePosition.end()), tempTreePosition.end());
+
+	for (int i = 0; i < vTreeNumber; i++)
+	{
+		tempTreeXPosition.push_back(i);
+		tempTreeYPosition.push_back(i);
 	}
-	for (auto i = 0; i < tempTreePosition.size(); i++)
+
+	std::random_shuffle(tempTreeXPosition.begin(), tempTreeXPosition.end());
+	std::random_shuffle(tempTreeYPosition.begin(), tempTreeYPosition.end());
+
+	for (int i = 0; i < vTreeNumber; i++)
+	{
+		tempTreedoublePosition[i].first = tempTreeXPosition[i];
+		tempTreedoublePosition[i].second = tempTreeYPosition[i];
+	}
+
+	//while (tempTreePosition.size()!=vTreeNumber)
+	//{
+	//	LARGE_INTEGER seed;
+	//	QueryPerformanceFrequency(&seed);
+	//	QueryPerformanceCounter(&seed);
+	//	srand(seed.QuadPart);
+	//	int tempfirst = rand() % vTreeNumber;
+	//	//std::pair<int, int> temppair(rand() % vTreeNumber, rand() % vTreeNumber);
+	//	QueryPerformanceFrequency(&seed);
+	//	QueryPerformanceCounter(&seed);
+	//	srand(seed.QuadPart);
+	//	int tempsecond = rand() % vTreeNumber;
+	//	std::pair<int, int> temppair(tempfirst, tempsecond);
+
+
+
+	//	tempTreePosition.push_back(temppair);
+
+	//	//std::sort(tempTreePosition.begin(), tempTreePosition.end());
+	//	tempTreePosition.erase(std::unique(tempTreePosition.begin(), tempTreePosition.end()), tempTreePosition.end());
+	//}
+	/*for (auto i = 0; i < tempTreePosition.size(); i++)
 	{
 		std::default_random_engine e;
 		LARGE_INTEGER seed;
@@ -79,7 +107,12 @@ std::vector<std::pair<double,double>> RandomTreePositionGenerate(int vTreeNumber
 		std::uniform_real_distribution<double> u(0, 1);
 		tempTreedoublePosition[i].first = tempTreePosition[i].first + u(e);
 		tempTreedoublePosition[i].second = tempTreePosition[i].second + u(e);
-	}
+	}*/
+	/*for (auto i = 0; i < tempTreePosition.size(); i++)
+	{
+		tempTreedoublePosition[i].first = tempTreePosition[i].first;
+		tempTreedoublePosition[i].second = tempTreePosition[i].second;
+	}*/
 	return tempTreedoublePosition;
 }
 

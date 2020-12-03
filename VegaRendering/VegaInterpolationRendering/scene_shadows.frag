@@ -105,7 +105,7 @@ void main()
 {    
 	vec4  texColor1 = texture(texture_diffuse1, v2f_TexCoords);
 	vec4  texColor2 = texture(texture_opacity1, v2f_TexCoords);
-	if(texColor2.r < 0.07 && texColor2.g < 0.07 && texColor2.b < 0.07)
+	if(texColor2.rgb == vec3(0.0,0.0,0.0))
 		discard;	
     //FragColor = texColor1;
 
