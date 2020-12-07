@@ -53,6 +53,7 @@ void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTre
 {
     CSence* ourModel=new CSence(vModelPath);
 
+
     ourModel->setTreeNumber(m_MultipleEachTreeProductNumber[vTreeTypeIndex]);
     std::vector<float> SpecificRotation = m_MultipleTypeTree[vTreeTypeIndex].getMultipleRotationAngle();
     std::vector<std::pair<double, double>> tempTransFormation;
@@ -75,6 +76,16 @@ void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTre
     m_MultipleTreeModel.push_back(ourModel);
 }
 
+int CInitMultipleTypeTree::getSumFaceVerticesBeforeEndMesh(const int & vMeshIndex)
+{
+	int sumFaceVerticesBeforeEndMesh = 0;
+	for (int i = 0; i < m_MultipleTreeModel[vMeshIndex]->getMeshes().size() - 1; i++)
+	{
+		sumFaceVerticesBeforeEndMesh += m_MultipleTreeModel[vMeshIndex]->getMeshes()[i].getVertices().size();
+	}
+	return sumFaceVerticesBeforeEndMesh;
+}
+
 void CInitMultipleTypeTree::InitMultipleExtraWindData(int vTreeTypeIndex)
 {
     std::vector<std::vector<SWaveFunctionPara>> OneDirectionWindRelatedMultipleTree = m_MultipleTypeTree[vTreeTypeIndex].getMultipleTreeWindPara();
@@ -83,7 +94,7 @@ void CInitMultipleTypeTree::InitMultipleExtraWindData(int vTreeTypeIndex)
     //只计算了树受到不同的风力，若相同则直接取用已有数据
     for (int i = 0; i < OneDirectionWindRelatedMultipleTree.size(); i++)
     {
-        CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindRelatedMultipleTree[i], 60000, Common::SForceDirection(0, 0), m_MultipleTypeTree[vTreeTypeIndex].getTreeRotationAngle()[i]);
+        CWindField OnedirectionWind(Common::ProductFrameNumber, OneDirectionWindRelatedMultipleTree[i], 600000, Common::SForceDirection(0, 0), m_MultipleTypeTree[vTreeTypeIndex].getTreeRotationAngle()[i]);
         m_MultipleExtraForces[vTreeTypeIndex].push_back(OnedirectionWind.getDirectionWindForces());
         m_MultipleExtraDirections[vTreeTypeIndex].push_back(OnedirectionWind.getDirectionWindDirection());
     }
