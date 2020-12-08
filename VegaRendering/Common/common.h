@@ -36,11 +36,11 @@ namespace Common
 
     /////each time change
 
-    const int AllTreesNumber = 1;
+    const int AllTreesNumber = 3;
 
-    const int TreesTypeNumber = 1;
+    const int TreesTypeNumber = 3;
 
-    const int TreesNumbers[TreesTypeNumber] = { 1 };
+    const int TreesNumbers[TreesTypeNumber] = { 60,35,10 };
     //int SecondTypeTreesNumber = 5;
 
     //const int AllTreesNumber = 100;
@@ -49,7 +49,7 @@ namespace Common
 
     //const int TreesNumbers[TreesTypeNumber] = {60,40 };
     ////int SecondTypeTreesNumber = 5;
-    const float ScaleTree[TreesTypeNumber] = { 1.0};
+    const float ScaleTree[TreesTypeNumber] = { 0.7,1.5 };
 
 	static int MaxTimeStep = 60;
 
@@ -66,7 +66,7 @@ namespace Common
 	//一个文件中存多少帧
 	static int SamplingFrameNumber = 180;
 
-	static int ProductFrameNumber = 18000000;
+	static int ProductFrameNumber = 1800000;
 
 	//static int KErrorRange = 10;
 	static int ExpandForceError = 1;

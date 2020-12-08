@@ -105,7 +105,7 @@ void main()
 {    
 	vec4  texColor1 = texture(texture_diffuse1, v2f_TexCoords);
 	vec4  texColor2 = texture(texture_opacity1, v2f_TexCoords);
-	if(texColor2.r<0.05 && texColor2.g<0.05 && texColor2.b<0.05)
+	if(texColor2.r < 0.07 && texColor2.g < 0.07 && texColor2.b < 0.07)
 		discard;	
     //FragColor = texColor1;
 
@@ -126,7 +126,7 @@ void main()
         float distance = length(lightPositions[i] - v2f_WorldPos);
         float attenuation = 1.0 / (distance * distance);
         //vec3 radiance = lightColors[i] * attenuation;
-		vec3 radiance = lightColors[i]*2.0;
+		vec3 radiance = lightColors[i];
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);   
@@ -153,6 +153,7 @@ void main()
     color = pow(color, vec3(1.0/2.2)); 
 
     FragColor = vec4(color, 1.0);
+
 	
 }
 
