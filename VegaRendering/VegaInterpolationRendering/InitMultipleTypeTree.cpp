@@ -126,11 +126,11 @@ void CInitMultipleTypeTree::InitASpecificWindSourceWindData(int vTreeTypeIndex)
     m_ASpecificWindSource=new CWindField (glm::vec3(0, 0, 0), Common::ProductFrameNumber, SpecificeWindFunctionPara[0], 60000, 10, WindCenterMovePosition, WindCenterMoveFrames, MoveScale);
 }
 
-//void CInitMultipleTypeTree::InitFemFrameStruct(int vTreeTypeIndex)
-//{
-//    m_MultipleTypeFem[vTreeTypeIndex]->initMatchedFrameStruct(m_MultipleExtraForces[vTreeTypeIndex].size());
-//    m_MultipleTypeFem[vTreeTypeIndex]->initKVFDataSearchRangeError();
-//}
+void CInitMultipleTypeTree::InitFemFrameStruct(int vTreeTypeIndex)
+{
+    m_MultipleTypeFem[vTreeTypeIndex]->initMatchedFrameStruct(m_MultipleExtraForces[vTreeTypeIndex].size());
+    m_MultipleTypeFem[vTreeTypeIndex]->initKVFDataSearchRangeError();
+}
 
 void CInitMultipleTypeTree::InitShadowCubeMapPara(float vNearPlane, float vFarPlane, int vSHADOW_WIDTH, int vSHADOW_HEIGHT, std::vector <glm::mat4>& vshadowTransforms, glm::vec3 * vlightVertices, glm::vec3 * vlightColors)
 {
