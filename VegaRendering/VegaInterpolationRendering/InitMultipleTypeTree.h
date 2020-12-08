@@ -26,6 +26,7 @@ public:
     void InitSceneDepthShader(const char* vVertexPath, const char* vFragmentPath, const char* vGeometryPath = nullptr);
 
     void InitTreeModel(const std::string& vModelPath, int vTreeTypeIndex);
+	int getSumFaceVerticesBeforeEndMesh(const int& vTreeIndex);
 
     void InitMultipleExtraWindData(int vTreeTypeIndex);
 
