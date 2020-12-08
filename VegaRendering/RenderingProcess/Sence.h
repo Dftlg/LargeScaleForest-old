@@ -65,6 +65,8 @@ public:
 	void randomRotation(glm::mat4* vmodelMatrices);
 	void setMeshGroupAndAssimpIndex();
 
+    std::vector<glm::vec3> getTreePositions() { return m_TreePositions; };
+
     std::vector<Common::SForceDirection> getAngles() { return m_Angles; };
 
 	void UpdataSSBOMeshTreeAndFrameIndex(std::vector<std::pair<int,int>>& vTreeFileAndFrameIndex);
@@ -104,6 +106,8 @@ private:
 	unsigned int m_TreeFileAndFrameSSBO;
 
     std::vector<GLuint> m_SSBO_Binding_Point_Index;
+
+    std::vector<glm::vec3> m_TreePositions;
 
 	int m_FrameNums;
 	int m_VertexNums;

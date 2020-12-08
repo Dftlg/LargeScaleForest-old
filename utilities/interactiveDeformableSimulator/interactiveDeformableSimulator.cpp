@@ -212,6 +212,8 @@ char fixedVerticesKVFFileName[4096];
 char uDeformationoutputFileName[4096];
 char ObjectVertexIndexInElement[4096];
 char ExternFileDirectory[4096];
+char ExternFileLineForceDirectory[4096];
+char ExternStreePointsDirectory[4096];
 
 // adjusts the stiffness of the object to cause all frequencies scale by the provided factor:
 // keep it to 1.0 (except for experts)
@@ -242,13 +244,16 @@ int staticSolver = 0;
 int graphicFrame = 0;
 int lockAt30Hz = 0;
 int forceNum = 3;
+
+std::vector<int> LineExtraForces;
 struct SPullVertexInfo
 {
 	int StemPullVertexNum;
 	std::vector<int> PullVertexIndex;
 	std::vector<int> StemExtraForces;
-	std::vector<int> LeafExtraForces;
+	std::vector<std::vector<int>> LeafExtraForces;
 	std::vector<float> Scale;
+    std::vector<std::pair<int, int>> DeviationDirection;
 };
 SPullVertexInfo pullVertexInfo;
 int* pulledVertex = (int*)calloc(forceNum, sizeof(int));
@@ -270,7 +275,7 @@ int * fixedKVFVertices;
 std::vector<int> KVFVertices;
 
 std::vector<int> StemExtraForces;
-std::vector<int> LeafExtraForces;
+std::vector<std::vector<int>> LeafExtraForces;
 std::vector<int> TempExtraForces;
 int FramesNumber = 0;
 int Amplitude = 0;
@@ -692,7 +697,7 @@ void idleFunction(void)
 	  for (int i = 0; i < pullVertexInfo.StemPullVertexNum; i++)
 	  {
 		  camera->setWorldCoorinateSystemForce(pullVertexInfo.StemExtraForces[subTimestepCounter], Theta, Phi, externalForce);
-		  std::copy(externalForce, externalForce + 3, vForce);
+		  //std::copy(externalForce, externalForce + 3, vForce);
 		  for (int j = 0; j < 3; j++)
 		  {
 			  externalForce[j] *= deformableObjectCompliance * pullVertexInfo.Scale[i];
@@ -703,10 +708,11 @@ void idleFunction(void)
 	  }
 
 	  //leaf
+
 	  for (int i = pullVertexInfo.StemPullVertexNum; i < pullVertexInfo.PullVertexIndex.size(); i++)
 	  {
-		  camera->setWorldCoorinateSystemForce(pullVertexInfo.LeafExtraForces[subTimestepCounter], 90, 90, externalForce);
-		  //std::copy(externalForce, externalForce + 3, vForce);
+		  camera->setWorldCoorinateSystemForce(pullVertexInfo.LeafExtraForces[i-pullVertexInfo.StemPullVertexNum][subTimestepCounter], Theta+ pullVertexInfo.DeviationDirection[i].first, Phi+ pullVertexInfo.DeviationDirection[i].second, externalForce);
+		  std::copy(externalForce, externalForce + 3, vForce);
 		  for (int j = 0; j < 3; j++)
 		  {
 			  externalForce[j] *= deformableObjectCompliance * pullVertexInfo.Scale[i];
@@ -860,7 +866,9 @@ void idleFunction(void)
 	}*/
 	//存储deltaU的形变数据
 	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
-	//存储U的形变数据
+
+
+    //存储U的形变数据
 	//deformationsave.SaveDeformationVertexFromBaseModel(uSecondary, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter - 1);
 
 
@@ -1616,26 +1624,56 @@ void initSimulation()
   deltau = (double*)calloc(3 * n, sizeof(double));
   preu= (double*)calloc(3 * n, sizeof(double));
 
-  std::vector<std::vector<double>> tempConfig = GetForceConfigurate(outputFilename, ExternFileDirectory,Theta,Phi);
+  StemExtraForces.resize(180, 0);
+
+  //if (ExternFileLineForceDirectory != "none")
+  //{
+  //    std::vector<std::pair<int, int>> tempLineConfig = GetLineForceConfigurate(ExternFileLineForceDirectory);
+  //    LineExtraForces = GenerateLineForce(Common::SamplingFrameNumber, tempLineConfig);
+  //    for (int i = 0; i < LineExtraForces.size(); i++)
+  //    {
+  //        StemExtraForces[i] += LineExtraForces[i];
+  //    }
+  //}
+  std::vector<std::pair<int, int>> tempLineConfig;
+  std::vector<std::vector<double>> tempConfig = GetForceConfigurate(outputFilename, ExternFileDirectory,Theta,Phi, tempLineConfig);
+  if (tempLineConfig.size() != 0)
+  {
+      LineExtraForces = GenerateLineForce(Common::SamplingFrameNumber, tempLineConfig);
+      for (int i = 0; i < LineExtraForces.size(); i++)
+      {
+          StemExtraForces[i] += LineExtraForces[i];
+      }
+  }
+  std::pair<std::vector<int>, std::vector<float>>tempStreePoints;
+  std::vector<std::pair<int, int>>tempDeviationDirection;
+  std::vector<float> tempFrequency;
+  std::vector<float> tempPhase;
+  GetStemAndLeafStreePointsConfigurate(ExternStreePointsDirectory, tempStreePoints, tempDeviationDirection,tempFrequency, tempPhase);
+
+  pullVertexInfo.StemPullVertexNum = 2;
+  pullVertexInfo.PullVertexIndex = tempStreePoints.first;
   
+  pullVertexInfo.LeafExtraForces = LeafExtraForces;
+  pullVertexInfo.Scale = tempStreePoints.second;
+  pullVertexInfo.DeviationDirection = tempDeviationDirection;
   //1000
   //5828, 6539, 8117
   //6172,6552,2768
   //6270,5852
   //std::vector<int>pullVertexIndex = { 6172,6552,2768 };
-  std::vector<int>pullVertexIndex = { 6270,5852 ,11542 };
+  //std::vector<int>pullVertexIndex = { 6270,5852 ,6821,2910,7408,11070,8341,10950,232,10393,11621,10222,3000,10682 };
   //std::vector<float>scale = { 1.0,0.8,0.08,0.05,-0.02,-0.05 };
   //600
   //std::vector<float>scale = { 1.0,0.8,0.05,0.03,-0.009,-0.03 };
   //3000
-  std::vector<float>scale = { 1.0,1.0,0.1,0.1,-0.009,-0.009 };
+  //std::vector<float>scale = { 1.0,1.0,0.1,0.1,0.1,0.1 };
   //std::vector<float>scale = { 1.0,1.0,1.0,0.01,-0.009,-0.009 };
-  StemExtraForces.resize(180, 0);
-  LeafExtraForces.resize(180, 0);
+ 
+
   for (int i = 0; i < tempConfig.size(); i++)
   {
-	  std::vector<int> tempStemForces= GenerateSamplingForce(180, tempConfig[i][0], tempConfig[i][1], tempConfig[i][2], tempConfig[i][3], 6);
-	  std::vector<int> tempLeafForces = GenerateSamplingForce(180, tempConfig[i][0], tempConfig[i][1], tempConfig[i][2], tempConfig[i][3], 6);
+	  std::vector<int> tempStemForces= GenerateSamplingForce(180, tempConfig[i][0], tempConfig[i][1], tempConfig[i][2], tempConfig[i][3], 6);	  
 	  for (int k = 0; k < tempStemForces.size(); k++)
 	  {
           std::cout << tempConfig[i].size() << std::endl;
@@ -1643,8 +1681,7 @@ void initSimulation()
           {
               if (tempStemForces[k] < tempConfig[i][3])
               {
-                  tempStemForces[k] = tempConfig[i][3];
-                  tempLeafForces[k]= tempConfig[i][3];
+                  tempStemForces[k] = tempConfig[i][3];                
               }
              
           }
@@ -1652,27 +1689,55 @@ void initSimulation()
           {
               if (tempStemForces[k] < tempConfig[i][3])
               {
-                  tempStemForces[k] = tempConfig[i][3];
-                  tempLeafForces[k] = tempConfig[i][3];
-
+                  tempStemForces[k] = tempConfig[i][3];          
                   tempStemForces[k] -= tempConfig[i][5];
-                  tempLeafForces[k] -= tempConfig[i][5];
+                
               }
 
           }
 		  StemExtraForces[k] += tempStemForces[k];
-		  LeafExtraForces[k] += tempLeafForces[k];
 	  }
-
   }
+  pullVertexInfo.StemExtraForces = StemExtraForces;
+  for (int k = pullVertexInfo.StemPullVertexNum; k < tempFrequency.size() ; k++)
+  {
+      std::vector<int> tempLeafExtraForces;
+      tempLeafExtraForces.resize(180, 0);
+      for (int i = 0; i < tempConfig.size(); i++)
+      {
+          std::vector<int> tempLeafForces = GenerateSamplingForce(180, tempConfig[i][0], tempConfig[i][1] * tempFrequency[k], tempConfig[i][2]+ tempPhase[k], tempConfig[i][3], 6);
+          for (int k = 0; k < tempLeafForces.size(); k++)
+          {
+              std::cout << tempConfig[i].size() << std::endl;
+              if (tempConfig[i].size() == 5)
+              {
+                  if (tempLeafForces[k] < tempConfig[i][3])
+                  {
+                      tempLeafForces[k] = tempConfig[i][3];
+                  }
+
+              }
+              if (tempConfig[i].size() == 6)
+              {
+                  if (tempLeafForces[k] < tempConfig[i][3])
+                  { 
+                      tempLeafForces[k] = tempConfig[i][3];   
+                      tempLeafForces[k] -= tempConfig[i][5];
+                  }
+
+              }
+              tempLeafExtraForces[k] += tempLeafForces[k];
+          }
+      }
+      pullVertexInfo.LeafExtraForces.push_back(tempLeafExtraForces);
+  }
+
+
+  ///////////////////////////
   //StemExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
   //LeafExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
   
-  pullVertexInfo.StemPullVertexNum = 2;
-  pullVertexInfo.PullVertexIndex = pullVertexIndex;
-  pullVertexInfo.StemExtraForces = StemExtraForces;
-  pullVertexInfo.LeafExtraForces = LeafExtraForces;
-  pullVertexInfo.Scale = scale;
+
 
   for (int i = 0; i < pullVertexInfo.StemPullVertexNum; i++)
   {
@@ -1952,6 +2017,9 @@ void initConfigurations()
 
   configFile.addOptionOptional("fixedVerticesKVFFileName", fixedVerticesKVFFileName, "__none");
   configFile.addOptionOptional("ExternFileDirectory", ExternFileDirectory, "_none");
+  configFile.addOptionOptional("ExternFileLineForceDirectory", ExternFileLineForceDirectory, "_none");
+
+  configFile.addOptionOptional("ExternStreePointsDirectory", ExternStreePointsDirectory, "_none");
   configFile.addOptionOptional("uDeformationoutputFileName", uDeformationoutputFileName, "__none");
   configFile.addOptionOptional("ObjectVertexIndexInElement", ObjectVertexIndexInElement, "__none");
 
@@ -2346,7 +2414,7 @@ int main(int argc, char* argv[])
 
   //configFilename = string("D:/GraduationProject/Vega/examples/simpleBridge_vox/simpleBridge_vox.config");
  /* configFilename = string("D:/GraduationProject/Vega/models/newgrass/voxelizegrass/voxelizegrass.config");*/
-  configFilename = string("../../models/apricot_tree/tree.config");
+  configFilename = string("../../models/mini_mapleTree/tree.config");
   printf("Loading scene configuration from %s.\n", configFilename.c_str());
 
   initConfigurations(); // parse the config file同时输出到cmd

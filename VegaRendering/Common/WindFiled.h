@@ -71,11 +71,21 @@ class CWindField
 public:
 	CWindField()=default;
 	//direction wind
+    //vSwavePara为每一棵树独有的风场函数
     //最后一个参数为场景中的风场方向
 	CWindField(const int vSize,const std::vector<SWaveFunctionPara> vSwavePara,const int vWavelength,Common::SForceDirection vWindDirection,Common::SForceDirection vTreeRotationDirection);
 	//specific wind source
-	CWindField(const glm::vec3 vWindCenter, const std::vector<SWaveFunctionPara> vSwavePara, int AmplitudeInWindCenter, int Sphere4Influence);
+    //初始化生成风源
+    //vSwavePara为风源的风场函数,vWindCenter风源中心，vSize,vWaveLength,生成的风场函数帧数，Sphere4Influence风源影响范围，vWindCenterMovePosition风源每个阶段移动的位置，vWindCenterMoveFrames风源在一个阶段内移动所需要帧数
+	CWindField(const glm::vec3 vWindCenter, const int vSize, const std::vector<SWaveFunctionPara> vSwavePara, const int vWavelength,double Sphere4Influence,std::vector<glm::vec3>& vWindCenterMovePosition,std::vector<int>& vWindCenterMoveFrames,std::vector<double> & vMoveScale);
 	~CWindField()=default;
+
+    //setTreePositionAndRotationAngle In Sence
+    void setTreePositionAndRotationAngle(std::vector<glm::vec3>& vTreePosition,std::vector<Common::SForceDirection>& vTreeRotationDirection);
+
+    void caculateWindForcesAndDirection2Trees();
+
+    void caculateWindForcesAndDirection2OneTree(int vTreeIndex);
 
     Common::SForceDirection caculateRelativeDirection(Common::SForceDirection &vWindDirection, Common::SForceDirection &vTreeRotationDirection);
 	std::vector<int> getDirectionWindForces() { return m_Forces[0]; };
@@ -86,11 +96,26 @@ public:
     void saveForces2File(const std::string filePath);
 
 private:
+
+    //frameindex can get windsource force and windsource position
+    int __caculateWindForceOnTree(int vFrameIndex,glm::vec3& vTreePosition);
+
 	glm::vec3 m_WindCenter;
-	int WindInfluenceField;
+	double m_WindInfluenceField;
 	std::vector<SWaveFunctionPara> m_WavePara;
 	int AmplitudeWindCenter;
 
+    //size Common::ProductFrameNumber
+    std::vector<glm::vec3> m_WindSourceCenterMovePosition;
+
+    std::vector<glm::vec3> m_WindSourceCenterMoveVelocity;
+    std::vector<int> m_WindCenterMoveFrames;
+
+    std::vector<glm::vec3> m_TreesPosition;
+    std::vector<Common::SForceDirection> m_TreesRotationAngle;
+    std::vector<int> m_WindCenterForces;
+
+    //定向风源
 	std::vector<std::vector<int>> m_Forces;
 	std::vector<std::vector<Common::SForceDirection>> m_RelativeDirectionOfWindAndTree;
 };

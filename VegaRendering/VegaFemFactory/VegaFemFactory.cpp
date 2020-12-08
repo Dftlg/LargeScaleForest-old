@@ -455,8 +455,14 @@ void CVegaFemFactory::setDeformationStateFromFileName()
 		std::ifstream positionFile(tempFileForceName, std::ios::in);
 		std::string lineString;
 		int forcenumber = 0;
+        bool isLineForce = false;
 		while (getline(positionFile, lineString))
 		{
+            if (lineString == "initForce:")
+            {
+                isLineForce = true;
+                break;
+            }
 			boost::split(ForceSequence, lineString, boost::is_any_of(","), boost::token_compress_off);
 			std::vector<double> tempCon;
 			std::vector<std::string>::iterator it;
@@ -469,6 +475,18 @@ void CVegaFemFactory::setDeformationStateFromFileName()
 			tempSequence.clear();
 			forcenumber++;
 		}
+        if (isLineForce == true)
+        {
+            getline(positionFile, lineString);
+            m_FilesData[i].PolyLineForceSequence.push_back(std::make_pair(0, std::stoi(lineString)));
+            getline(positionFile, lineString);
+            while (getline(positionFile, lineString))
+            {
+                boost::split(ForceSequence, lineString, boost::is_any_of(","), boost::token_compress_off);
+                std::pair<int, int> tempPair(std::stoi(ForceSequence[0]), std::stoi(ForceSequence[1]));
+                m_FilesData[i].PolyLineForceSequence.push_back(tempPair);
+            }
+        }
 	}
 }
 

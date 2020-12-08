@@ -116,6 +116,16 @@ std::vector<std::pair<double,double>> RandomTreePositionGenerate(int vTreeNumber
 	return tempTreedoublePosition;
 }
 
+std::vector<std::pair<double, double>> StableTreePositionGenerate(int vTreesNumber)
+{
+    std::vector<std::pair<double, double>> tempTreedoublePosition(vTreesNumber);
+    for (int i = 0; i < vTreesNumber; i++)
+    {
+        tempTreedoublePosition.push_back(std::make_pair(0, vTreesNumber));
+    }
+    return tempTreedoublePosition;
+}
+
 //采样频率，振幅，频率，相位，偏距
 std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency, double vPhase,int vYpluse,int wavelength)
 {
@@ -129,7 +139,33 @@ std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency
 	return tempForces;
 }
 
-std::vector<std::vector<double>> GetForceConfigurate(const std::string& vFilePath,const std::string &vExternFile,int &vTheta,int &vPhi)
+std::vector<int> LineSamplineForce(std::pair<int, int>& vfirstPoint, std::pair<int, int>& vSecondPoint)
+{
+    std::vector<int> tempYForce;
+    int k = (vSecondPoint.second - vfirstPoint.second) / (vSecondPoint.first - vfirstPoint.first);
+    for (int xNumber = 0; xNumber < vSecondPoint.first - vfirstPoint.first; xNumber++)
+    {
+        tempYForce.push_back(k*xNumber + vfirstPoint.second);
+    }
+    return tempYForce;
+}
+
+std::vector<int> GenerateLineForce(int vFrameNumber,std::vector<std::pair<int,int>>& vForceConfig)
+{
+    if (vForceConfig.back().first != vFrameNumber)
+    {
+        vForceConfig.push_back(std::make_pair(vFrameNumber, vForceConfig[vForceConfig.size()-1].second));
+    }
+    std::vector<int> tempForce;
+    for (int i = 0; i < vForceConfig.size()-1; i++)
+    {
+        std::vector<int> temp=LineSamplineForce(vForceConfig[i], vForceConfig[i+1]);
+        tempForce.insert(tempForce.end(), temp.begin(), temp.end());
+    }
+    return tempForce;
+}
+
+std::vector<std::vector<double>> GetForceConfigurate(const std::string& vFilePath,const std::string &vExternFile,int &vTheta,int &vPhi, std::vector<std::pair<int, int>>& voLineForceConfig)
 {
 	std::vector<std::string> ForceConfig;
 	std::vector <std::vector<double>> tempConfig;
@@ -144,10 +180,17 @@ std::vector<std::vector<double>> GetForceConfigurate(const std::string& vFilePat
 
 	std::string forceFileName = vExternFile +"/"+ vFilePath.substr(IndexPos + 5, endPos - IndexPos - 5) + ".txt";
 
+    bool isLineForce=false;
+
 	std::ifstream positionFile(forceFileName, std::ios::in);
 	std::string lineString;
 	while (getline(positionFile, lineString))
 	{
+        if (lineString == "initForce:")
+        {
+            isLineForce = true;
+            break;
+        }
 		boost::split(ForceConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
 		std::vector<double> tempCon;
 		std::vector<std::string>::iterator it;
@@ -157,9 +200,142 @@ std::vector<std::vector<double>> GetForceConfigurate(const std::string& vFilePat
 		}
 		tempConfig.push_back(tempCon);
 	}
+    if (isLineForce == true)
+    {
+        getline(positionFile, lineString);
+        voLineForceConfig.push_back(std::make_pair(0, std::stoi(lineString)));
+        getline(positionFile, lineString);
+        while (getline(positionFile, lineString))
+        {
+            boost::split(ForceConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
+            std::pair<int, int> tempPair(std::stoi(ForceConfig[0]), std::stoi(ForceConfig[1]));
+            voLineForceConfig.push_back(tempPair);
+        }
+    }
 	return tempConfig;
 	
 }
+
+//std::vector<std::pair<int,int>> GetLineForceConfigurate(const std::string &vExternFile)
+//{
+//    std::vector<std::string> ForceConfig;
+//    std::vector <std::pair<int,int>> tempConfig;
+//
+//    std::ifstream positionFile(vExternFile, std::ios::in);
+//    std::string lineString;
+//    getline(positionFile, lineString);
+//    if (lineString == "initForce:")
+//    {
+//        getline(positionFile, lineString);
+//        tempConfig.push_back(std::make_pair(0, std::stoi(lineString)));
+//    }
+//    getline(positionFile, lineString);
+//    while (getline(positionFile, lineString))
+//    {
+//        boost::split(ForceConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
+//        std::pair<int, int> tempPair(std::stoi(ForceConfig[0]), std::stoi(ForceConfig[1]));
+//        tempConfig.push_back(tempPair);
+//    }
+//    return tempConfig;
+//
+//}
+
+void GetStemAndLeafStreePointsConfigurate(const std::string& vFilePath, std::pair<std::vector<int>, std::vector<float>>&vStreePointAndScale,std::vector<std::pair<int,int>>& vForceDeviationDirection,std::vector<float>&vFrequency,std::vector<float>&vPhase)
+{
+    std::pair<std::vector<int>, std::vector<float>> temp;
+    std::vector<int> tempStreePoints;
+    std::vector<float> tempStreePointsScales;
+    std::vector<std::string> StreePointsConfig;
+    std::ifstream positionFile(vFilePath, std::ios::in);
+    std::string lineString;
+    getline(positionFile, lineString);
+    if (lineString == "stem:")
+    {
+        getline(positionFile, lineString);
+        boost::split(StreePointsConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
+        std::vector<std::string>::iterator it;
+        for (it = StreePointsConfig.begin(); it != StreePointsConfig.end(); ++it)
+        {
+            tempStreePoints.push_back(std::stoi(*it));
+        }
+    }
+    StreePointsConfig.clear();
+    getline(positionFile, lineString);
+    if (lineString == "leaf:")
+    {
+        getline(positionFile, lineString);
+        if (lineString != "")
+        {
+            boost::split(StreePointsConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
+            std::vector<std::string>::iterator it;
+            for (it = StreePointsConfig.begin(); it != StreePointsConfig.end(); ++it)
+            {
+                tempStreePoints.push_back(std::stoi(*it));
+            }
+        }    
+    }
+    StreePointsConfig.clear();
+    getline(positionFile, lineString);
+    if (lineString == "leafScale:")
+    {
+        getline(positionFile, lineString);
+        boost::split(StreePointsConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
+        std::vector<std::string>::iterator it;
+        for (it = StreePointsConfig.begin(); it != StreePointsConfig.end(); ++it)
+        {
+            tempStreePointsScales.push_back(std::stof(*it));
+        }
+    }
+    StreePointsConfig.clear();
+    getline(positionFile, lineString);
+    if (lineString == "leafFrequency:")
+    {
+        getline(positionFile, lineString);
+        boost::split(StreePointsConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
+        std::vector<std::string>::iterator it;
+        for (it = StreePointsConfig.begin(); it != StreePointsConfig.end(); ++it)
+        {
+            vFrequency.push_back(std::stof(*it));
+        }
+    }
+    StreePointsConfig.clear();
+    getline(positionFile, lineString);
+    if (lineString == "leafPhase:")
+    {
+        getline(positionFile, lineString);
+        boost::split(StreePointsConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
+        std::vector<std::string>::iterator it;
+        for (it = StreePointsConfig.begin(); it != StreePointsConfig.end(); ++it)
+        {
+            vPhase.push_back(std::stof(*it));
+        }
+    }
+    StreePointsConfig.clear();
+    getline(positionFile, lineString);
+    if (lineString == "leafDeviationDirection:")
+    {
+        getline(positionFile, lineString);
+        boost::split(StreePointsConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
+        for (int i = 0; i < StreePointsConfig.size() / 2; i++)
+        {
+            std::pair<int, int> tempPair;
+            tempPair.first =std::stoi(StreePointsConfig[2*i]);
+            tempPair.second = std::stoi(StreePointsConfig[2 * i + 1]);
+            vForceDeviationDirection.push_back(tempPair);
+        }
+    }
+    if (tempStreePoints.size() != tempStreePointsScales.size())
+        std::cout << "pullVertex GetStemAndLeafStreePointsConfigurate doesn't match" << std::endl;
+    else
+    {
+        vStreePointAndScale.first = tempStreePoints;
+        vStreePointAndScale.second = tempStreePointsScales;
+    }
+
+
+}
+
+
 
 //输入数据，控制范围在数据的周围每次扩大10例如：10,100,0.1,0.001，控制其范围的倍率
 double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
@@ -184,5 +360,17 @@ double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
 		}
 		return (pow(10,(BaseNumber-1 - vControlFloatPosition)))*vRange;
 	} 
+}
+
+void TransformCartesianCorrdinate2SphericalCorrdinate(glm::vec3 &vStartPoint, glm::vec3 &vEndPoint, double &voRadius, int& voTheta, int& voPhi)
+{
+    glm::vec3 tempVector =glm::normalize(vEndPoint - vStartPoint);
+    glm::vec3 tempXYAxisChange(tempVector.x, tempVector.z, tempVector.y);
+    voRadius = sqrt(tempXYAxisChange.x*tempXYAxisChange.x + tempXYAxisChange.y*tempXYAxisChange.y + tempXYAxisChange.z*tempXYAxisChange.z);
+    double ThetaRadian = acos(tempVector.z / voRadius);
+    double PhiRadian = atan(tempVector.y / tempVector.x);
+
+    voTheta = 180 * ThetaRadian / M_PI;
+    voPhi = 180 * PhiRadian / M_PI;
 }
 

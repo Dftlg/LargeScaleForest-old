@@ -36,11 +36,11 @@ namespace Common
 
     /////each time change
 
-    const int AllTreesNumber = 500;
+    const int AllTreesNumber = 4;
 
-    const int TreesTypeNumber = 3;
+    const int TreesTypeNumber = 1;
 
-    const int TreesNumbers[TreesTypeNumber] = { 250,200,50 };
+    const int TreesNumbers[TreesTypeNumber] = { 4 };
     //int SecondTypeTreesNumber = 5;
 
     //const int AllTreesNumber = 100;
@@ -49,7 +49,8 @@ namespace Common
 
     //const int TreesNumbers[TreesTypeNumber] = {60,40 };
     ////int SecondTypeTreesNumber = 5;
-    const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };
+    /*const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };*/
+    const float ScaleTree[TreesTypeNumber] = { 1.5};
 
 	static int MaxTimeStep = 60;
 
@@ -259,7 +260,10 @@ namespace Common
 		bool isLoadDataSet = false;
 		int Theta;
 		int Phi;
+        //力的sin函数部分
 		std::vector<std::vector<double>> ForceFluctuationSequence;
+        //力的基础部分
+        std::vector<std::pair<int, int>> PolyLineForceSequence;
 		//delta U数据
 		std::vector<SFileData> Frames;
 		std::vector<SpKVFData> KVFFrameDatas;

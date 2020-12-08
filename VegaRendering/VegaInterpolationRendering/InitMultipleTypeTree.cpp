@@ -1,11 +1,13 @@
 #include "InitMultipleTypeTree.h"
 
-CInitMultipleTypeTree::CInitMultipleTypeTree(int vTreeTypeNumber, int vAllTreeNumbers)
+CInitMultipleTypeTree::CInitMultipleTypeTree(int vTreeTypeNumber, int vAllTreeNumbers, bool vWindFieldType)
 {
     m_TreeTypeNumber = vTreeTypeNumber;
     m_AllTreesNumber = vAllTreeNumbers;
     m_MultipleExtraForces.resize(vTreeTypeNumber);
     m_MultipleExtraDirections.resize(vTreeTypeNumber);
+    m_EachTypeTreesPositionInSence.resize(vTreeTypeNumber);
+    m_OneDirectionWindOrSpecificWindSource = vWindFieldType;
     __GenerateTreesPosition();
     m_EachTypeTreesPositonArray.push_back(0);
     int Sum = 0;
@@ -14,6 +16,14 @@ CInitMultipleTypeTree::CInitMultipleTypeTree(int vTreeTypeNumber, int vAllTreeNu
         Sum += Common::TreesNumbers[i];
         m_EachTypeTreesPositonArray.push_back(Sum);
     }
+}
+
+void CInitMultipleTypeTree::__GenerateTreesPosition()
+{
+    if (m_OneDirectionWindOrSpecificWindSource == true)
+        __GenerateRandomTreesPosition();
+    else
+        __GenerateStableTreesPosition();
 }
 
 void CInitMultipleTypeTree::InitVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex, int vTypeTreeRelatedFileNumber)
@@ -30,6 +40,7 @@ void CInitMultipleTypeTree::InitVegaFemFactory(const std::string & vDirectoryNam
     m_MultipleTypeFem.push_back(vFem);
 }
 
+//在这里写位置
 void CInitMultipleTypeTree::InitWindAndTree(int vTreeNumber, const std::string & vFilePath)
 {
     m_MultipleEachTreeProductNumber.push_back(vTreeNumber);
@@ -37,6 +48,17 @@ void CInitMultipleTypeTree::InitWindAndTree(int vTreeNumber, const std::string &
     CLoadWindAndTreeConfig windAndTreeConfig(vTreeNumber, vFilePath);
     m_MultipleTypeTree.push_back(windAndTreeConfig);
 }
+
+//void CInitMultipleTypeTree::InitASpecificWindSourceTreeRotation(int vTreeNumber, const std::string & vFilePath)
+//{
+//    if (m_OneDirectionWindOrSpecificWindSource = true)
+//        std::cout << "This step use on A Specific Wind Source,The other function InitWindAndTree use on a one Direction wind" << std::endl;
+//    else
+//    {
+//        m_MultipleEachTreeProductNumber.push_back(vTreeNumber);
+//
+//    }
+//}
 
 void CInitMultipleTypeTree::InitSceneShadowShader(const char* vVertexPath, const char* vFragmentPath)
 {
@@ -60,6 +82,8 @@ void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTre
         tempTransFormation.push_back(m_AllTreesPosition[i]);
     
     ourModel->setMeshRotation(SpecificRotation, tempTransFormation,Common::ScaleTree[vTreeTypeIndex],Common::TreesNumbers[vTreeTypeIndex]);
+    m_EachTypeTreesPositionInSence[vTreeTypeIndex] = ourModel->getTreePositions();
+    m_AllTreesPositionInSence.insert(m_AllTreesPositionInSence.end(), m_EachTypeTreesPositionInSence[vTreeTypeIndex].begin(), m_EachTypeTreesPositionInSence[vTreeTypeIndex].end());
 
     ourModel->setGroupsIndex(*(m_MultipleTypeFem[vTreeTypeIndex]));
     ourModel->setVerticesNumber(*(m_MultipleTypeFem[vTreeTypeIndex]));
@@ -75,6 +99,7 @@ void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTre
     m_MultipleTreeModel.push_back(ourModel);
 }
 
+//计算定向风场
 void CInitMultipleTypeTree::InitMultipleExtraWindData(int vTreeTypeIndex)
 {
     std::vector<std::vector<SWaveFunctionPara>> OneDirectionWindRelatedMultipleTree = m_MultipleTypeTree[vTreeTypeIndex].getMultipleTreeWindPara();
@@ -89,11 +114,23 @@ void CInitMultipleTypeTree::InitMultipleExtraWindData(int vTreeTypeIndex)
     }
 }
 
-void CInitMultipleTypeTree::InitFemFrameStruct(int vTreeTypeIndex)
+void CInitMultipleTypeTree::InitASpecificWindSourceWindData(int vTreeTypeIndex)
 {
-    m_MultipleTypeFem[vTreeTypeIndex]->initMatchedFrameStruct(m_MultipleExtraForces[vTreeTypeIndex].size());
-    m_MultipleTypeFem[vTreeTypeIndex]->initKVFDataSearchRangeError();
+    std::vector<int> TreesNumberSubjected2SameWind = m_MultipleTypeTree[vTreeTypeIndex].getMultipleTreeDuplicateNumber();
+    m_MultipleTreesNumberSubjected2SameWind.push_back(TreesNumberSubjected2SameWind);
+    //还没设置
+    std::vector<std::vector<SWaveFunctionPara>> SpecificeWindFunctionPara;
+    std::vector<glm::vec3> WindCenterMovePosition;
+    std::vector<int> WindCenterMoveFrames;
+    std::vector<double> MoveScale;
+    m_ASpecificWindSource=new CWindField (glm::vec3(0, 0, 0), Common::ProductFrameNumber, SpecificeWindFunctionPara[0], 60000, 10, WindCenterMovePosition, WindCenterMoveFrames, MoveScale);
 }
+
+//void CInitMultipleTypeTree::InitFemFrameStruct(int vTreeTypeIndex)
+//{
+//    m_MultipleTypeFem[vTreeTypeIndex]->initMatchedFrameStruct(m_MultipleExtraForces[vTreeTypeIndex].size());
+//    m_MultipleTypeFem[vTreeTypeIndex]->initKVFDataSearchRangeError();
+//}
 
 void CInitMultipleTypeTree::InitShadowCubeMapPara(float vNearPlane, float vFarPlane, int vSHADOW_WIDTH, int vSHADOW_HEIGHT, std::vector <glm::mat4>& vshadowTransforms, glm::vec3 * vlightVertices, glm::vec3 * vlightColors)
 {
