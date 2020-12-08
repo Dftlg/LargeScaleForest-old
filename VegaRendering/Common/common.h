@@ -49,7 +49,7 @@ namespace Common
 
     //const int TreesNumbers[TreesTypeNumber] = {60,40 };
     ////int SecondTypeTreesNumber = 5;
-    const float ScaleTree[TreesTypeNumber] = { 1.0 };
+    const float ScaleTree[TreesTypeNumber] = { 1.0};
 
 	static int MaxTimeStep = 60;
 

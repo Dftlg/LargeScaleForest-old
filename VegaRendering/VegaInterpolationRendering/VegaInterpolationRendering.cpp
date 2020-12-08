@@ -280,7 +280,7 @@ int main()
 	// plane load textures
 	unsigned int floorTexture = loadTexture("resources/textures/metal.png");
 	unsigned int opacityTexture = loadTexture("resources/textures/opacity.png");
-	unsigned int waveMap = loadTexture("resources/textures/wave_3.png");
+	//unsigned int waveMap = loadTexture("resources/textures/wave_3.png");
 #pragma endregion
 
 #pragma region skybox VAO and VBO and Texture
@@ -361,19 +361,19 @@ int main()
         MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
         MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
-		MultipleTypeTree.getSpecificScenceShadowShader(0)[0].use();
+		/*MultipleTypeTree.getSpecificScenceShadowShader(0)[0].use();
 		MultipleTypeTree.getSpecificScenceShadowShader(0)->setInt("sumFaceVerticesBeforeEndMesh", MultipleTypeTree.getSumFaceVerticesBeforeEndMesh(0));
 		MultipleTypeTree.getSpecificScenceShadowShader(0)->setInt("waveMap", 9);
 		MultipleTypeTree.getSpecificScenceDepthShader(0)[0].use();
 		MultipleTypeTree.getSpecificScenceDepthShader(0)->setInt("sumFaceVerticesBeforeEndMesh", MultipleTypeTree.getSumFaceVerticesBeforeEndMesh(0));	
-		MultipleTypeTree.getSpecificScenceDepthShader(0)->setInt("waveMap", 9);
+		MultipleTypeTree.getSpecificScenceDepthShader(0)->setInt("waveMap", 9);*/
 
-        /*MultipleTypeTree.InitVegaFemFactory("G:/GraduationProject/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 1);
+       /* MultipleTypeTree.InitVegaFemFactory("G:/GraduationProject/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 1);
         MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "G:/GraduationProject/mini_mapleTree/WindAndTreeConfig/Config.txt");
         MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
-        MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 0);
-		MultipleTypeTree.getSpecificScenceShadowShader(0)[0].use();
+        MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 0);*/
+		/*MultipleTypeTree.getSpecificScenceShadowShader(0)[0].use();
 		MultipleTypeTree.getSpecificScenceShadowShader(0)->setInt("sumFaceVerticesBeforeEndMesh", MultipleTypeTree.getSumFaceVerticesBeforeEndMesh(0));
 		MultipleTypeTree.getSpecificScenceShadowShader(0)->setInt("waveMap", 9);
 		MultipleTypeTree.getSpecificScenceDepthShader(0)[0].use();
@@ -382,10 +382,16 @@ int main()
 
 
 		/*MultipleTypeTree.InitVegaFemFactory("G:/GraduationProject/apricot_tree/deltaU", "../../models/apricot_tree/tree.obj", "../../models/apricot_tree/ObjectVertexIndex.txt", 1);
-		MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[2], "G:/GraduationProject/apricot_tree/WindAndTreeConfig/Config.txt");
+		MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "G:/GraduationProject/apricot_tree/WindAndTreeConfig/Config.txt");
 		MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
 		MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
-		MultipleTypeTree.InitTreeModel("../../models/apricot_tree/tree.obj", 2); */
+		MultipleTypeTree.InitTreeModel("../../models/apricot_tree/tree.obj", 0); */
+		/*MultipleTypeTree.getSpecificScenceShadowShader(1)[0].use();
+		MultipleTypeTree.getSpecificScenceShadowShader(1)->setInt("sumFaceVerticesBeforeEndMesh", MultipleTypeTree.getSumFaceVerticesBeforeEndMesh(0));
+		MultipleTypeTree.getSpecificScenceShadowShader(1)->setInt("waveMap", 9);*/
+		/*MultipleTypeTree.getSpecificScenceDepthShader(1)[0].use();
+		MultipleTypeTree.getSpecificScenceDepthShader(1)->setInt("sumFaceVerticesBeforeEndMesh", MultipleTypeTree.getSumFaceVerticesBeforeEndMesh(0));
+		MultipleTypeTree.getSpecificScenceDepthShader(1)->setInt("waveMap", 9);*/
         
         for (int i = 0; i < Common::TreesTypeNumber; i++)
         {
@@ -406,13 +412,13 @@ int main()
         /////each time change
 	/*boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getFemFactory()), *(MultipleTypeTree.getTreeModel()), *(MultipleTypeTree.getExtraForces()), *(MultipleTypeTree.getExtraDirection()), *(MultipleTypeTree.getTreesNumberSubjected2SameWind()),MultipleTypeTree.getTreeTypeIndex());*/
      boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(0)), *(MultipleTypeTree.getSpecificTreeModel(0)), *(MultipleTypeTree.getSpecificExtraForces(0)), *(MultipleTypeTree.getSpecificExtraDirection(0)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(0)), 0);
-	// boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
+	 //boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
 	// boost::thread ThirdstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(2)), *(MultipleTypeTree.getSpecificTreeModel(2)), *(MultipleTypeTree.getSpecificExtraForces(2)), *(MultipleTypeTree.getSpecificExtraDirection(2)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(2)), 2);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
 	glm::mat4 view;
-	int frameIndex = 0;
+	//int frameIndex = 0;
 	while (!glfwWindowShouldClose(Window))
 	{
 		// per-frame time logic
@@ -471,11 +477,13 @@ int main()
         {
             MultipleTypeTree.getSpecificTreeModel(i)->UpdataSSBOBindingPointIndex();
             MultipleTypeTree.getSpecificScenceDepthShader(i)->use();
-			glActiveTexture(GL_TEXTURE9);
-			glBindTexture(GL_TEXTURE_2D, waveMap);
+			//glActiveTexture(GL_TEXTURE9);
+			//glBindTexture(GL_TEXTURE_2D, waveMap);
             MultipleTypeTree.getSpecificScenceDepthShader(i)->setInt("planeOrTree", 1);
-			MultipleTypeTree.getSpecificScenceDepthShader(i)->setFloat("time", glfwGetTime());
-			MultipleTypeTree.getSpecificScenceDepthShader(i)->setInt("frameIndex", frameIndex);
+			//MultipleTypeTree.getSpecificScenceDepthShader(i)->setFloat("time", glfwGetTime());
+			//MultipleTypeTree.getSpecificScenceDepthShader(i)->setInt("frameIndex", frameIndex);
+			//MultipleTypeTree.getSpecificScenceDepthShader(i)->setInt("sumFaceVerticesBeforeEndMesh", MultipleTypeTree.getSumFaceVerticesBeforeEndMesh(i));
+			//MultipleTypeTree.getSpecificScenceDepthShader(i)->setInt("waveMap", 9);
             renderTree(*(MultipleTypeTree.getSpecificScenceDepthShader(i)), *(MultipleTypeTree.getSpecificTreeModel(i)));
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
         }
@@ -504,11 +512,13 @@ int main()
             MultipleTypeTree.getSpecificScenceShadowShader(i)->use();
             glActiveTexture(GL_TEXTURE8);
             glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-			glActiveTexture(GL_TEXTURE9);
-			glBindTexture(GL_TEXTURE_2D, waveMap);
+			//glActiveTexture(GL_TEXTURE9);
+			//glBindTexture(GL_TEXTURE_2D, waveMap);
             MultipleTypeTree.getSpecificScenceShadowShader(i)->setInt("planeOrTree", 1);
-			MultipleTypeTree.getSpecificScenceShadowShader(i)->setFloat("time", glfwGetTime());
-			MultipleTypeTree.getSpecificScenceShadowShader(i)->setInt("frameIndex", frameIndex);
+			//MultipleTypeTree.getSpecificScenceShadowShader(i)->setFloat("time", glfwGetTime());
+			//MultipleTypeTree.getSpecificScenceShadowShader(i)->setInt("frameIndex", frameIndex);
+			//MultipleTypeTree.getSpecificScenceShadowShader(i)->setInt("sumFaceVerticesBeforeEndMesh", MultipleTypeTree.getSumFaceVerticesBeforeEndMesh(i));
+			//MultipleTypeTree.getSpecificScenceShadowShader(i)->setInt("waveMap", 9);
             renderTree(*(MultipleTypeTree.getSpecificScenceShadowShader(i)), *(MultipleTypeTree.getSpecificTreeModel(i)));
         }
 
@@ -518,7 +528,7 @@ int main()
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);
 	
 		Sleep(100);
-		frameIndex++;
+		//frameIndex++;
 		glDepthFunc(GL_LESS); // set depth function back to default
 		glfwSwapBuffers(Window);
 		glfwPollEvents();

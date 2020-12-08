@@ -78,12 +78,12 @@ void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTre
 
 int CInitMultipleTypeTree::getSumFaceVerticesBeforeEndMesh(const int & vMeshIndex)
 {
-	int sumFaceVerticesBeforeEndMesh = 0;
+	/*int sumFaceVerticesBeforeEndMesh = 0;
 	for (int i = 0; i < m_MultipleTreeModel[vMeshIndex]->getMeshes().size() - 1; i++)
 	{
 		sumFaceVerticesBeforeEndMesh += m_MultipleTreeModel[vMeshIndex]->getMeshes()[i].getVertices().size();
 	}
-	return sumFaceVerticesBeforeEndMesh;
+	return sumFaceVerticesBeforeEndMesh;*/
 }
 
 void CInitMultipleTypeTree::InitMultipleExtraWindData(int vTreeTypeIndex)

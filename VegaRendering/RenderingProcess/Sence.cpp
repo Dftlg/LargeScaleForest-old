@@ -73,8 +73,8 @@ glm::mat4* CSence::translateTreePosition()
 	{
 		glm::mat4 model = glm::mat4(1.0f);
 		//model = glm::translate(model, glm::vec3(translate[i], -0.5f,0));
-		//0.45
-		model = glm::translate(model, glm::vec3((m_TransFormations[i].first - Common::AllTreesNumber / 2)*0.075, -0.5f, (m_TransFormations[i].second - Common::AllTreesNumber / 2)*0.075));
+		//0.45   0.075
+		model = glm::translate(model, glm::vec3((m_TransFormations[i].first - Common::AllTreesNumber / 2)*3, -0.5f, (m_TransFormations[i].second - Common::AllTreesNumber / 2)*0));
 		modelMatrices[i] = model;
 	}
 	return modelMatrices;
