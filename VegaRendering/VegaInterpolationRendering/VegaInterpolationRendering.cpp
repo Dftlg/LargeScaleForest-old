@@ -512,7 +512,7 @@ int main()
             MultipleTypeTree.getSpecificScenceShadowShader(i)->use();
             glActiveTexture(GL_TEXTURE8);
             glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-			//glActiveTexture(GL_TEXTURE9);
+			glActiveTexture(GL_TEXTURE9);
 			//glBindTexture(GL_TEXTURE_2D, waveMap);
             MultipleTypeTree.getSpecificScenceShadowShader(i)->setInt("planeOrTree", 1);
 			//MultipleTypeTree.getSpecificScenceShadowShader(i)->setFloat("time", glfwGetTime());
