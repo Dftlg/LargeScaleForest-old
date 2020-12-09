@@ -81,17 +81,20 @@ public:
 	~CWindField()=default;
 
     //setTreePositionAndRotationAngle In Sence
+    void setEachTypeTreeNumber(int vTreeNumber);
     void setTreePositionAndRotationAngle(std::vector<glm::vec3>& vTreePosition,std::vector<Common::SForceDirection>& vTreeRotationDirection);
 
     void caculateWindForcesAndDirection2Trees();
 
-    void caculateWindForcesAndDirection2OneTree(int vTreeIndex);
+    void caculateWindForcesAndDirection2OneTree(int vTreeType,int vTreeIndex);
 
     Common::SForceDirection caculateRelativeDirection(Common::SForceDirection &vWindDirection, Common::SForceDirection &vTreeRotationDirection);
 	std::vector<int> getDirectionWindForces() { return m_Forces[0]; };
 	std::vector<Common::SForceDirection> getDirectionWindDirection() { return m_RelativeDirectionOfWindAndTree[0]; };
 
 	std::vector<int> getSpecificWindSourceForces(glm::vec3 vObjectPosition);
+    //return same type tree forces
+    void getSpecificWindForcesAndDirection(int vTreeType, std::vector<std::vector<int>> &voForcesInSameType, std::vector<std::vector<Common::SForceDirection>>& voDirectionInSameType);
 
     void saveForces2File(const std::string filePath);
 
@@ -99,6 +102,8 @@ private:
 
     //frameindex can get windsource force and windsource position
     int __caculateWindForceOnTree(int vFrameIndex,glm::vec3& vTreePosition);
+
+    std::vector<int> m_EachTypeTreeNumberIndexArea;
 
 	glm::vec3 m_WindCenter;
 	double m_WindInfluenceField;
@@ -111,8 +116,8 @@ private:
     std::vector<glm::vec3> m_WindSourceCenterMoveVelocity;
     std::vector<int> m_WindCenterMoveFrames;
 
-    std::vector<glm::vec3> m_TreesPosition;
-    std::vector<Common::SForceDirection> m_TreesRotationAngle;
+    std::vector<std::vector<glm::vec3>> m_TreesPosition;
+    std::vector<std::vector<Common::SForceDirection>> m_TreesRotationAngle;
     std::vector<int> m_WindCenterForces;
 
     //定向风源

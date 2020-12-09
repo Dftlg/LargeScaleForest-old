@@ -114,16 +114,37 @@ void CInitMultipleTypeTree::InitMultipleExtraWindData(int vTreeTypeIndex)
     }
 }
 
-void CInitMultipleTypeTree::InitASpecificWindSourceWindData(int vTreeTypeIndex)
+void CInitMultipleTypeTree::InitASpecificWindSourceWindData()
 {
-    std::vector<int> TreesNumberSubjected2SameWind = m_MultipleTypeTree[vTreeTypeIndex].getMultipleTreeDuplicateNumber();
-    m_MultipleTreesNumberSubjected2SameWind.push_back(TreesNumberSubjected2SameWind);
     //还没设置
     std::vector<std::vector<SWaveFunctionPara>> SpecificeWindFunctionPara;
     std::vector<glm::vec3> WindCenterMovePosition;
     std::vector<int> WindCenterMoveFrames;
     std::vector<double> MoveScale;
     m_ASpecificWindSource=new CWindField (glm::vec3(0, 0, 0), Common::ProductFrameNumber, SpecificeWindFunctionPara[0], 60000, 10, WindCenterMovePosition, WindCenterMoveFrames, MoveScale);
+}
+
+void CInitMultipleTypeTree::SetASpecificWindSourceTreeData(int vTreeTypeIndex)
+{
+    std::vector<int> TreesNumberSubjected2SameWind = m_MultipleTypeTree[vTreeTypeIndex].getMultipleTreeDuplicateNumber();
+    m_MultipleTreesNumberSubjected2SameWind.push_back(TreesNumberSubjected2SameWind);
+    std::vector<Common::SForceDirection> tempRotation = m_MultipleTypeTree[vTreeTypeIndex].getTreeRotationAngle();
+    m_ASpecificWindSource->setTreePositionAndRotationAngle(m_EachTypeTreesPositionInSence[vTreeTypeIndex], tempRotation);
+    m_ASpecificWindSource->setEachTypeTreeNumber(m_MultipleEachTreeProductNumber[vTreeTypeIndex]);
+}
+
+void CInitMultipleTypeTree::caculateSpecificWindSourceData()
+{
+    m_ASpecificWindSource->caculateWindForcesAndDirection2Trees();
+    for (int i = 0; i < m_TreeTypeIndex.size(); i++)
+    {
+        std::vector<std::vector<int>> tempTreeInSameTypeForce;
+        std::vector<std::vector<Common::SForceDirection>> tempTreeInSameTypeDirection;
+        m_ASpecificWindSource->getSpecificWindForcesAndDirection(i, tempTreeInSameTypeForce, tempTreeInSameTypeDirection);
+        m_MultipleExtraForces[i]=tempTreeInSameTypeForce;
+        m_MultipleExtraDirections[i] = tempTreeInSameTypeDirection;
+    }
+   
 }
 
 void CInitMultipleTypeTree::InitFemFrameStruct(int vTreeTypeIndex)

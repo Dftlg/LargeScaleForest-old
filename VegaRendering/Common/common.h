@@ -36,11 +36,11 @@ namespace Common
 
     /////each time change
 
-    const int AllTreesNumber = 4;
+    const int AllTreesNumber = 380;
 
-    const int TreesTypeNumber = 1;
+    const int TreesTypeNumber = 3;
 
-    const int TreesNumbers[TreesTypeNumber] = { 4 };
+    const int TreesNumbers[TreesTypeNumber] = { 300,50,30 };
     //int SecondTypeTreesNumber = 5;
 
     //const int AllTreesNumber = 100;
@@ -49,8 +49,8 @@ namespace Common
 
     //const int TreesNumbers[TreesTypeNumber] = {60,40 };
     ////int SecondTypeTreesNumber = 5;
-    /*const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };*/
-    const float ScaleTree[TreesTypeNumber] = { 1.5};
+    const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };
+ /*   const float ScaleTree[TreesTypeNumber] = { 1.5};*/
 
 	static int MaxTimeStep = 60;
 

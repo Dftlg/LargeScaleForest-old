@@ -82,20 +82,34 @@ CWindField::CWindField(const glm::vec3 vWindCenter, const int vSize, const std::
         }
     }
 
+    m_EachTypeTreeNumberIndexArea.push_back(0);
+
+}
+void CWindField::setEachTypeTreeNumber(int vTreeNumber)
+{
+    int tempNumber = 0;
+    for (auto i : m_EachTypeTreeNumberIndexArea)
+        tempNumber += i;
+    tempNumber += vTreeNumber;
+    m_EachTypeTreeNumberIndexArea.push_back(tempNumber);
 }
 
 void CWindField::setTreePositionAndRotationAngle(std::vector<glm::vec3>& vTreePosition, std::vector<Common::SForceDirection>& vTreeRotationDirection)
 {
-    m_TreesPosition = vTreePosition;
-    m_TreesRotationAngle = vTreeRotationDirection;
+    m_TreesPosition.push_back(vTreePosition);
+    m_TreesRotationAngle.push_back(vTreeRotationDirection);
 }
 
 void CWindField::caculateWindForcesAndDirection2Trees()
 {
-
+    for (int TreeTypeIndex = 0; TreeTypeIndex < m_TreesPosition.size(); TreeTypeIndex++)
+    {
+        for (int TreeIndexInType = 0; TreeIndexInType < m_TreesPosition[TreeTypeIndex].size(); TreeIndexInType++)
+            caculateWindForcesAndDirection2OneTree(TreeTypeIndex, TreeIndexInType);
+    }
 }
 
-void CWindField::caculateWindForcesAndDirection2OneTree(int vTreeIndex)
+void CWindField::caculateWindForcesAndDirection2OneTree(int vTreeType,int vTreeIndex)
 {
     std::vector<int> oneTreeForces;
     std::vector<Common::SForceDirection> oneTreeRelativeDirection;
@@ -103,14 +117,23 @@ void CWindField::caculateWindForcesAndDirection2OneTree(int vTreeIndex)
     {
         double Radius;
         int Theta, Phi;
-        TransformCartesianCorrdinate2SphericalCorrdinate(m_WindSourceCenterMovePosition[i], m_TreesPosition[vTreeIndex], Radius, Theta, Phi);
+        TransformCartesianCorrdinate2SphericalCorrdinate(m_WindSourceCenterMovePosition[i], m_TreesPosition[vTreeType][vTreeIndex], Radius, Theta, Phi);
         Common::SForceDirection tempWindDirection(Theta, Phi);
-        Common::SForceDirection tempDirection = caculateRelativeDirection(tempWindDirection, m_TreesRotationAngle[vTreeIndex]);
+        Common::SForceDirection tempDirection = caculateRelativeDirection(tempWindDirection, m_TreesRotationAngle[vTreeType][vTreeIndex]);
         oneTreeRelativeDirection.push_back(tempDirection);
-        oneTreeForces.push_back(__caculateWindForceOnTree(i, m_TreesPosition[vTreeIndex]));
+        oneTreeForces.push_back(__caculateWindForceOnTree(i, m_TreesPosition[vTreeType][vTreeIndex]));
     }
     m_Forces.push_back(oneTreeForces);
     m_RelativeDirectionOfWindAndTree.push_back(oneTreeRelativeDirection);
+}
+
+void CWindField::getSpecificWindForcesAndDirection(int vTreeType, std::vector<std::vector<int>> &voForcesInSameType, std::vector<std::vector<Common::SForceDirection>>& voDirectionInSameType)
+{
+    for (int i = m_EachTypeTreeNumberIndexArea[vTreeType - 1]; i < m_EachTypeTreeNumberIndexArea[vTreeType]; i++)
+    {
+        voForcesInSameType.push_back(m_Forces[i]);
+        voDirectionInSameType.push_back(m_RelativeDirectionOfWindAndTree[i]);
+    }
 }
 
 int CWindField::__caculateWindForceOnTree(int vFrameIndex, glm::vec3& vTreePosition)

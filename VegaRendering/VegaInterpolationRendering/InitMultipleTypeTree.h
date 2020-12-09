@@ -33,8 +33,8 @@ public:
     void InitMultipleExtraWindData(int vTreeTypeIndex);
 
     //a specific wind source
-    void InitASpecificWindSourceWindData(int vTreeTypeIndex);
-    void SetASpecificWindSourceTreeData();
+    void InitASpecificWindSourceWindData();
+    void SetASpecificWindSourceTreeData(int vTreeTypeIndex);
 
     void InitFemFrameStruct(int vTreeTypeIndex);
     void InitShadowCubeMapPara(float vNearPlane, float vFarPlane, int vSHADOW_WIDTH, int vSHADOW_HEIGHT,  std::vector <glm::mat4>& vshadowTransforms,glm::vec3 * vlightVertices,glm::vec3 * vlightColors);
@@ -62,6 +62,9 @@ public:
     CLoadWindAndTreeConfig getSpecificLoadWindAndTree(int vTreeTypeIndex) { return m_MultipleTypeTree[vTreeTypeIndex];}
 
     std::vector<int> getTreeTypeIndex() { return m_TreeTypeIndex; };
+
+    void caculateSpecificWindSourceData();
+    //void get
 
 private:
 

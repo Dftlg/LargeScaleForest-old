@@ -64,10 +64,10 @@ int i = 0;
 int Size = 0;
 int FrameNumber = 0;
 ////each time change
-//int SearchFrameNumber[Common::TreesTypeNumber] = { 0,0,0 };
-//int SearchFrameStep[Common::TreesTypeNumber] = { 0,0,0};
-int SearchFrameNumber[Common::TreesTypeNumber] = { 0 };
-int SearchFrameStep[Common::TreesTypeNumber] = { 0 };
+int SearchFrameNumber[Common::TreesTypeNumber] = { 0,0,0 };
+int SearchFrameStep[Common::TreesTypeNumber] = { 0,0,0};
+//int SearchFrameNumber[Common::TreesTypeNumber] = { 0 };
+//int SearchFrameStep[Common::TreesTypeNumber] = { 0 };
 
 int ALLTreeNumber = 0;
 
@@ -357,7 +357,7 @@ int main()
         CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, ALLTreeNumber);
 		//////////////////////////////////////////
         MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
-		MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 1);
+		MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 5);
         MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
         MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
@@ -369,17 +369,17 @@ int main()
         MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
         MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 0);*/
 
-        //MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt",3);
-        //MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
-        //MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
-        //MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
-        //MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 0);
+        MultipleTypeTree.InitVegaFemFactory("../../models/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt",1);
+        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[1], "../../models/mini_mapleTree/WindAndTreeConfig/Config.txt");
+        MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
+        MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+        MultipleTypeTree.InitTreeModel("../../models/mini_mapleTree/tree.obj", 1);
 
-		/*MultipleTypeTree.InitVegaFemFactory("G:/GraduationProject/apricot_tree/deltaU", "../../models/apricot_tree/tree.obj", "../../models/apricot_tree/ObjectVertexIndex.txt", 1);
-		MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[2], "G:/GraduationProject/apricot_tree/WindAndTreeConfig/Config.txt");
+		MultipleTypeTree.InitVegaFemFactory("../../models/apricot_tree/deltaU", "../../models/apricot_tree/tree.obj", "../../models/apricot_tree/ObjectVertexIndex.txt", 1);
+		MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[2], "../../models/apricot_tree/WindAndTreeConfig/Config.txt");
 		MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
 		MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
-		MultipleTypeTree.InitTreeModel("../../models/apricot_tree/tree.obj", 2); */
+		MultipleTypeTree.InitTreeModel("../../models/apricot_tree/tree.obj", 2); 
         
         for (int i = 0; i < Common::TreesTypeNumber; i++)
         {
@@ -394,14 +394,33 @@ int main()
             EachFormNumberArray.push_back(MultipleTypeTree.getSpecificLoadWindAndTree(i).getEachFormNumberArray());
         }
 
+        //////////////////////////////////
+        //CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, ALLTreeNumber);
+        ////////////////////////////////////////////
+        //MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
+        //MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 1);
+        //MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
+        //MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
+        //MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+        //MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
+        //MultipleTypeTree.InitASpecificWindSourceWindData();
+        //for (int i = 0; i < Common::TreesTypeNumber; i++)
+        //{
+        //    MultipleTypeTree.SetASpecificWindSourceTreeData(i);
+        //    MultipleTypeTree.InitFemFrameStruct(i);
+        //    MultipleTypeTree.InitScenceShaderData(i);
+        //}
+        //MultipleTypeTree.caculateSpecificWindSourceData();
+
+
 
 
 	//开启线程进行读取Tree索引
         /////each time change
 	/*boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getFemFactory()), *(MultipleTypeTree.getTreeModel()), *(MultipleTypeTree.getExtraForces()), *(MultipleTypeTree.getExtraDirection()), *(MultipleTypeTree.getTreesNumberSubjected2SameWind()),MultipleTypeTree.getTreeTypeIndex());*/
      boost::thread startInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(0)), *(MultipleTypeTree.getSpecificTreeModel(0)), *(MultipleTypeTree.getSpecificExtraForces(0)), *(MultipleTypeTree.getSpecificExtraDirection(0)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(0)), 0);
-	// boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
-	// boost::thread ThirdstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(2)), *(MultipleTypeTree.getSpecificTreeModel(2)), *(MultipleTypeTree.getSpecificExtraForces(2)), *(MultipleTypeTree.getSpecificExtraDirection(2)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(2)), 2);
+	boost::thread SecondstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(1)), *(MultipleTypeTree.getSpecificTreeModel(1)), *(MultipleTypeTree.getSpecificExtraForces(1)), *(MultipleTypeTree.getSpecificExtraDirection(1)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(1)), 1);
+	boost::thread ThirdstartInsertIntoQueue = boost::thread(InsertSearchTreeFrameIndex, *(MultipleTypeTree.getSpecificFemFactory(2)), *(MultipleTypeTree.getSpecificTreeModel(2)), *(MultipleTypeTree.getSpecificExtraForces(2)), *(MultipleTypeTree.getSpecificExtraDirection(2)), *(MultipleTypeTree.getSpecificTreesNumberSubjected2SameWind(2)), 2);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection;
