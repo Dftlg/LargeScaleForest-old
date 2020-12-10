@@ -71,6 +71,22 @@ void CInitMultipleTypeTree::InitSceneDepthShader(const char* vVertexPath, const 
     m_MultipleSceneDepthShader.push_back(ourSceneDepthShader);
 }
 
+void CInitMultipleTypeTree::InitWindSource(const char* vVertexPath, const char* vFragmentPath, const std::string & vModelPath)
+{
+    m_WindSourceShader= new CShader(vVertexPath, vFragmentPath);
+    m_WindSourceObject = new CSence(vModelPath);
+}
+
+void CInitMultipleTypeTree::renderingWindSource(glm::mat4 vPerspective, glm::mat4 vView, int vFrameIndex)
+{
+    m_WindSourceShader->use();
+    m_WindSourceShader->setMat4("projection", vPerspective);
+    m_WindSourceShader->setMat4("view", vView);
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, m_ASpecificWindSource->getSpecificWindSourcePosition(vFrameIndex));
+    m_WindSourceObject->draw(*m_WindSourceShader);
+}
+
 void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTreeTypeIndex)
 {
     CSence* ourModel=new CSence(vModelPath);
@@ -114,18 +130,21 @@ void CInitMultipleTypeTree::InitMultipleExtraWindData(int vTreeTypeIndex)
     }
 }
 
-void CInitMultipleTypeTree::InitASpecificWindSourceWindData()
+void CInitMultipleTypeTree::InitASpecificWindSourceWindData(const std::string& vWindSourceConfigPath)
 {
-    //还没设置
-    std::vector<std::vector<SWaveFunctionPara>> SpecificeWindFunctionPara;
-    std::vector<glm::vec3> WindCenterMovePosition;
-    std::vector<int> WindCenterMoveFrames;
-    std::vector<double> MoveScale;
-    m_ASpecificWindSource=new CWindField (glm::vec3(0, 0, 0), Common::ProductFrameNumber, SpecificeWindFunctionPara[0], 60000, 10, WindCenterMovePosition, WindCenterMoveFrames, MoveScale);
+    CLoadWindSourceConfig windSource(vWindSourceConfigPath);
+    glm::vec3 windCenter = windSource.getWindSourceCenter();
+    double windInfluence = windSource.getWindInfluenceArea();
+    std::vector<SWaveFunctionPara> SpecificeWindFunctionPara= windSource.getWindSourceFunctionPara();
+    std::vector<glm::vec3> WindCenterMoveVelocity=windSource.getWindCenterMoveVelocity();
+    std::vector<int> WindCenterMoveFrames= windSource.getWindCenterMoveFrames();
+    std::vector<double> MoveScale= windSource.getWindCenterMoveScale();
+    m_ASpecificWindSource=new CWindField (windCenter, Common::ProductFrameNumber, SpecificeWindFunctionPara, 60000, windInfluence, WindCenterMoveVelocity, WindCenterMoveFrames, MoveScale);
 }
 
 void CInitMultipleTypeTree::SetASpecificWindSourceTreeData(int vTreeTypeIndex)
 {
+
     std::vector<int> TreesNumberSubjected2SameWind = m_MultipleTypeTree[vTreeTypeIndex].getMultipleTreeDuplicateNumber();
     m_MultipleTreesNumberSubjected2SameWind.push_back(TreesNumberSubjected2SameWind);
     std::vector<Common::SForceDirection> tempRotation = m_MultipleTypeTree[vTreeTypeIndex].getTreeRotationAngle();

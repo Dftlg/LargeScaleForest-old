@@ -36,6 +36,23 @@ namespace Common
 
     /////each time change
 
+    //const int AllTreesNumber = 2;
+
+    //const int TreesTypeNumber = 1;
+
+    //const int TreesNumbers[TreesTypeNumber] = { 2 };
+    ////int SecondTypeTreesNumber = 5;
+
+    ////const int AllTreesNumber = 100;
+
+    ////const int TreesTypeNumber = 2;
+
+    ////const int TreesNumbers[TreesTypeNumber] = {60,40 };
+    //////int SecondTypeTreesNumber = 5;
+    ////const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };
+    //const float ScaleTree[TreesTypeNumber] = { 1.5};
+    ////////////////////////////////////////////////
+
     const int AllTreesNumber = 380;
 
     const int TreesTypeNumber = 3;
@@ -49,8 +66,10 @@ namespace Common
 
     //const int TreesNumbers[TreesTypeNumber] = {60,40 };
     ////int SecondTypeTreesNumber = 5;
+    //const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };
     const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };
- /*   const float ScaleTree[TreesTypeNumber] = { 1.5};*/
+
+
 
 	static int MaxTimeStep = 60;
 
@@ -76,6 +95,8 @@ namespace Common
 	static double internalForceErrorRange = 50;
 
 	static float Pi = 3.1415926;
+    /////////////////////
+    static bool ShowWindSourceCenter = false;
 
 	struct SVertex
 	{

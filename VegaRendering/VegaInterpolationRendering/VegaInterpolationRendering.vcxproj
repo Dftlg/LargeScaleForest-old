@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="InitMultipleTypeTree.cpp" />
     <ClCompile Include="LoadWindAndTreeConfig.cpp" />
+    <ClCompile Include="LoadWindSourceConfig.cpp" />
     <ClCompile Include="VegaInterpolationRendering.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +159,8 @@
     <None Include="skybox.vert" />
     <None Include="Tree.frag" />
     <None Include="Tree.vert" />
+    <None Include="WindSourceCenter.frag" />
+    <None Include="WindSourceCenter.vert" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
@@ -173,6 +176,7 @@
   <ItemGroup>
     <ClInclude Include="InitMultipleTypeTree.h" />
     <ClInclude Include="LoadWindAndTreeConfig.h" />
+    <ClInclude Include="LoadWindSourceConfig.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,6 +4,7 @@ CMesh::CMesh(const std::vector<Common::SVertex>& vVertices, const std::vector<un
 {
 	__setParameter(vVertices, vIndices, vTestures);
 	__setupMesh();
+    m_isInstance = false;
 }
 
 //****************************************************************************************************
@@ -29,6 +30,7 @@ void CMesh::setRotation(glm::mat4 * temp,int vInstanceTreeNumber)
 {
 	m_modelMatrices = temp;
     m_InstanceTreeNumber = vInstanceTreeNumber;
+    m_isInstance = true;
 	__setupInstanceMesh();
 }
 
@@ -83,7 +85,12 @@ void CMesh::draw(const CShader& vShader) const
 	// draw mesh
 	glBindVertexArray(m_VAO);
 	//glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+    if(m_isInstance==true)
 	glDrawElementsInstanced(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0, m_InstanceTreeNumber);
+    else
+    {
+        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+    }
 	glBindVertexArray(0);
 
 	// always good practice to set everything back to defaults once configured.

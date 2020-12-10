@@ -394,16 +394,18 @@ int main()
             EachFormNumberArray.push_back(MultipleTypeTree.getSpecificLoadWindAndTree(i).getEachFormNumberArray());
         }
 
-        //////////////////////////////////
-        //CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, ALLTreeNumber);
+        ////////////////////////////////
+        //CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, ALLTreeNumber,false);
         ////////////////////////////////////////////
         //MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
         //MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 1);
-        //MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
+        //MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/HemiWindField/WindSourceTreeConfig.txt");
         //MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
         //MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
         //MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
-        //MultipleTypeTree.InitASpecificWindSourceWindData();
+        //MultipleTypeTree.InitASpecificWindSourceWindData("../../models/yellow_tree/HemiWindField/WindSourceConfig.txt");
+        //MultipleTypeTree.InitWindSource("WindSourceCenter.vert", "WindSourceCenter.frag","../../models/sphere/sphere.obj");
+
         //for (int i = 0; i < Common::TreesTypeNumber; i++)
         //{
         //    MultipleTypeTree.SetASpecificWindSourceTreeData(i);
@@ -474,7 +476,7 @@ int main()
 
         MultipleTypeTree.getSpecificScenceDepthShader(0)->use();
         MultipleTypeTree.getSpecificScenceDepthShader(0)->setInt("planeOrTree", -1);
-        //这地方是错的把。。。
+  
 		renderPlane(*(MultipleTypeTree.getSpecificScenceDepthShader(0)), planeVAO, floorTexture, opacityTexture);
 		//tree
         /*MultipleTypeTree.getScenceDepthShader(1)->setInt("planeOrTree", 1);
@@ -516,7 +518,12 @@ int main()
             renderTree(*(MultipleTypeTree.getSpecificScenceShadowShader(i)), *(MultipleTypeTree.getSpecificTreeModel(i)));
         }
 
-
+        if (Common::ShowWindSourceCenter == true)
+        {
+            projection = glm::perspective(glm::radians(Camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+            view = Camera.getViewMatrix();
+            MultipleTypeTree.renderingWindSource(projection, view, FrameNumber);
+        }
 		//skybox	
 		ourSkyBoxShader.use();
 		renderSkybox(ourSkyBoxShader, skyboxVAO, cubemapTexture);

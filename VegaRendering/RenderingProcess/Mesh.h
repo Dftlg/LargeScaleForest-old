@@ -49,6 +49,7 @@ private:
 	glm::mat4* m_modelMatrices;
     glm::mat4* m_specificmodelRotationMatrices;
     int m_InstanceTreeNumber;
+    bool m_isInstance;
 
 	int * m_TreeFileIndex;
 	int * m_FrameIndex;

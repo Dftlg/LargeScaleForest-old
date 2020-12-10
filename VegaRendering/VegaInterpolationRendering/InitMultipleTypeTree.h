@@ -13,6 +13,7 @@
 #include "Mesh.h"
 #include "VegaFemFactory.h"
 #include "../Common/WindFiled.h"
+#include "LoadWindSourceConfig.h"
 #include "LoadWindAndTreeConfig.h"
 
 class CInitMultipleTypeTree
@@ -24,6 +25,7 @@ public:
     void InitWindAndTree(int vTreeNumber, const std::string & vFilePath);
     void InitSceneShadowShader(const char* vVertexPath, const char* vFragmentPath);
     void InitSceneDepthShader(const char* vVertexPath, const char* vFragmentPath, const char* vGeometryPath = nullptr);
+    void InitWindSource(const char* vVertexPath, const char* vFragmentPath,const std::string &vModelPath);
 
     void InitTreeModel(const std::string& vModelPath, int vTreeTypeIndex);
 	int getSumFaceVerticesBeforeEndMesh(const int& vTreeIndex);
@@ -33,7 +35,7 @@ public:
     void InitMultipleExtraWindData(int vTreeTypeIndex);
 
     //a specific wind source
-    void InitASpecificWindSourceWindData();
+    void InitASpecificWindSourceWindData(const std::string& vWindSourceConfigPath);
     void SetASpecificWindSourceTreeData(int vTreeTypeIndex);
 
     void InitFemFrameStruct(int vTreeTypeIndex);
@@ -64,6 +66,8 @@ public:
     std::vector<int> getTreeTypeIndex() { return m_TreeTypeIndex; };
 
     void caculateSpecificWindSourceData();
+
+    void renderingWindSource(glm::mat4 vPerspective,glm::mat4 vView,int vFrameIndex);
     //void get
 
 private:
@@ -83,6 +87,9 @@ private:
     std::vector<CShader*> m_MultipleSceneShadowShader;
     std::vector<CShader*> m_MultipleSceneDepthShader;
     std::vector<CSence *> m_MultipleTreeModel;
+
+    CSence* m_WindSourceObject;
+    CShader* m_WindSourceShader;
 
     //第一个std::vector表示某棵树，第二个vector表示该棵树共有多少中不同的形变，第三个vector表示某一形变收到的外力
     std::vector<std::vector<std::vector<int>>> m_MultipleExtraForces;
@@ -111,4 +118,5 @@ private:
     std::vector<std::vector<glm::vec3>> m_EachTypeTreesPositionInSence;
 
     CWindField * m_ASpecificWindSource;
+
 };

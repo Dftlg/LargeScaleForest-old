@@ -180,3 +180,16 @@ void CWindField::saveForces2File(const std::string filePath)
     }
     outFile.close();
 }
+//
+//void CWindField::setWindSourceRendering()
+//{
+//    for (int i = 0; i < 6; i++)
+//    {
+//        renderPoints.push_back()
+//    }
+//    glGenVertexArrays(1, &m_WindVAO);
+//    glGenBuffers(1, &m_WindVBO);
+//    glBindVertexArray(m_WindVAO);
+//    glBindBuffer(GL_ARRAY_BUFFER, m_WindVBO);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(lightPositionsData), &lightPositionsData, GL_STATIC_DRAW);
+//}

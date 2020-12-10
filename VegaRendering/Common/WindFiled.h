@@ -93,10 +93,16 @@ public:
 	std::vector<Common::SForceDirection> getDirectionWindDirection() { return m_RelativeDirectionOfWindAndTree[0]; };
 
 	std::vector<int> getSpecificWindSourceForces(glm::vec3 vObjectPosition);
+
+    std::vector<glm::vec3> getWindSourcePosition() { return m_WindSourceCenterMovePosition; }
+    glm::vec3 getSpecificWindSourcePosition(int vFrameIndex) { return m_WindSourceCenterMovePosition[vFrameIndex]; };
     //return same type tree forces
     void getSpecificWindForcesAndDirection(int vTreeType, std::vector<std::vector<int>> &voForcesInSameType, std::vector<std::vector<Common::SForceDirection>>& voDirectionInSameType);
 
     void saveForces2File(const std::string filePath);
+
+    //void setWindSourceRendering();
+    //void updataWindSourceRendering();
 
 private:
 
@@ -123,4 +129,9 @@ private:
     //定向风源
 	std::vector<std::vector<int>> m_Forces;
 	std::vector<std::vector<Common::SForceDirection>> m_RelativeDirectionOfWindAndTree;
+
+    ////风源当前渲染正方体点
+    //std::vector<glm::vec3> renderPoints;
+    //unsigned int m_WindVAO;
+    //unsigned int m_WindVBO;
 };
