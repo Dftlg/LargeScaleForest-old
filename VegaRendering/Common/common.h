@@ -36,11 +36,11 @@ namespace Common
 
     /////each time change
 
-    const int AllTreesNumber = 3;
+    const int AllTreesNumber = 4;
 
     const int TreesTypeNumber = 1;
 
-    const int TreesNumbers[TreesTypeNumber] = { 3 };
+    const int TreesNumbers[TreesTypeNumber] = { 4 };
     //int SecondTypeTreesNumber = 5;
 
     //const int AllTreesNumber = 100;
@@ -89,7 +89,7 @@ namespace Common
 	static float Pi = 3.1415926;
     /////////////////////
     //each time change
-    static bool ShowWindSourceCenter = false;
+    static bool ShowWindSourceCenter = true;
 
 	struct SVertex
 	{

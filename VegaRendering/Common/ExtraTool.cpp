@@ -338,11 +338,12 @@ double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
 
 //计算范围从+0到360
 //坐标系图片参考文档
-//opengl点的x,yz坐标系与theta和phi坐标系z轴相反
+//opengl点的x,yz坐标系与theta和phi坐标系z轴相同
 void TransformCartesianCorrdinate2SphericalCorrdinate(glm::vec3 &vStartPoint, glm::vec3 &vEndPoint, double &voRadius, int& voTheta, int& voPhi)
 {
     glm::vec3 tempVector =glm::normalize(vEndPoint - vStartPoint);
-    tempVector.z = -tempVector.z;
+    //////////////////
+    //tempVector.z = -tempVector.z;
     if (tempVector.x == 0)
         tempVector.x = FLT_MIN;
     //std::cout << tempVector.x << " " << tempVector.y << " " << tempVector.z << std::endl;

@@ -18,6 +18,12 @@
 
  树自身旋转角度为0-360度 从D:\GraduationProject\LargeScaleForest\models\yellow_tree\WindAndTreeConfig 文件中配置
 
-树自选转方向为逆时针
+树自选转方向为逆时针（已更改为顺时针方向旋转）
 
 模型风力方向为顺时针
+
+
+
+需要测试当模型自旋转时，直升机风源产生的风场，
+
+测试直升机风源产生的外力，随距离场进行波动

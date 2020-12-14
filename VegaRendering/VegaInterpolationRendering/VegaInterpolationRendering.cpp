@@ -354,14 +354,14 @@ int main()
 		}
         //生成树木的随机位置
         
-        CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, Common::AllTreesNumber);
-		//////////////////////////////////////////
-        MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
-		MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 3);
-        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
-        MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
-        MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
-        MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
+  //      CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, Common::AllTreesNumber);
+		////////////////////////////////////////////
+  //      MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
+		//MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 3);
+  //      MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/WindAndTreeConfig/Config.txt");
+  //      MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
+  //      MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+  //      MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0);
 
       /*  MultipleTypeTree.InitVegaFemFactory("G:/GraduationProject/mini_mapleTree/deltaU", "../../models/mini_mapleTree/tree.obj", "../../models/mini_mapleTree/ObjectVertexIndex.txt", 1);
         MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "G:/GraduationProject/mini_mapleTree/WindAndTreeConfig/Config.txt");
@@ -381,7 +381,7 @@ int main()
 		MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
 		MultipleTypeTree.InitTreeModel("../../models/apricot_tree/tree.obj", 2); */
         
-        for (int i = 0; i < Common::TreesTypeNumber; i++)
+       /* for (int i = 0; i < Common::TreesTypeNumber; i++)
         {
             MultipleTypeTree.InitMultipleExtraWindData(i);
             MultipleTypeTree.InitFemFrameStruct(i);
@@ -392,35 +392,35 @@ int main()
         for (int i = 0; i < Common::TreesTypeNumber; i++)
         {
             EachFormNumberArray.push_back(MultipleTypeTree.getSpecificLoadWindAndTree(i).getEachFormNumberArray());
-        }
+        }*/
 #pragma endregion
-        //////////////////////////////////
-        //CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, Common::AllTreesNumber,false);
-        ////////////////////////////////////////////
-        //MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
-        //MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt",4);
-        //MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/HemiWindField/WindSourceTreeConfig.txt");
-        //MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
-        //MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
-        //MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0,false);
-        //MultipleTypeTree.InitASpecificWindSourceWindData("../../models/yellow_tree/HemiWindField/WindSourceConfig.txt");
-        //MultipleTypeTree.InitWindSource("WindSourceCenter.vert", "WindSourceCenter.frag","../../models/sphere/sphere.obj");
+        ////////////////////////////////
+        CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, Common::AllTreesNumber,false);
+        //////////////////////////////////////////
+        MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
+        MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt",4);
+        MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/HemiWindField/WindSourceTreeConfig.txt");
+        MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
+        MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
+        MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0,false);
+        MultipleTypeTree.InitASpecificWindSourceWindData("../../models/yellow_tree/HemiWindField/WindSourceConfig.txt");
+        MultipleTypeTree.InitWindSource("WindSourceCenter.vert", "WindSourceCenter.frag","../../models/sphere/sphere.obj");
 
-        //for (int i = 0; i < Common::TreesTypeNumber; i++)
-        //{
-        //    MultipleTypeTree.SetASpecificWindSourceTreeData(i);
-        //}
-        //MultipleTypeTree.caculateSpecificWindSourceData();
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            MultipleTypeTree.SetASpecificWindSourceTreeData(i);
+        }
+        MultipleTypeTree.caculateSpecificWindSourceData();
 
-        //for (int i = 0; i < Common::TreesTypeNumber; i++)
-        //{
-        //    MultipleTypeTree.InitFemFrameStruct(i);
-        //    MultipleTypeTree.InitScenceShaderData(i);
-        //}
-        // for (int i = 0; i < Common::TreesTypeNumber; i++)
-        //{
-        //   EachFormNumberArray.push_back(MultipleTypeTree.getSpecificLoadWindAndTree(i).getEachFormNumberArray());
-        //}
+        for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+            MultipleTypeTree.InitFemFrameStruct(i);
+            MultipleTypeTree.InitScenceShaderData(i);
+        }
+         for (int i = 0; i < Common::TreesTypeNumber; i++)
+        {
+           EachFormNumberArray.push_back(MultipleTypeTree.getSpecificLoadWindAndTree(i).getEachFormNumberArray());
+        }
 
 
 	//开启线程进行读取Tree索引
