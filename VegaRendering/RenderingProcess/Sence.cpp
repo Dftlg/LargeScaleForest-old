@@ -16,12 +16,14 @@ void CSence::draw(const CShader& vShader)
 
 }
 
-void CSence::setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations, float vScaleNumber, int vTreesNumber)
+void CSence::setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations, float vScaleNumber, int vTreesNumber,bool vWindTypeDecideTreePosition)
 {
 	m_InstanceTreeNumber = vTreesNumber;
 	m_TransFormations = vTransFormations;
 	glm::mat4*temp = translateTreePosition();
-	
+
+    m_WindTypeDecideTreePosition = vWindTypeDecideTreePosition;
+
 	m_SetRotation = vRotations;
 	specificTreeRotation(m_SetRotation, temp);
 	//randomRotation(temp);
@@ -51,7 +53,7 @@ void CSence::setScaleMesh(float vScale, glm::mat4 * vmodelMatrices)
 //}
 //
 
-void CSence::specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrces)
+void CSence::specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrces, bool vWindTypeDecideTreePosition)
 {
 	glm::mat4* modelMatrices = new glm::mat4[m_InstanceTreeNumber];
 	for (int i = 0; i < m_InstanceTreeNumber; i++)
@@ -60,8 +62,11 @@ void CSence::specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmo
 		//tempRandom = 0;
 		//m_Angles.push_back(Common::SForceDirection(0, tempRandom));
 
-		m_Angles.push_back(Common::SForceDirection(0, vRotations[i]));
-		vmodelMatrces[i] = glm::rotate(vmodelMatrces[i], glm::radians(vRotations[i]), glm::vec3(0.0, 1.0, 0.0));
+        //将模型旋转方向改为顺时针方向
+      /*  m_Angles.push_back(Common::SForceDirection(0, vRotations[i]));
+        vmodelMatrces[i] = glm::rotate(vmodelMatrces[i], glm::radians(vRotations[i]), glm::vec3(0.0, 1.0, 0.0));*/
+		m_Angles.push_back(Common::SForceDirection(0, -vRotations[i]));
+		vmodelMatrces[i] = glm::rotate(vmodelMatrces[i], glm::radians(-vRotations[i]), glm::vec3(0.0, 1.0, 0.0));
 	}
 }
 
@@ -74,7 +79,16 @@ glm::mat4* CSence::translateTreePosition()
 		glm::mat4 model = glm::mat4(1.0f);
 		//model = glm::translate(model, glm::vec3(translate[i], -0.5f,0));
 		//0.45
-        glm::vec3 tempTranslatePosition((m_TransFormations[i].first - Common::AllTreesNumber / 2) * 0.075, -0.5f, (m_TransFormations[i].second - Common::AllTreesNumber / 2) *0.075);
+        glm::vec3 tempTranslatePosition;
+        if (m_WindTypeDecideTreePosition == true)
+        {
+            tempTranslatePosition= glm::vec3((m_TransFormations[i].first - Common::AllTreesNumber / 2) * 0.075, -0.5f, (m_TransFormations[i].second - Common::AllTreesNumber / 2) *0.075);
+            //tempTranslatePosition = glm::vec3((m_TransFormations[i].first - Common::AllTreesNumber / 2) * 0.5, -0.5f, (m_TransFormations[i].second - Common::AllTreesNumber / 2) *0.5);
+        }
+        else
+        {
+            tempTranslatePosition=glm::vec3(m_TransFormations[i].first, -0.5f, m_TransFormations[i].second);
+        }
         model = glm::translate(model, tempTranslatePosition);
 
         m_TreePositions.push_back(tempTranslatePosition);

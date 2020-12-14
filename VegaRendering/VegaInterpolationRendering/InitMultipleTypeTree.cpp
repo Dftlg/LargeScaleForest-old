@@ -18,6 +18,23 @@ CInitMultipleTypeTree::CInitMultipleTypeTree(int vTreeTypeNumber, int vAllTreeNu
     }
 }
 
+CInitMultipleTypeTree::~CInitMultipleTypeTree()
+{
+    for (auto p : m_MultipleTypeFem)
+        delete p;
+    m_MultipleTypeFem.clear();
+    for (auto p : m_MultipleSceneShadowShader)
+        delete p;
+    m_MultipleSceneShadowShader.clear();
+    for (auto p : m_MultipleSceneDepthShader)
+        delete p;
+    m_MultipleSceneDepthShader.clear();
+    for (auto p : m_MultipleTreeModel)
+        delete p;
+    m_MultipleTreeModel.clear();
+}
+
+
 void CInitMultipleTypeTree::__GenerateTreesPosition()
 {
     if (m_OneDirectionWindOrSpecificWindSource == true)
@@ -83,11 +100,14 @@ void CInitMultipleTypeTree::renderingWindSource(glm::mat4 vPerspective, glm::mat
     m_WindSourceShader->setMat4("projection", vPerspective);
     m_WindSourceShader->setMat4("view", vView);
     glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0, 2, 0));
     model = glm::translate(model, m_ASpecificWindSource->getSpecificWindSourcePosition(vFrameIndex));
+    model = glm::scale(model, glm::vec3(0.3, 0.3, 0.3));
+    m_WindSourceShader->setMat4("model", model);
     m_WindSourceObject->draw(*m_WindSourceShader);
 }
 
-void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTreeTypeIndex)
+void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTreeTypeIndex, bool vWindTypeDecideTreePosition)
 {
     CSence* ourModel=new CSence(vModelPath);
 
@@ -97,7 +117,7 @@ void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTre
     for (int i = m_EachTypeTreesPositonArray[vTreeTypeIndex]; i < m_EachTypeTreesPositonArray[vTreeTypeIndex + 1]; i++)
         tempTransFormation.push_back(m_AllTreesPosition[i]);
     
-    ourModel->setMeshRotation(SpecificRotation, tempTransFormation,Common::ScaleTree[vTreeTypeIndex],Common::TreesNumbers[vTreeTypeIndex]);
+    ourModel->setMeshRotation(SpecificRotation, tempTransFormation,Common::ScaleTree[vTreeTypeIndex],Common::TreesNumbers[vTreeTypeIndex], vWindTypeDecideTreePosition);
     m_EachTypeTreesPositionInSence[vTreeTypeIndex] = ourModel->getTreePositions();
     m_AllTreesPositionInSence.insert(m_AllTreesPositionInSence.end(), m_EachTypeTreesPositionInSence[vTreeTypeIndex].begin(), m_EachTypeTreesPositionInSence[vTreeTypeIndex].end());
 
@@ -138,7 +158,7 @@ void CInitMultipleTypeTree::InitASpecificWindSourceWindData(const std::string& v
     std::vector<SWaveFunctionPara> SpecificeWindFunctionPara= windSource.getWindSourceFunctionPara();
     std::vector<glm::vec3> WindCenterMoveVelocity=windSource.getWindCenterMoveVelocity();
     std::vector<int> WindCenterMoveFrames= windSource.getWindCenterMoveFrames();
-    std::vector<double> MoveScale= windSource.getWindCenterMoveScale();
+    std::vector<float> MoveScale= windSource.getWindCenterMoveScale();
     m_ASpecificWindSource=new CWindField (windCenter, Common::ProductFrameNumber, SpecificeWindFunctionPara, 60000, windInfluence, WindCenterMoveVelocity, WindCenterMoveFrames, MoveScale);
 }
 

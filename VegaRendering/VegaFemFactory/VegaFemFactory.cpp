@@ -1039,7 +1039,6 @@ void CVegaFemFactory::searchMatchedOneTreeFrameSequences(std::vector<int> & voMa
 
 		//k
 	//compare K Martix
-#pragma omp parallel for
 		for (int i = 0; i < m_KMartixSequence.size(); i++)
 		{
 			if (!isDataExist(m_VelocitySequence[i].first, searchFileAndFrameIndexWithWind)||gaussianForceErrrorSequence[i].second <0.6|| tempVelocityErrorSequence[i].second==0)

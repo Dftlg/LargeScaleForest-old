@@ -77,7 +77,7 @@ public:
 	//specific wind source
     //初始化生成风源
     //vSwavePara为风源的风场函数,vWindCenter风源中心，vSize,vWaveLength,生成的风场函数帧数，Sphere4Influence风源影响范围，vWindCenterMovePosition风源每个阶段移动的位置，vWindCenterMoveFrames风源在一个阶段内移动所需要帧数
-	CWindField(const glm::vec3 vWindCenter, const int vSize, const std::vector<SWaveFunctionPara> vSwavePara, const int vWavelength,double Sphere4Influence,std::vector<glm::vec3>& vWindCenterMovePosition,std::vector<int>& vWindCenterMoveFrames,std::vector<double> & vMoveScale);
+	CWindField(const glm::vec3 vWindCenter, const int vSize, const std::vector<SWaveFunctionPara> vSwavePara, const int vWavelength,double Sphere4Influence,std::vector<glm::vec3>& vWindCenterMovePosition,std::vector<int>& vWindCenterMoveFrames,std::vector<float> & vMoveScale);
 	~CWindField()=default;
 
     //setTreePositionAndRotationAngle In Sence
@@ -121,6 +121,7 @@ private:
 
     std::vector<glm::vec3> m_WindSourceCenterMoveVelocity;
     std::vector<int> m_WindCenterMoveFrames;
+    std::vector<float> m_WindMoveScale;
 
     std::vector<std::vector<glm::vec3>> m_TreesPosition;
     std::vector<std::vector<Common::SForceDirection>> m_TreesRotationAngle;

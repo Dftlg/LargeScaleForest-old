@@ -36,28 +36,11 @@ namespace Common
 
     /////each time change
 
-    //const int AllTreesNumber = 2;
+    const int AllTreesNumber = 3;
 
-    //const int TreesTypeNumber = 1;
+    const int TreesTypeNumber = 1;
 
-    //const int TreesNumbers[TreesTypeNumber] = { 2 };
-    ////int SecondTypeTreesNumber = 5;
-
-    ////const int AllTreesNumber = 100;
-
-    ////const int TreesTypeNumber = 2;
-
-    ////const int TreesNumbers[TreesTypeNumber] = {60,40 };
-    //////int SecondTypeTreesNumber = 5;
-    ////const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };
-    //const float ScaleTree[TreesTypeNumber] = { 1.5};
-    ////////////////////////////////////////////////
-
-    const int AllTreesNumber = 380;
-
-    const int TreesTypeNumber = 3;
-
-    const int TreesNumbers[TreesTypeNumber] = { 300,50,30 };
+    const int TreesNumbers[TreesTypeNumber] = { 3 };
     //int SecondTypeTreesNumber = 5;
 
     //const int AllTreesNumber = 100;
@@ -67,7 +50,16 @@ namespace Common
     //const int TreesNumbers[TreesTypeNumber] = {60,40 };
     ////int SecondTypeTreesNumber = 5;
     //const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };
-    const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };
+    const float ScaleTree[TreesTypeNumber] = { 1.5};
+    ////////////////////////////////////////////////
+
+   /* const int AllTreesNumber = 380;
+
+    const int TreesTypeNumber = 3;
+
+    const int TreesNumbers[TreesTypeNumber] = { 300,50,30 };
+
+    const float ScaleTree[TreesTypeNumber] = { 0.7,1.5,1.0 };*/
 
 
 
@@ -96,6 +88,7 @@ namespace Common
 
 	static float Pi = 3.1415926;
     /////////////////////
+    //each time change
     static bool ShowWindSourceCenter = false;
 
 	struct SVertex

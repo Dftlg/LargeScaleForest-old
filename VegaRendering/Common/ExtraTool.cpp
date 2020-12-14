@@ -80,16 +80,23 @@ std::vector<std::pair<double,double>> RandomTreePositionGenerate(int vTreeNumber
 		tempTreedoublePosition[i].first = tempTreePosition[i].first + u(e);
 		tempTreedoublePosition[i].second = tempTreePosition[i].second + u(e);
 	}
+
 	return tempTreedoublePosition;
 }
 
+//opengl z轴向外与球坐标z相反
 std::vector<std::pair<double, double>> StableTreePositionGenerate(int vTreesNumber)
 {
-    std::vector<std::pair<double, double>> tempTreedoublePosition(vTreesNumber);
-    for (int i = 0; i < vTreesNumber; i++)
+    std::vector<std::pair<double, double>> tempTreedoublePosition;
+   /* for (int i = 0; i < vTreesNumber; i++)
     {
-        tempTreedoublePosition.push_back(std::make_pair(0, vTreesNumber));
-    }
+        tempTreedoublePosition.push_back(std::make_pair(0, i+1));
+    }*/
+    tempTreedoublePosition.push_back(std::make_pair(8, 0));
+    tempTreedoublePosition.push_back(std::make_pair(0, -8));
+    tempTreedoublePosition.push_back(std::make_pair(0, 8));
+    tempTreedoublePosition.push_back(std::make_pair(-8, 0));
+
     return tempTreedoublePosition;
 }
 
@@ -329,15 +336,30 @@ double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
 	} 
 }
 
+//计算范围从+0到360
+//坐标系图片参考文档
+//opengl点的x,yz坐标系与theta和phi坐标系z轴相反
 void TransformCartesianCorrdinate2SphericalCorrdinate(glm::vec3 &vStartPoint, glm::vec3 &vEndPoint, double &voRadius, int& voTheta, int& voPhi)
 {
     glm::vec3 tempVector =glm::normalize(vEndPoint - vStartPoint);
-    glm::vec3 tempXYAxisChange(tempVector.x, tempVector.z, tempVector.y);
-    voRadius = sqrt(tempXYAxisChange.x*tempXYAxisChange.x + tempXYAxisChange.y*tempXYAxisChange.y + tempXYAxisChange.z*tempXYAxisChange.z);
-    double ThetaRadian = acos(tempVector.z / voRadius);
-    double PhiRadian = atan(tempVector.y / tempVector.x);
+    tempVector.z = -tempVector.z;
+    if (tempVector.x == 0)
+        tempVector.x = FLT_MIN;
+    //std::cout << tempVector.x << " " << tempVector.y << " " << tempVector.z << std::endl;
+    voRadius = sqrt(tempVector.x*tempVector.x + tempVector.y*tempVector.y + tempVector.z*tempVector.z);
+
+    double ThetaRadian = asin(tempVector.y / voRadius);
+    double PhiRadian = atan2(tempVector.z , tempVector.x);
 
     voTheta = 180 * ThetaRadian / M_PI;
+    if (voTheta < 0)
+    {
+        voTheta += 360;
+    }
     voPhi = 180 * PhiRadian / M_PI;
+    if (voPhi < 0)
+    {
+        voPhi += 360;
+    }
 }
 

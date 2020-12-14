@@ -55,11 +55,11 @@ public:
 	void setFileDirectiory(std::string vFileDirectory) { m_FileDirectory = vFileDirectory; }
 	int getAssimpVerticesNumber() { return m_AssimpVerticesNumber; }
 	void draw(const CShader& vShader);
-	void setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations,float vScaleNumber,int vTreesNumber);
+	void setMeshRotation(std::vector<float> &vRotations, std::vector<std::pair<double, double>>& vTransFormations,float vScaleNumber,int vTreesNumber, bool vWindTypeDecideTreePosition=true);
     //void setMeshRotation();
     void setScaleMesh(float vScale, glm::mat4 * vmodelMatrices);
     void setMeshRotationRelationWindFieldAndTreeDirection(std::vector<float> &vRotations);
-    void specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrces);
+    void specificTreeRotation(std::vector<float> &vRotations, glm::mat4* vmodelMatrces, bool vWindTypeDecideTreePosition = true);
     glm::mat4* translateTreePosition();
     void randomScaleMesh(glm::mat4 * vmodelMatrices);
 	void randomRotation(glm::mat4* vmodelMatrices);
@@ -121,4 +121,5 @@ private:
     std::vector<Common::SForceDirection> m_Angles;
     std::vector<std::pair<double, double>> m_TransFormations;
     int m_InstanceTreeNumber;
+    bool m_WindTypeDecideTreePosition;
 };

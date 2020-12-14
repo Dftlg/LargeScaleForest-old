@@ -7,6 +7,7 @@ CLoadWindSourceConfig::CLoadWindSourceConfig(const std::string & vFilePath)
 
 void CLoadWindSourceConfig::__readWindSourceConfig(const std::string &vFilePath)
 {
+    int WindMotionDataNumber = 0;
     std::ifstream positionFile(vFilePath);
     std::string lineString;
     while (getline(positionFile, lineString))
@@ -31,9 +32,9 @@ void CLoadWindSourceConfig::__readWindSourceConfig(const std::string &vFilePath)
         if (str == "WindCenterMoveVelocity")
         {
             getline(positionFile, lineString);
-            int VelocityNumber= atoi(lineString.c_str());
+            int WindMotionDataNumber = atoi(lineString.c_str());
             glm::vec3 tempVec3Velocity;
-            for (int i = 0; i < VelocityNumber; i++)
+            for (int i = 0; i < WindMotionDataNumber; i++)
             {
                 std::vector<std::string> MoveVelocity;
                 getline(positionFile, lineString);
@@ -55,7 +56,7 @@ void CLoadWindSourceConfig::__readWindSourceConfig(const std::string &vFilePath)
             getline(positionFile, lineString);
             boost::split(MoveScale, lineString, boost::is_any_of(","), boost::token_compress_off);
             for (auto movescale : MoveScale)
-                m_windCenterMoveFrames.push_back((atof(movescale.c_str())));
+                m_moveScale.push_back((atof(movescale.c_str())));
         }
         if (str == "WindPara")
         {

@@ -697,7 +697,7 @@ void idleFunction(void)
 	  for (int i = 0; i < pullVertexInfo.StemPullVertexNum; i++)
 	  {
 		  camera->setWorldCoorinateSystemForce(pullVertexInfo.StemExtraForces[subTimestepCounter], Theta, Phi, externalForce);
-		  //std::copy(externalForce, externalForce + 3, vForce);
+		  std::copy(externalForce, externalForce + 3, vForce);
 		  for (int j = 0; j < 3; j++)
 		  {
 			  externalForce[j] *= deformableObjectCompliance * pullVertexInfo.Scale[i];
@@ -712,7 +712,7 @@ void idleFunction(void)
 	  for (int i = pullVertexInfo.StemPullVertexNum; i < pullVertexInfo.PullVertexIndex.size(); i++)
 	  {
 		  camera->setWorldCoorinateSystemForce(pullVertexInfo.LeafExtraForces[i-pullVertexInfo.StemPullVertexNum][subTimestepCounter], Theta+ pullVertexInfo.DeviationDirection[i].first, Phi+ pullVertexInfo.DeviationDirection[i].second, externalForce);
-		  std::copy(externalForce, externalForce + 3, vForce);
+		  //std::copy(externalForce, externalForce + 3, vForce);
 		  for (int j = 0; j < 3; j++)
 		  {
 			  externalForce[j] *= deformableObjectCompliance * pullVertexInfo.Scale[i];
@@ -2414,7 +2414,7 @@ int main(int argc, char* argv[])
 
   //configFilename = string("D:/GraduationProject/Vega/examples/simpleBridge_vox/simpleBridge_vox.config");
  /* configFilename = string("D:/GraduationProject/Vega/models/newgrass/voxelizegrass/voxelizegrass.config");*/
-  configFilename = string("../../models/mini_mapleTree/tree.config");
+  configFilename = string("../../models/yellow_tree/tree.config");
   printf("Loading scene configuration from %s.\n", configFilename.c_str());
 
   initConfigurations(); // parse the config file同时输出到cmd

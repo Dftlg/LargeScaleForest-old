@@ -18,7 +18,7 @@ public:
     std::vector<SWaveFunctionPara> getWindSourceFunctionPara() { return m_specificWindFunctionPara; };
     std::vector<glm::vec3> getWindCenterMoveVelocity() { return m_windCenterMoveVelocity; };
     std::vector<int> getWindCenterMoveFrames() { return m_windCenterMoveFrames; };
-    std::vector<double> getWindCenterMoveScale() { return m_moveScale; };
+    std::vector<float> getWindCenterMoveScale() { return m_moveScale; };
     //std::vector<std::vector<SWaveFunctionPara>> getMultipleTreeWindPara() { return m_ProductMultipleTreePara; };
 private:
 
@@ -29,6 +29,6 @@ private:
     std::vector<SWaveFunctionPara> m_specificWindFunctionPara;
     std::vector<glm::vec3> m_windCenterMoveVelocity;
     std::vector<int> m_windCenterMoveFrames;
-    std::vector<double> m_moveScale;
+    std::vector<float> m_moveScale;
 };
 

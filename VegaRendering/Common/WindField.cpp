@@ -31,12 +31,13 @@ CWindField::CWindField(const int vSize, const std::vector<SWaveFunctionPara> vSw
     m_RelativeDirectionOfWindAndTree.push_back(tempDirections);
 }
 
-CWindField::CWindField(const glm::vec3 vWindCenter, const int vSize, const std::vector<SWaveFunctionPara> vSwavePara, const int vWavelength, double Sphere4Influence, std::vector<glm::vec3>& vWindCenterMoveVelocity, std::vector<int>& vWindCenterMoveFrames, std::vector<double> & vMoveScale)
+CWindField::CWindField(const glm::vec3 vWindCenter, const int vSize, const std::vector<SWaveFunctionPara> vSwavePara, const int vWavelength, double Sphere4Influence, std::vector<glm::vec3>& vWindCenterMoveVelocity, std::vector<int>& vWindCenterMoveFrames, std::vector<float> & vMoveScale)
 {
     m_WindCenter = vWindCenter;
     m_WindInfluenceField = Sphere4Influence;
     m_WindSourceCenterMoveVelocity = vWindCenterMoveVelocity;
     m_WindCenterMoveFrames = vWindCenterMoveFrames;
+    m_WindMoveScale = vMoveScale;
     std::vector<int>tempForces(vSize, 0);
     for (auto tempwavepara : vSwavePara)
     {
@@ -77,7 +78,7 @@ CWindField::CWindField(const glm::vec3 vWindCenter, const int vSize, const std::
         glm::vec3 tempVelocity = m_WindSourceCenterMoveVelocity[i];
         for (int k = 0; k < m_WindCenterMoveFrames[i]; k++)
         {
-            tempWindSourcePosition += glm::vec1((k + 1))*tempVelocity;
+            tempWindSourcePosition += glm::vec1((k + 1))*tempVelocity*glm::vec1(m_WindMoveScale[i]);
             m_WindSourceCenterMovePosition.push_back(tempWindSourcePosition);
         }
     }
@@ -116,8 +117,12 @@ void CWindField::caculateWindForcesAndDirection2OneTree(int vTreeType,int vTreeI
     for (int i = 0; i < m_WindSourceCenterMovePosition.size(); i++)
     {
         double Radius;
-        int Theta, Phi;
+        int Theta=0, Phi=0;
+        
         TransformCartesianCorrdinate2SphericalCorrdinate(m_WindSourceCenterMovePosition[i], m_TreesPosition[vTreeType][vTreeIndex], Radius, Theta, Phi);
+        //////
+        //std::cout <<"Theta"<< Theta <<"Phi"<< Phi << std::endl;
+        //生成0-360
         Common::SForceDirection tempWindDirection(Theta, Phi);
         Common::SForceDirection tempDirection = caculateRelativeDirection(tempWindDirection, m_TreesRotationAngle[vTreeType][vTreeIndex]);
         oneTreeRelativeDirection.push_back(tempDirection);
@@ -129,7 +134,7 @@ void CWindField::caculateWindForcesAndDirection2OneTree(int vTreeType,int vTreeI
 
 void CWindField::getSpecificWindForcesAndDirection(int vTreeType, std::vector<std::vector<int>> &voForcesInSameType, std::vector<std::vector<Common::SForceDirection>>& voDirectionInSameType)
 {
-    for (int i = m_EachTypeTreeNumberIndexArea[vTreeType - 1]; i < m_EachTypeTreeNumberIndexArea[vTreeType]; i++)
+    for (int i = m_EachTypeTreeNumberIndexArea[vTreeType]; i < m_EachTypeTreeNumberIndexArea[vTreeType+1]; i++)
     {
         voForcesInSameType.push_back(m_Forces[i]);
         voDirectionInSameType.push_back(m_RelativeDirectionOfWindAndTree[i]);
@@ -143,7 +148,10 @@ int CWindField::__caculateWindForceOnTree(int vFrameIndex, glm::vec3& vTreePosit
     double absRelativeDistance = sqrt(RelativeDistance.x*RelativeDistance.x + RelativeDistance.z*RelativeDistance.z);
 
     //y=-(1/N)*x+1
-    int Force = m_WindCenterForces[vFrameIndex] * (-(absRelativeDistance / m_WindInfluenceField) + 1);
+    //int Force = m_WindCenterForces[vFrameIndex] * (-(absRelativeDistance / m_WindInfluenceField) + 1);
+    /////////////////////
+    int Force = m_WindCenterForces[vFrameIndex];
+
     return Force;
 }
 
@@ -151,8 +159,14 @@ Common::SForceDirection CWindField::caculateRelativeDirection(Common::SForceDire
 {
     Common::SForceDirection tempDirection(0, 0);
     tempDirection.Phi = vWindDirection.Phi - vTreeRotationDirection.Phi;
-    std::cout << -tempDirection.Phi;
-    tempDirection.Phi = (-tempDirection.Phi);
+    
+   // std::cout << -tempDirection.Phi;
+    //tempDirection.Phi = (-tempDirection.Phi);
+    //////////////////这里修改
+    if (tempDirection.Phi < 0)
+    {
+        tempDirection.Phi += 360;
+    }
     return tempDirection;
 }
 

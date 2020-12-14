@@ -27,7 +27,7 @@ public:
     void InitSceneDepthShader(const char* vVertexPath, const char* vFragmentPath, const char* vGeometryPath = nullptr);
     void InitWindSource(const char* vVertexPath, const char* vFragmentPath,const std::string &vModelPath);
 
-    void InitTreeModel(const std::string& vModelPath, int vTreeTypeIndex);
+    void InitTreeModel(const std::string& vModelPath, int vTreeTypeIndex, bool vWindTypeDecideTreePosition = true);
 	int getSumFaceVerticesBeforeEndMesh(const int& vTreeIndex);
 
     //void InitASpecificWindSourceTreeRotation(int vTreeNumber, const std::string & vFilePath);
@@ -43,7 +43,7 @@ public:
    
 
     void InitScenceShaderData(int vTreeTypeIndex);
-    ~CInitMultipleTypeTree()=default;
+    ~CInitMultipleTypeTree();
 
     std::vector<CVegaFemFactory*> * getFemFactory() { return &m_MultipleTypeFem; };
     std::vector<CSence*> * getTreeModel() { return &m_MultipleTreeModel; };
