@@ -36,11 +36,11 @@ namespace Common
 
     /////each time change
 
-    const int AllTreesNumber = 4;
+    const int AllTreesNumber = 1;
 
     const int TreesTypeNumber = 1;
 
-    const int TreesNumbers[TreesTypeNumber] = { 4 };
+    const int TreesNumbers[TreesTypeNumber] = { 1 };
     //int SecondTypeTreesNumber = 5;
 
     //const int AllTreesNumber = 100;

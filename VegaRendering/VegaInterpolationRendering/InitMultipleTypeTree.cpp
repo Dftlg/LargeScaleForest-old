@@ -135,6 +135,17 @@ void CInitMultipleTypeTree::InitTreeModel(const std::string& vModelPath,int vTre
     m_MultipleTreeModel.push_back(ourModel);
 }
 
+int CInitMultipleTypeTree::getSumFaceVerticesBeforeEndMesh(const int & vTreeIndex)
+{
+    int sumFaceVerticesBeforeEndMesh = 0;
+    for (int i = 0; i < m_MultipleTreeModel[vTreeIndex]->getMeshes().size() - 1; i++)
+    {
+        sumFaceVerticesBeforeEndMesh += m_MultipleTreeModel[vTreeIndex]->getMeshes()[i].getVertices().size();
+    }
+    return sumFaceVerticesBeforeEndMesh;
+
+}
+
 //计算定向风场
 void CInitMultipleTypeTree::InitMultipleExtraWindData(int vTreeTypeIndex)
 {
