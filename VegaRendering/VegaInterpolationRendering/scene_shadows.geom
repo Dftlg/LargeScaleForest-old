@@ -34,10 +34,10 @@ vec3 getNormal(vec4 positionfirst,vec4 positionsecond,vec4 positionthird)
     return normalize(cross(tempa,tempb));
 };
 
-float smoothCurve(float x)
+vec4 smoothCurve(vec4 x)
 {
 	return x * x * (3.0 - 2.0 * x);
-};
+}
 
 float mag(vec3 vVecotr)
 {
@@ -51,24 +51,20 @@ float twovectorangle(vec3 vfirVector,vec3 vsecVector)
 };
 
 
-float trianglewave(float x,float scale)
+vec4 trianglewave(vec4 x)
 {
-	return abs(fract(scale*(x +0.5)) * 2.0 - 1.0);
-};
+	return abs(fract(x +0.5) * 2.0 - 1.0);
+}
 
-float sinwave(float angle,float vAmplitude, int vFrequency, float vPhase,int vYpluse)
+float sinwave(float angle,float vAmplitude, float vFrequency, float vPhase,float vYpluse)
 {
     return vAmplitude * cos(angle*M_PI*vFrequency + vPhase * M_PI) + vYpluse;
 };
 
-float smoothTriangleWave(float x,float scale)
+vec4 smoothTriangleWave(vec4 x)
 {
-    float temp= sinwave(fract(time),0.5,1,0,0);
-    return smoothCurve(temp);
-	//return smoothCurve(trianglewave(x,scale)+temp);
-};
-
-
+	return smoothCurve(trianglewave(x));
+}
 
 float animfadefactor(float x,float y,float centerx,float centery)
 {
@@ -80,7 +76,7 @@ void main()
 {
     //计算法线
     vec3 Normal=getNormal(gl_in[0].gl_Position,gl_in[1].gl_Position,gl_in[2].gl_Position);
-       
+       vec4 tempPos;
         for (int i = 0; i <= 2; i++)
         {
              gs_out.v2f_TexCoords = vs_in[i].v2f_TexCoords;
@@ -91,38 +87,31 @@ void main()
             {
             //修改法线
                 vec4 windDirection = vec4(1.0,0.0,0.0,1.0);
+                float force = sin(0.1* time*vs_in[i].v2f_WorldPos.x)+1;
                 float phase=0.05;
-                float flutter=2.0;
+                float flutter=1.0;
                 float primaryOffset=0.08;
 
                 float leafPhase=dot(vs_in[i].v2f_WorldPos,vec3(1.0));
-	            float wavesIn=time+leafPhase+phase;
-                
-                float waves=fract(wavesIn*1.975)*2.0-1.0;
+	            //float wavesIn=time+leafPhase+phase;
+                vec2 wavesIn = vec2(time) + vec2(leafPhase,phase);
+                vec4  waves = (fract(wavesIn.xxyy * vec4(1.975,0.793,0.375,0.193))*2.0 - 1.0);
+                waves = 0.08 * smoothTriangleWave(waves);
+                vec2 waveSum = waves.xz +waves.yw;
 
-//                for(int j=1;j<=10;j++)
-//                {
-//                    if(positiontoGeo[0]>sumFaceVerticesBeforeEndMesh+3591*(j-1)&&positiontoGeo[0]<sumFaceVerticesBeforeEndMesh+3591*j)
-//                        waves=0.05*smoothTriangleWave(waves,Scale[j]);
-//                }
-                 waves=0.1*smoothTriangleWave(waves,0.5);
+                //vec3 bend = vec3(flutter) *  Normal.xyz;
+                 vec3 bend = vec3(flutter) *  vs_in[i].v2f_Normal.xyz;
+                //限制根部附近顶点的运动
+                float animfade = pow((1 - (pow(vs_in[i].v2f_TexCoords.x-0.5,2) + pow(vs_in[i].v2f_TexCoords.y,2))),2);
 
-                vec3 bend=flutter*Normal.xyz;
-            //根部不动
-                
-                float angle=twovectorangle(Normal,windDirection.xyz);
-                float area=1*cos(angle);
+                tempPos=gl_in[i].gl_Position;
+                //最终混合：抖动（平滑过的三角波）+次偏移（整体来回摆动）
+			/////(vec3(波*弯曲）+ vec3(风向*波))*float*float
+                tempPos.xyz +=  ((waveSum.xyx * bend) + 0.3 * (windDirection.xyz * waveSum.y))*windDirection.w*animfade;
 
-
-                col=vec3(waves,0,0);
-
-
-                float animfade=animfadefactor(vs_in[i].v2f_TexCoords.x,vs_in[i].v2f_TexCoords.y,0.5,1);
-
-                gs_out.v2f_Normal=Normal;
-                //gl_Position = gl_in[i].gl_Position+vec4(1*((waves*bend)*windDirection.w*animfade),0);
-                //gl_Position = gl_in[i].gl_Position+vec4(1*((windDirection.xyz*waves)*windDirection.w*animfade),0);
-                gl_Position = gl_in[i].gl_Position+vec4(0.5*(0.2*(waves*bend)+(windDirection.xyz*waves))*windDirection.w*animfade,0);
+                tempPos.xyz += 0.1 * primaryOffset * windDirection.xyz * animfade * force;
+                 gl_Position=tempPos;
+               gs_out.v2f_Normal=Normal;     
             }
               EmitVertex();
          }

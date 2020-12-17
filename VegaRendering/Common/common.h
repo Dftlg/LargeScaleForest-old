@@ -89,7 +89,7 @@ namespace Common
 	static float Pi = 3.1415926;
     /////////////////////
     //each time change
-    static bool ShowWindSourceCenter = true;
+    static bool ShowWindSourceCenter = false;
 
 	struct SVertex
 	{
