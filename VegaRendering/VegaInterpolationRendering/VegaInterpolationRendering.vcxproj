@@ -151,8 +151,9 @@
     <None Include="Plane.frag" />
     <None Include="Plane.vert" />
     <None Include="point_shadows_depth.frag" />
-    <None Include="point_shadows_depth.gs" />
+    <None Include="point_shadows_depth.geom" />
     <None Include="point_shadows_depth.vert" />
+    <None Include="scene_shadows.geom" />
     <None Include="scene_shadows.frag" />
     <None Include="scene_shadows.vert" />
     <None Include="skybox.frag" />

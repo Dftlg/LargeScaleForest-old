@@ -77,9 +77,9 @@ void CInitMultipleTypeTree::InitWindAndTree(int vTreeNumber, const std::string &
 //    }
 //}
 
-void CInitMultipleTypeTree::InitSceneShadowShader(const char* vVertexPath, const char* vFragmentPath)
+void CInitMultipleTypeTree::InitSceneShadowShader(const char* vVertexPath, const char* vFragmentPath, const char* vGeometryPath)
 {
-    CShader * ourSceneShadowShader=new CShader (vVertexPath, vFragmentPath);
+    CShader * ourSceneShadowShader=new CShader (vVertexPath, vFragmentPath, vGeometryPath);
     m_MultipleSceneShadowShader.push_back(ourSceneShadowShader);
 }
 void CInitMultipleTypeTree::InitSceneDepthShader(const char* vVertexPath, const char* vFragmentPath, const char* vGeometryPath)

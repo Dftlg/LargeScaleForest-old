@@ -23,7 +23,7 @@ public:
     CInitMultipleTypeTree(int vTreeTypeNumber, int vAllTreeNumbers,bool vWindFieldType=true) ;
     void InitVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex,int vTypeTreeRelatedFileNumber);
     void InitWindAndTree(int vTreeNumber, const std::string & vFilePath);
-    void InitSceneShadowShader(const char* vVertexPath, const char* vFragmentPath);
+    void InitSceneShadowShader(const char* vVertexPath, const char* vFragmentPath,const char* vGeometryPath = nullptr);
     void InitSceneDepthShader(const char* vVertexPath, const char* vFragmentPath, const char* vGeometryPath = nullptr);
     void InitWindSource(const char* vVertexPath, const char* vFragmentPath,const std::string &vModelPath);
 

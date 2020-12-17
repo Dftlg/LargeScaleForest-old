@@ -69,6 +69,7 @@ int FrameNumber = 0;
 int SearchFrameNumber[Common::TreesTypeNumber] = { 0 };
 int SearchFrameStep[Common::TreesTypeNumber] = { 0 };
 
+float scale[10] = { 0.5,0.3,0.4,0.5,0.5,0.6,0.4,0.6,0.4,0.1 };
 
 
 //前一个std::vector表示匹配树的个数，后一个std::vector表示每一帧中需要的数据
@@ -398,11 +399,12 @@ int main()
     CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, Common::AllTreesNumber, false);
     //////////////////////////////////////////
     MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
-    MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 1);
+    MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last_test.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 1);
     MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/HemiWindField/WindSourceTreeConfig.txt");
-    MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
-    MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.gs");
-    MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last.obj", 0, false);
+    //MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
+    MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag","scene_shadows.geom");
+    MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.geom");
+    MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last_test.obj", 0, false);
     MultipleTypeTree.InitASpecificWindSourceWindData("../../models/yellow_tree/HemiWindField/WindSourceConfig.txt");
     MultipleTypeTree.InitWindSource("WindSourceCenter.vert", "WindSourceCenter.frag", "../../models/sphere/sphere.obj");
 
@@ -433,6 +435,16 @@ int main()
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 projection;
     glm::mat4 view;
+
+    MultipleTypeTree.getSpecificScenceShadowShader(0)->use();
+    for (int i = 0; i < 10; i++)
+    {
+        std::string scl = "Scale[";
+        scl += std::to_string(i);
+        scl += "]";
+        MultipleTypeTree.getSpecificScenceShadowShader(0)->setFloat(scl, scale[i]);
+    }
+ 
     while (!glfwWindowShouldClose(Window))
     {
         // per-frame time logic

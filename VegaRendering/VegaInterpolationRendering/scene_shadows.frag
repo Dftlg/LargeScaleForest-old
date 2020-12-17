@@ -1,10 +1,14 @@
 #version 430 core
 out vec4 FragColor;
 
-in vec2 v2f_TexCoords;
-in vec3 v2f_WorldPos;
-in vec3 v2f_Normal;
+in VS_OUT
+{
+    vec2 v2f_TexCoords;
+    vec3 v2f_WorldPos;
+    vec3 v2f_Normal;
+}gs_in;
 
+in vec3 col;
 // material parameters
 //uniform vec3 albedo;
 uniform float metallic;
@@ -103,16 +107,16 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {    
-	vec4  texColor1 = texture(texture_diffuse1, v2f_TexCoords);
-	vec4  texColor2 = texture(texture_opacity1, v2f_TexCoords);
+	vec4  texColor1 = texture(texture_diffuse1, gs_in.v2f_TexCoords);
+	vec4  texColor2 = texture(texture_opacity1, gs_in.v2f_TexCoords);
 	if(texColor2.r < 0.07 && texColor2.g < 0.07 && texColor2.b < 0.07)
 		discard;	
     //FragColor = texColor1;
 
-	vec3 albedo = pow(texture(texture_diffuse1, v2f_TexCoords).rgb, vec3(2.2));
+	vec3 albedo = pow(texture(texture_diffuse1, gs_in.v2f_TexCoords).rgb, vec3(2.2));
 
-    vec3 N = normalize(v2f_Normal);
-    vec3 V = normalize(camPos - v2f_WorldPos);
+    vec3 N = normalize(gs_in.v2f_Normal);
+    vec3 V = normalize(camPos - gs_in.v2f_WorldPos);
 
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
@@ -121,9 +125,9 @@ void main()
 	float shadow = 0.0;
 	 for(int i = 0; i < 4; ++i) 
     {
-        vec3 L = normalize(lightPositions[i] - v2f_WorldPos);
+        vec3 L = normalize(lightPositions[i] - gs_in.v2f_WorldPos);
         vec3 H = normalize(V + L);
-        float distance = length(lightPositions[i] - v2f_WorldPos);
+        float distance = length(lightPositions[i] - gs_in.v2f_WorldPos);
         float attenuation = 1.0 / (distance * distance);
         //vec3 radiance = lightColors[i] * attenuation;
 		vec3 radiance = lightColors[i];
@@ -141,7 +145,7 @@ void main()
         float NdotL = max(dot(N, L), 0.0);        
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;  		
     }   
-    shadow = shadows ? ShadowCalculation(v2f_WorldPos,lightPositions[0]) : 0.0;
+    shadow = shadows ? ShadowCalculation(gs_in.v2f_WorldPos,lightPositions[0]) : 0.0;
 
     vec3 ambient = vec3(0.03) * albedo * ao;
 
@@ -153,7 +157,7 @@ void main()
     color = pow(color, vec3(1.0/2.2)); 
 
     FragColor = vec4(color, 1.0);
-
+   //FragColor=vec4(col,1.0);
 	
 }
 

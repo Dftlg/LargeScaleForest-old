@@ -39,10 +39,11 @@
     <None Include="scene_shadows.vert" />
     <None Include="scene_shadows.frag" />
     <None Include="point_shadows_depth.frag" />
-    <None Include="point_shadows_depth.gs" />
     <None Include="point_shadows_depth.vert" />
     <None Include="WindSourceCenter.vert" />
     <None Include="WindSourceCenter.frag" />
+    <None Include="point_shadows_depth.geom" />
+    <None Include="scene_shadows.geom" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LoadWindAndTreeConfig.h">
