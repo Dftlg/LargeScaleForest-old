@@ -283,6 +283,7 @@ int Frequency = 0;
 int vYpluse = 0;
 int Theta = 0;
 int Phi = 0;
+float Scale = 1;
 
 int numForceLoads = 0;
 //加载力模型
@@ -1636,7 +1637,7 @@ void initSimulation()
   //    }
   //}
   std::vector<std::pair<int, int>> tempLineConfig;
-  std::vector<std::vector<double>> tempConfig = GetForceConfigurate(outputFilename, ExternFileDirectory,Theta,Phi, tempLineConfig);
+  std::vector<std::vector<double>> tempConfig = GetForceConfigurate(outputFilename, ExternFileDirectory,Theta,Phi,Scale, tempLineConfig);
   if (tempLineConfig.size() != 0)
   {
       LineExtraForces = GenerateLineForce(Common::SamplingFrameNumber, tempLineConfig);
@@ -1695,7 +1696,7 @@ void initSimulation()
               }
 
           }
-		  StemExtraForces[k] += tempStemForces[k];
+		  StemExtraForces[k] += tempStemForces[k];        
 	  }
   }
   pullVertexInfo.StemExtraForces = StemExtraForces;
@@ -1726,13 +1727,34 @@ void initSimulation()
                   }
 
               }
-              tempLeafExtraForces[k] += tempLeafForces[k];
+              tempLeafExtraForces[k] += tempLeafForces[k];            
           }
       }
       pullVertexInfo.LeafExtraForces.push_back(tempLeafExtraForces);
   }
 
+  for (int i = 0; i < 180; i++)
+  {
+      pullVertexInfo.StemExtraForces[i] = pullVertexInfo.StemExtraForces[i] * Scale;
+      //std::cout << pullVertexInfo.StemExtraForces[i]<<std::endl;
+      
+  }
 
+  for (int i = 0; i < 180; i++)
+  {
+      StemExtraForces[i] = StemExtraForces[i] * Scale;
+      //std::cout <<StemExtraForces[i] << std::endl;
+
+  }
+
+  for (int k = 0; k < pullVertexInfo.LeafExtraForces.size(); k++)
+  {
+      for (int i = 0; i < 180; i++)
+      {
+          pullVertexInfo.LeafExtraForces[k][i] = pullVertexInfo.LeafExtraForces[k][i] * Scale;
+        //  std::cout << pullVertexInfo.LeafExtraForces[k][i] << std::endl;
+      }
+  }
   ///////////////////////////
   //StemExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);
   //LeafExtraForces = GenerateSamplingForce(180, tempConfig[0], tempConfig[1], tempConfig[2], tempConfig[3], 6);

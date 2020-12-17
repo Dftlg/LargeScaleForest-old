@@ -93,9 +93,9 @@ std::vector<std::pair<double, double>> StableTreePositionGenerate(int vTreesNumb
         tempTreedoublePosition.push_back(std::make_pair(0, i+1));
     }*/
     tempTreedoublePosition.push_back(std::make_pair(8, 0));
-    tempTreedoublePosition.push_back(std::make_pair(0, -8));
-    tempTreedoublePosition.push_back(std::make_pair(0, 8));
-    tempTreedoublePosition.push_back(std::make_pair(-8, 0));
+    //tempTreedoublePosition.push_back(std::make_pair(0, -8));
+    //tempTreedoublePosition.push_back(std::make_pair(0, 8));
+    //tempTreedoublePosition.push_back(std::make_pair(16, 0));
 
     return tempTreedoublePosition;
 }
@@ -139,7 +139,7 @@ std::vector<int> GenerateLineForce(int vFrameNumber,std::vector<std::pair<int,in
     return tempForce;
 }
 
-std::vector<std::vector<double>> GetForceConfigurate(const std::string& vFilePath,const std::string &vExternFile,int &vTheta,int &vPhi, std::vector<std::pair<int, int>>& voLineForceConfig)
+std::vector<std::vector<double>> GetForceConfigurate(const std::string& vFilePath,const std::string &vExternFile,int &vTheta,int &vPhi,float &vScale, std::vector<std::pair<int, int>>& voLineForceConfig)
 {
 	std::vector<std::string> ForceConfig;
 	std::vector <std::vector<double>> tempConfig;
@@ -164,6 +164,11 @@ std::vector<std::vector<double>> GetForceConfigurate(const std::string& vFilePat
         {
             isLineForce = true;
             break;
+        }
+        if (lineString == "scale:")
+        {
+            getline(positionFile, lineString);
+            vScale = std::stof(lineString);
         }
 		boost::split(ForceConfig, lineString, boost::is_any_of(","), boost::token_compress_off);
 		std::vector<double> tempCon;

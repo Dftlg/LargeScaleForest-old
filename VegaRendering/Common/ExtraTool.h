@@ -26,7 +26,7 @@ int RandomGenerate();
 
 std::vector<int> GenerateSamplingForce(int vSize, int vAmplitude, int vFrequency, double vPhase, int vYpluse, int wavelength = 2);
 
-std::vector<std::vector<double>> GetForceConfigurate(const std::string & vFilePath, const std::string &vExternFile, int &vTheta, int &vPhi, std::vector<std::pair<int, int>>& voLineForceConfig);
+std::vector<std::vector<double>> GetForceConfigurate(const std::string & vFilePath, const std::string &vExternFile, int &vTheta, int &vPhi, float &vScale, std::vector<std::pair<int, int>>& voLineForceConfig);
 
 std::vector<int> GenerateLineForce(int vFrameNumber, std::vector<std::pair<int, int>>& vForceConfig);
 
