@@ -36,11 +36,11 @@ namespace Common
 
     /////each time change
 
-    const int AllTreesNumber = 1;
+    const int AllTreesNumber = 2;
 
     const int TreesTypeNumber = 1;
 
-    const int TreesNumbers[TreesTypeNumber] = {1 };
+    const int TreesNumbers[TreesTypeNumber] = {2 };
     //int SecondTypeTreesNumber = 5;
 
     //const int AllTreesNumber = 100;
@@ -236,6 +236,16 @@ namespace Common
 		}
 	};
 
+    struct SpKVFGroupData
+    {
+        //每个group相关的体素
+        int GroupId;
+        std::vector<int> KLengths;
+        std::vector<std::vector<double>> Kmatrix;
+        std::vector<glm::vec3> InternalForces;
+        std::vector<glm::vec3> Velocity;
+    };
+
 	//一个文件中帧的KVF数据，KVF数据既代表前面帧的结果，又可以用来判断后面帧的数据
 	//树木朝向默认都为向右
 	struct SpKVFData
@@ -246,12 +256,25 @@ namespace Common
 		std::vector<SForceDirection> WindDirection;
 
 		std::vector<int> Forces;
-		std::vector<int> KLengths;
-		std::vector<std::vector<double>> Kmatrix;
 
-		std::vector<glm::vec3> InternalForces;
-		std::vector<glm::vec3> Velocity;
+        std::vector<SpKVFGroupData> GroupsKVF;
+
+        std::vector<int> KConnectLengths;
+        std::vector<std::vector<double>> KmatrixConnect;
+        std::vector<glm::vec3> ConnectInternalForces;
+        std::vector<glm::vec3> ConnectVelocity;
+
 	};
+
+    //struct SpKVFTempData
+    //{
+    //    int FrameIndex;
+    //    int GroupId;
+    //    std::vector<SForceDirection> WindDirection;
+    //    std::vector<int> Forces;
+    //    std::vector<SpKVFGroupData> GroupData;
+
+    //};
 
 	struct SpDeformation
 	{
@@ -271,11 +294,13 @@ namespace Common
 		std::string FileName;
 		//文件的绝对路径
 		std::string FilePath;
+
 		bool isLoadDataSet = false;
 		int Theta;
 		int Phi;
         //力的sin函数部分
 		std::vector<std::vector<double>> ForceFluctuationSequence;
+        float ForceFluctuationSequenceScale;
         //力的基础部分
         std::vector<std::pair<int, int>> PolyLineForceSequence;
 		//delta U数据
@@ -316,5 +341,20 @@ namespace Common
 			ConnectedIndex = vConnectedIndex;
 		}
 	};
+
+    struct SKVFGroupRelateObjGroup
+    {
+        std::vector<std::vector<int>> KVFGroupIndex;
+        std::vector<std::vector<int>> ObjectGroupIndex;
+
+        int ConnectKVFIndex;
+
+        SKVFGroupRelateObjGroup()
+        {
+            KVFGroupIndex.resize(2);
+            ObjectGroupIndex.resize(2);
+        }
+
+    };
 
 }

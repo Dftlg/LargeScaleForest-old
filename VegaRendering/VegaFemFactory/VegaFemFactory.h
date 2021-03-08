@@ -22,9 +22,10 @@ class CVegaFemFactory
 public:
 
 	CVegaFemFactory() = default;
-	CVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex);
+	CVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex, const std::string& vKVFGroupConnectObjGroup);
 	~CVegaFemFactory() = default;
 
+    void readObjGroupConnectKVFGroupAndConnectKVFMessage(const std::string & vFilePath);
 	void readCorrectUdeformationIndex(const std::string & vFilePath);
 	void readKVFFileData(const std::string & vFile, Common::SFileFrames & vFileFrame);
 	void readUdeformationData(const std::string & vFile, Common::SFileFrames &vFileFrame);
@@ -37,35 +38,46 @@ public:
 	void readDeformationDataInOneThread(Common::SFileData& vFileData, int vTid, const std::string& vFilePath, long long vBlockSize);
 	void addSeekgOfEachFramesBlock(const std::string& vFilePath);
 	std::vector<Common::SFileDataGroup> getConnectedFemMutileDeformation(int vConnectionIndex, int vTimestep);
-	//¸ù¾İÎÄ¼şµÄ¾ø¶ÔÂ·¾¶È¡ÎÄ¼şÃû×Ö,Èç£ºpositionthe0phi0force500,500,500
+	//æ ¹æ®æ–‡ä»¶çš„ç»å¯¹è·¯å¾„å–æ–‡ä»¶åå­—,å¦‚ï¼špositionthe0phi0force500,500,500
 	std::string getFileName(const std::string & vFileDirectory);
-	//·µ»ØÒ»¸öĞÎ±äÎÄ¼ş
+	//è¿”å›ä¸€ä¸ªå½¢å˜æ–‡ä»¶
 	//Common::SFileFrames getFileFrames(int vIndex) { return m_FilesData[vIndex]; }
 	Common::SpKVFData getFirstKVFDataFromFirstFileFrame() { return m_FilesData[0].KVFFrameDatas[0]; }
 
 	Common::SFileFrames* getFileFrames(int vIndex) { return &m_FilesData[vIndex]; }
-	std::vector<std::vector<int>> getMultipleFramesIndex() { return m_MultipleFramesIndex; }
+	//std::vector<std::vector<int>> getMultipleFramesIndex() { return m_MultipleFramesIndex; }
 
-	std::pair<int, int> getFileAndFrameIndex(int vTreeIndex, int vFrameIndex) { return m_MultipleFileAndFramesIndex[vTreeIndex][vFrameIndex]; };
-	int getSearchFileIndex(int vTreeIndex, int vFrameIndex) { return m_MultipleFileAndFramesIndex[vTreeIndex][vFrameIndex].first; };
-	int getSearchFrameIndex(int vTreeIndex, int vFrameIndex) { return m_MultipleFileAndFramesIndex[vTreeIndex][vFrameIndex].second; };
+	//std::pair<int, int> getFileAndFrameIndex(int vTreeIndex, int vFrameIndex) { return m_MultipleFileAndFramesIndex[vTreeIndex][vFrameIndex]; };
+	//int getSearchFileIndex(int vTreeIndex, int vFrameIndex) { return m_MultipleFileAndFramesIndex[vTreeIndex][vFrameIndex].first; };
+	//int getSearchFrameIndex(int vTreeIndex, int vFrameIndex) { return m_MultipleFileAndFramesIndex[vTreeIndex][vFrameIndex].second; };
 
 	void setDeformationStateFromFileName();
+
+
+
+    std::vector<int> getEachGroupVertexNums()
+    {
+        std::vector<int> tempEachGroupVertexNum;
+        for (int i = 0; i < getModelGroupNumber(); i++)
+            tempEachGroupVertexNum.push_back(m_FilesData[i].Frames[0].BaseFileDeformations.size());
+        return tempEachGroupVertexNum;
+    }
+    int getModelGroupNumber() { return m_ModelTransformStruct->getGroups().size(); };
 	CModelDeformationTransform*  getModelTransformStruct() { return m_ModelTransformStruct;}
 	std::vector<Common::SFileFrames> searchFileFramesOnAnimation(const int vTheta, const int vPhi, const std::vector<double> & vForceFluctuationSequence);
 	std::vector<Common::SFileFrames> searchFileFrameOnAttribute();
 
-	double getKMatrixSumNumber()
-	{
-		double Sum = 0;
-		if (!m_AllReallyLoadConnectedFem.empty())
-			for(int i=0;i< m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths.size();i++)
-				Sum+= m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths[i];
-		return Sum;
-	}
-	std::vector<int> getKMatrixEachElementRelatedDataLength() { if (!m_AllReallyLoadConnectedFem.empty()) return m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths; }
-	double getVeocitySumNumber() {if (!m_AllReallyLoadConnectedFem.empty()) return m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].Velocity.size();}
-	double getInternalForceSumNuber() { if (!m_AllReallyLoadConnectedFem.empty()) return m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].InternalForces.size(); }
+	//double getKMatrixSumNumber()
+	//{
+	//	double Sum = 0;
+	//	if (!m_AllReallyLoadConnectedFem.empty())
+	//		for(int i=0;i< m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths.size();i++)
+	//			Sum+= m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths[i];
+	//	return Sum;
+	//}
+	//std::vector<int> getKMatrixEachElementRelatedDataLength() { if (!m_AllReallyLoadConnectedFem.empty()) return m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].KLengths; }
+	//double getVeocitySumNumber() {if (!m_AllReallyLoadConnectedFem.empty()) return m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].Velocity.size();}
+	//double getInternalForceSumNuber() { if (!m_AllReallyLoadConnectedFem.empty()) return m_AllReallyLoadConnectedFem[0].FemDataset[0]->KVFFrameDatas[0].InternalForces.size(); }
 
 	void cleanSFileDataGroup(int vConnectionIndex, int vTimestep);
 
@@ -81,7 +93,7 @@ public:
 
 	void searchMatchedFrameSequences(std::vector<std::vector<int>> &voExtraForces, std::vector<std::vector<Common::SForceDirection>> &vForceDirection);
 
-	void searchMatchedOneTreeFrameSequences(std::vector<int> & voMatchedFrameSequenceIndex, Common::SpKVFData& voSpKVData, std::vector<int>&voExtraForces, int &voCurrentFrameIndex, int& vIsFirstFrame);
+	void searchMatchedOneTreeFrameSequences(std::vector<int> & voMatchedFrameSequenceIndex, Common::SpKVFData& voSpKVData, std::vector<int>&voExtraForces, int &voCurrentFrameIndex, int& vIsFirstFrame, int& Groupid);
 
 	inline float addDistance(float vorigin) { return vorigin + 0.0005; };
 	inline float minusDistance(float vorigin) { return vorigin - 0.0005; };
@@ -137,42 +149,54 @@ public:
 private:
 
 	void __getFileSeekDirOfEachBlock(const std::string& vFilePath, std::vector<long long>& vBlock);
-	//Â·¾¶ÏÂÃæµÄÃ¿¸öÎÄ¼şµÄ¾ø¶ÔÂ·¾¶¼¯ºÏ£¬Èç£ºD:\GraduationProject\Vega\models\8.10\test\positionthe0phi0force500,500,500.txt
+	//è·¯å¾„ä¸‹é¢çš„æ¯ä¸ªæ–‡ä»¶çš„ç»å¯¹è·¯å¾„é›†åˆï¼Œå¦‚ï¼šD:\GraduationProject\Vega\models\8.10\test\positionthe0phi0force500,500,500.txt
 	std::vector<std::string> m_FilePathList;
-	//ĞÎ±äÎÄ¼şµÄ¼¯ºÏ
+	//å½¢å˜æ–‡ä»¶çš„é›†åˆ
 	std::vector<Common::SFileFrames> m_FilesData;
 	std::vector<Common::SConnectedFemFiles> m_AllReallyLoadConnectedFem;
-	//¿ÉÒÔ¿´×÷ÊÇÒ»¸öobjµÄmodel¶ÔÏó£¬ÓĞmesh¼¯ºÏ£¬ÒÔ¼°group×é¼¯ºÏ
+	//å¯ä»¥çœ‹ä½œæ˜¯ä¸€ä¸ªobjçš„modelå¯¹è±¡ï¼Œæœ‰meshé›†åˆï¼Œä»¥åŠgroupç»„é›†åˆ
 	CModelDeformationTransform* m_ModelTransformStruct;
 
-	//ĞèÒªÆ¥ÅäµÄÄ³Ğ©ÌåËØÏÂµÄObject¶¥µã
+	//éœ€è¦åŒ¹é…çš„æŸäº›ä½“ç´ ä¸‹çš„Objecté¡¶ç‚¹
 	std::vector<std::vector<int>> m_CorrectDeformationIndex;
 
-	//µÚÒ»¸öÊÇÎÄ¼şµÄSpKVFµÄ¶ÎË÷ÒıºÅ4£¬9£¬14£¬19£¬µÚ¶ş¸öÖµÊÇµ±Ç°Ë÷ÒıÏÂÁ¦µÄĞòÁĞ
+	//ç¬¬ä¸€ä¸ªæ˜¯æ–‡ä»¶çš„SpKVFçš„æ®µç´¢å¼•å·4ï¼Œ9ï¼Œ14ï¼Œ19ï¼Œç¬¬äºŒä¸ªå€¼æ˜¯å½“å‰ç´¢å¼•ä¸‹åŠ›çš„åºåˆ—
 	std::vector<std::pair<int, std::vector<int>>> m_ForceSequence;
-	//spKVFÎÄ¼şµÄÊÜÁ¦·½Ïò
+	//spKVFæ–‡ä»¶çš„å—åŠ›æ–¹å‘
 	std::vector<std::pair<int, std::vector<Common::SForceDirection>>> m_WindDirectionSequence;
-	//SpKVFµÄ¶ÎË÷ÒıºÅ£¬µ±Ç°Ë÷ÒıÏÂK¾ØÕó
-	std::vector<std::pair<int, std::vector<std::vector<double>>* >> m_KMartixSequence;
-	//SpKVFµÄ¶ÎË÷ÒıºÅ£¬µ±Ç°Ë÷ÒıÏÂv¾ØÕó
-	std::vector<std::pair<int, std::vector<glm::vec3>* >> m_VelocitySequence;
-	//SpKVFµÄ¶ÎË÷ÒıºÅ£¬µ±Ç°Ë÷ÒıÏÂfÄÚ¾ØÕó
-	std::vector<std::pair<int, std::vector<glm::vec3>* >> m_InternalForcesSequence;
-	//ËùÓĞÎÄ¼şµÄSpKVFÊı¾İË÷Òı
+	//SpKVFçš„æ®µç´¢å¼•å·ï¼Œå½“å‰ç´¢å¼•ä¸‹KçŸ©é˜µ
+    //ç¬¬ä¸€ä¸ªæ˜¯group
+	//std::vector<std::vector<std::pair<int, std::vector<std::vector<std::vector<double>>>* >>> m_KMartixSequence;
+
+    std::vector < std::vector<std::pair<int, std::vector<std::vector<double>>* >>> m_KMartixSequence;
+    std::vector < std::pair<int, std::vector<std::vector<double>>* >> m_KMatrixConnectSequence;
+	//SpKVFçš„æ®µç´¢å¼•å·ï¼Œå½“å‰ç´¢å¼•ä¸‹vçŸ©é˜µ
+	std::vector<std::vector<std::pair<int, std::vector<glm::vec3>* >>> m_VelocitySequence;
+	//SpKVFçš„æ®µç´¢å¼•å·ï¼Œå½“å‰ç´¢å¼•ä¸‹få†…çŸ©é˜µ
+	std::vector<std::vector<std::pair<int, std::vector<glm::vec3>* >>> m_InternalForcesSequence;
+	//æ‰€æœ‰æ–‡ä»¶çš„SpKVFæ•°æ®ç´¢å¼•
 	std::vector<int> m_reorderSpKVFSegmentIndexSequence;
 	std::vector<std::vector<int>> m_sortSpKVFSegmentIndexSequenceByAngle;
-	
-	std::vector<std::vector<int>> m_MultipleFramesIndex;
+
+    //æ¯ä¸€æ£µæ ‘,æ¯ä¸€éƒ¨åˆ†,çš„5å¸§
+	std::vector<std::vector<std::vector<int>>> m_MultipleFramesIndex;
 	std::vector<Common::SpKVFData> m_TempSpKVFData;
 	std::vector<Common::SpKVFData> m_ZeroKVFData;
-	std::vector<int> m_CurrentFrameIndex;
+    //æ¯æ£µæ ‘ï¼Œæ¯ä¸€éƒ¨åˆ†çš„å¸§
+	std::vector<std::vector<int>> m_CurrentFrameIndex;
 	std::vector<int> m_Flag;
 
-	std::vector<std::vector<std::pair<int, int>>> m_MultipleFileAndFramesIndex;
+    //æ¯æ£µæ ‘ï¼Œæ¯ä¸€éƒ¨åˆ†çš„5å¸§æ‰€åœ¨æ–‡ä»¶æ ‡å·
+	std::vector<std::vector<std::vector<std::pair<int, int>>>> m_MultipleFileAndFramesIndex;
 
 	int CurrentFrameIndex = 0;
 
-	std::vector<double> m_VelocityRangeError;
-	std::vector<std::vector<double>> m_KMatrixRangeError;
-	std::vector<double> m_InternalForcesError;
+    //ç¬¬ä¸€ä¸ªvectoréƒ½æ˜¯ç»„
+	std::vector<std::vector<double>> m_VelocityRangeError;
+    std::vector<std::vector<std::vector<double>>> m_KMatrixRangeError;
+    std::vector <std::vector<double>> m_InternalForcesError;
+
+    std::vector<std::vector<double>> m_KMatrixConnectRangeError;
+
+    std::vector<Common::SKVFGroupRelateObjGroup> m_KVFGroupRelateObjGroup;
 };

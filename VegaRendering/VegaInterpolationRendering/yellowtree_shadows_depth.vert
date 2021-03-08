@@ -11,19 +11,29 @@ uniform int planeOrTree;
 uniform int frameNums;
 uniform int vertexNums;
 
-layout (std430, binding=1) buffer DeltaDeformationArray
-{
-	vec4 u[];
-};
-
-layout (std430, binding=2) buffer DeformationArray
+layout (std430, binding=1) buffer DeformationArray
 {
 	vec4 sum_u[];
 };
 
-layout (std430, binding=3) buffer IndexArray
+layout (std430, binding=2) buffer IndexArray
 {
 	ivec2 treeFrameIndex[];
+};
+
+layout (std430, binding=3) buffer DeltaDeformationArrayPart1
+{
+	vec4 u1[];
+};
+
+layout (std430, binding=4) buffer DeltaDeformationArrayPart2
+{
+	vec4 u2[];
+};
+
+layout (std430, binding=5) buffer DeltaDeformationArrayPart3
+{
+	vec4 u3[];
 };
 
 void main()

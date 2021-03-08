@@ -7,14 +7,14 @@
 #include "ObjStruct.h"
 #include "common.h"
 
-//Õâ¸öÀàÒ²ÄÜ½üËÆµÄ¿´³ÉÒ»¸ömodel
+//è¿™ä¸ªç±»ä¹Ÿèƒ½è¿‘ä¼¼çš„çœ‹æˆä¸€ä¸ªmodel
 class CModelDeformationTransform
 {
 public:
 	CModelDeformationTransform() = default;
 	~CModelDeformationTransform() = default;
 	CModelDeformationTransform(const std::string& vFileName);
-	void SaveDeformationVertexFromBaseModel(const double* u, int vDeformationSize, std::string vSaveFileName, int vtimeStepCounter);
+	void SaveDeformationVertexFromBaseModel(const double* u, SceneObjectDeformable & tempObject, std::string vSaveFileName, int vtimeStepCounter);
 	void ConvertVertex2mutileVerteices(Common::SFileData &vBaseFileDeformation);
 	std::vector<BaseObjConstruct::SGroup> getGroups() { return m_Groups; }
 	std::vector<std::vector<int>> getGroupsIndex(){ return m_GroupsIndex; }
@@ -26,11 +26,11 @@ private:
 
 	void __VertexRepeat();
 
-	//objÄ£ĞÍÖĞµÄmeshµÄ¼¯ºÏ
+	//objæ¨¡å‹ä¸­çš„meshçš„é›†åˆ
 	ObjMesh *m_BaseFileMesh;
-	//obj×Ü¶¥µãÊı
+	//objæ€»é¡¶ç‚¹æ•°
 	int m_VerticesNumber;
-	//Ò»ÏµÁĞµÄgroupµÄ¼¯ºÏ
+	//ä¸€ç³»åˆ—çš„groupçš„é›†åˆ
 	std::vector<BaseObjConstruct::SGroup> m_Groups;
 	std::vector<std::vector<int>>m_GroupsIndex;
 	std::vector<int> m_VertexRepeatNumber;

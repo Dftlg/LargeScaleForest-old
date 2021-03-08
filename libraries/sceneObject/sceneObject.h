@@ -90,6 +90,7 @@ public:
   inline int Getn() { return n; }
   inline int GetNumVertices() { return n; }
   inline int GetNumFaces() { return mesh->getNumFaces(); }
+  inline std::vector<int> GetVertexGroup() { return mesh->getVertexGroup(); };
   inline const Vec3d & GetVertexPosition(int index) const { return mesh->getPosition(index); }
   inline ObjMesh * GetMesh() { return mesh; }
   inline ObjMeshRender * GetMeshRender() { return meshRender; }

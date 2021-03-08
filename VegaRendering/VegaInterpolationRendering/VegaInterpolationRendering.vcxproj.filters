@@ -44,6 +44,7 @@
     <None Include="WindSourceCenter.frag" />
     <None Include="point_shadows_depth.geom" />
     <None Include="scene_shadows.geom" />
+    <None Include="yellowtree_shadows_depth.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LoadWindAndTreeConfig.h">

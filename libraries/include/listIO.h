@@ -40,6 +40,14 @@
 #include <stdio.h>
 #include <vector>
 #include <set>
+#include<iostream>
+#include <fstream>
+#include <Windows.h>
+#include<sstream>
+#include<algorithm>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 class ListIO
 {
@@ -62,6 +70,8 @@ public:
   static int loadBinary(FILE * fin, int * numListEntries, int ** listEntries, int offset=0);
   static int saveBinary(const char * filename, int numListEntries, int * listEntries, int offset=0);
   static int saveBinary(FILE * fout, int numListEntries, int * listEntries, int offset=0);
+
+  static void ListIO::loadKVFFile(const char * filename,std::vector<std::vector<int>> & vGroupKVFVertex,std::vector<int> &vConnectKVF);
 
   // loads/saves multiple lists to one binary file
   static int loadBinaryMulti(const char * filename, int * numLists, int ** numListEntries, int *** listEntries, int offset=0);

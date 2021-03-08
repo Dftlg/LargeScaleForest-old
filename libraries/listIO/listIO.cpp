@@ -410,3 +410,36 @@ int ListIO::saveBinaryMulti(const char * filename, int numLists, int * numListEn
   return code;
 }
 
+void ListIO::loadKVFFile(const char * filename, std::vector<std::vector<int>> & vGroupKVFVertex, std::vector<int> &vConnectKVF)
+{
+    std::ifstream positionFile(filename, std::ios::in);
+    std::string lineString;
+    while (getline(positionFile, lineString))
+    {
+        if (lineString == "Group")
+        {
+            std::vector<int> tempGroupKvf;
+            std::vector<std::string> tempstringGroupKvf;
+            getline(positionFile, lineString);
+            boost::split(tempstringGroupKvf, lineString, boost::is_any_of(","), boost::token_compress_off);
+            std::vector<std::string>::iterator it;
+            for (it = tempstringGroupKvf.begin(); it != tempstringGroupKvf.end(); ++it)
+            {
+                tempGroupKvf.push_back(std::stoi(*it));
+            }
+            vGroupKVFVertex.push_back(tempGroupKvf);
+        }
+        if (lineString == "Connect")
+        {
+            std::vector<std::string> tempConnectKvf;
+            getline(positionFile, lineString);
+            boost::split(tempConnectKvf, lineString, boost::is_any_of(","), boost::token_compress_off);
+            std::vector<std::string>::iterator it;
+            for (it = tempConnectKvf.begin(); it != tempConnectKvf.end(); ++it)
+            {
+                vConnectKVF.push_back(std::stoi(*it));
+            }
+        }
+    }
+}
+

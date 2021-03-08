@@ -162,6 +162,7 @@
     <None Include="Tree.vert" />
     <None Include="WindSourceCenter.frag" />
     <None Include="WindSourceCenter.vert" />
+    <None Include="yellowtree_shadows_depth.vert" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

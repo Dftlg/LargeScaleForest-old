@@ -141,7 +141,7 @@ public:
 
   // obtain pointers to the internally stored position, velocity, and acceleration
   /*********************question****************************/
-  //qÎªÊ²Ã´ÊÇposition£¬²»ÊÇÎ»ÒÆÄª£¿
+  //qä¸ºä»€ä¹ˆæ˜¯positionï¼Œä¸æ˜¯ä½ç§»è«ï¼Ÿ
 
   // (advanced usage)
   inline virtual double * Getq() { return q; }
@@ -192,15 +192,15 @@ public:
   // useful to prevent large values from occuring
   virtual void ConstrainToSphere(double R2);
   virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex) = 0;
-  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex, std::vector<int> & vForce)=0;
+  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<std::vector<int>> & vGroupElementIndex, std::vector<int> &vConnectElementIndex, std::vector<int> & vForce)=0;
 
 protected:
 
-  double * q; // current deformation amplitudes µ±Ç°ĞÎ±äÕñ·ù
+  double * q; // current deformation amplitudes å½“å‰å½¢å˜æŒ¯å¹…
   double * qvel; // current velocities of deformation amplitudes
   double * qaccel; // current acceleration (used inside implicit newmark integration)
-  double * qresidual, * qdelta; // aux integration variables ¸¨Öú»ı·Ö±äÁ¿
-  double * q_1; // deformation amplitudes at previous time-step ÉÏÒ»Ö¡µÄĞÎ±ä
+  double * qresidual, * qdelta; // aux integration variables è¾…åŠ©ç§¯åˆ†å˜é‡
+  double * q_1; // deformation amplitudes at previous time-step ä¸Šä¸€å¸§çš„å½¢å˜
   double * qvel_1;
   double * qaccel_1;
 

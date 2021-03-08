@@ -148,9 +148,9 @@ int CWindField::__caculateWindForceOnTree(int vFrameIndex, glm::vec3& vTreePosit
     double absRelativeDistance = sqrt(RelativeDistance.x*RelativeDistance.x + RelativeDistance.z*RelativeDistance.z);
 
     //y=-(1/N)*x+1
-    //int Force = m_WindCenterForces[vFrameIndex] * (-(absRelativeDistance / m_WindInfluenceField) + 1);
+    int Force = m_WindCenterForces[vFrameIndex] * (-(absRelativeDistance / m_WindInfluenceField) + 1);
     /////////////////////
-    int Force = m_WindCenterForces[vFrameIndex];
+    //int Force = m_WindCenterForces[vFrameIndex];
 
     return Force;
 }

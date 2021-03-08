@@ -1111,6 +1111,8 @@ void CorotationalLinearFEM::AddEnergyAndForceAndStiffnessMatrixOfSubmesh(const d
     }
     else
     {
+    std::cout << "warp" << std::endl;
+    std::cout << "2" << std::endl;
       // no warp
       memcpy(KElement, KElementUndeformed[el], sizeof(double) * elementStiffnessMatrixSpace);
       // f = K u
@@ -1178,11 +1180,14 @@ void CorotationalLinearFEM::ClearRowColumnIndices()
   columnIndices = NULL;
 }
 
+//sparseMatrix存的是每一个顶点的维度与其他顶点维度的关系，存储结构是1，2，3，4号顶点索引号，并不是体素内的顶点的索引号
 void CorotationalLinearFEM::BuildRowColumnIndices(SparseMatrix * sparseMatrix)
 {
   int numElements = volumetricMesh->getNumElements();
   int numElementVertices = volumetricMesh->getNumElementVertices();
+  //每一行为模型某个体素内的体素内所有的顶点索引
   rowIndices = (int**) malloc (sizeof(int*) * numElements);
+  //
   columnIndices = (int**) malloc (sizeof(int*) * numElements);
 
   for (int el=0; el < numElements; el++)

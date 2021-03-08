@@ -404,6 +404,7 @@ protected:
   // compressed row storage
   int numRows; // number of rows
   int * rowLength; // length of each row
+  //顶点的某个维度，对应于其他相邻顶点维度的索引，包含自己
   int ** columnIndices; // indices of columns of non-zero entries in each row
   double ** columnEntries; // values of non-zero entries in each row
 

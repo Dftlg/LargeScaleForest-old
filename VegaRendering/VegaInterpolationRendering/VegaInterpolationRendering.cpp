@@ -399,11 +399,11 @@ int main()
     CInitMultipleTypeTree MultipleTypeTree(Common::TreesTypeNumber, Common::AllTreesNumber, false);
     //////////////////////////////////////////
     MultipleTypeTree.InitShadowCubeMapPara(near_plane, far_plane, SHADOW_WIDTH, SHADOW_HEIGHT, shadowTransforms, lightVertices, lightColors);
-    MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last_test.obj", "../../models/yellow_tree/ObjectVertexIndex.txt", 3);
+    MultipleTypeTree.InitVegaFemFactory("../../models/yellow_tree/deltaU", "../../models/yellow_tree/tree_last_test.obj", "../../models/yellow_tree/ObjectVertexIndex.txt","../../models/yellow_tree/ObjgroupConKVFgroup.txt", 2);
     MultipleTypeTree.InitWindAndTree(Common::TreesNumbers[0], "../../models/yellow_tree/HemiWindField/WindSourceTreeConfig.txt");
     //MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag");
     MultipleTypeTree.InitSceneShadowShader("scene_shadows.vert", "scene_shadows.frag","scene_shadows.geom");
-    MultipleTypeTree.InitSceneDepthShader("point_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.geom");
+    MultipleTypeTree.InitSceneDepthShader("yellowtree_shadows_depth.vert", "point_shadows_depth.frag", "point_shadows_depth.geom");
     MultipleTypeTree.InitTreeModel("../../models/yellow_tree/tree_last_test.obj", 0, false);
     MultipleTypeTree.InitASpecificWindSourceWindData("../../models/yellow_tree/HemiWindField/WindSourceConfig.txt");
     MultipleTypeTree.InitWindSource("WindSourceCenter.vert", "WindSourceCenter.frag", "../../models/sphere/sphere.obj");
@@ -563,7 +563,7 @@ int main()
     glDeleteBuffers(1, &planeVBO);
     glDeleteBuffers(1, &skyboxVBO);
     //glDeleteBuffers(1, &SSBO);
-    MultipleTypeTree.getSpecificTreeModel(0)->Clear();
+    //MultipleTypeTree.getSpecificTreeModel(0)->Clear();
     glfwTerminate();
     return 0;
 }

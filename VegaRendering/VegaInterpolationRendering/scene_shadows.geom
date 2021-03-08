@@ -104,10 +104,13 @@ void main()
                 //限制根部附近顶点的运动
                 float animfade = pow((1 - (pow(vs_in[i].v2f_TexCoords.x-0.5,2) + pow(vs_in[i].v2f_TexCoords.y,2))),2);
 
+                float angle=twovectorangle(Normal,windDirection.xyz);
+                float area=1*cos(angle);
+
                 tempPos=gl_in[i].gl_Position;
                 //最终混合：抖动（平滑过的三角波）+次偏移（整体来回摆动）
 			/////(vec3(波*弯曲）+ vec3(风向*波))*float*float
-                tempPos.xyz +=  ((waveSum.xyx * bend) + 0.3 * (windDirection.xyz * waveSum.y))*windDirection.w*animfade;
+                tempPos.xyz +=  ((waveSum.xyx * bend) + 0.3 * (windDirection.xyz * waveSum.y*area))*windDirection.w*animfade;
 
                 tempPos.xyz += 0.1 * primaryOffset * windDirection.xyz * animfade * force;
                  gl_Position=tempPos;

@@ -43,12 +43,13 @@ void CInitMultipleTypeTree::__GenerateTreesPosition()
         __GenerateStableTreesPosition();
 }
 
-void CInitMultipleTypeTree::InitVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex, int vTypeTreeRelatedFileNumber)
+void CInitMultipleTypeTree::InitVegaFemFactory(const std::string & vDirectoryName, const std::string & vMutilVerticesBaseFile, const std::string &vCorrectDeformationUVertexIndex,const std::string& vKVFGroupConnectObjGroup, int vTypeTreeRelatedFileNumber)
 {
-    CVegaFemFactory* vFem=new CVegaFemFactory(vDirectoryName, vMutilVerticesBaseFile, vCorrectDeformationUVertexIndex);
+    CVegaFemFactory* vFem=new CVegaFemFactory(vDirectoryName, vMutilVerticesBaseFile, vCorrectDeformationUVertexIndex, vKVFGroupConnectObjGroup);
     std::vector<Common::SFileFrames> vtemp = vFem->searchFileFrameOnAttribute();
+    //////相关文件需要乘3
     m_MultipleEachTreeRelatedFileNumber.push_back(vTypeTreeRelatedFileNumber);
-    for (int i = 0; i < vTypeTreeRelatedFileNumber; i++)
+    for (int i = 0; i < vTypeTreeRelatedFileNumber*vFem->getModelGroupNumber(); i++)
     {
         std::vector<Common::SFileFrames> temp;
         temp.push_back(vtemp[i]);

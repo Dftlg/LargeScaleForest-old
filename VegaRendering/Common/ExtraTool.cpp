@@ -92,10 +92,25 @@ std::vector<std::pair<double, double>> StableTreePositionGenerate(int vTreesNumb
     {
         tempTreedoublePosition.push_back(std::make_pair(0, i+1));
     }*/
-    tempTreedoublePosition.push_back(std::make_pair(8, 0));
-    //tempTreedoublePosition.push_back(std::make_pair(0, -8));
-    //tempTreedoublePosition.push_back(std::make_pair(0, 8));
-    //tempTreedoublePosition.push_back(std::make_pair(16, 0));
+    tempTreedoublePosition.push_back(std::make_pair(2, 0));
+   /* tempTreedoublePosition.push_back(std::make_pair(-2, 0));
+    tempTreedoublePosition.push_back(std::make_pair(0, 2));
+    tempTreedoublePosition.push_back(std::make_pair(0, -2));
+
+    tempTreedoublePosition.push_back(std::make_pair(5, 0));
+    tempTreedoublePosition.push_back(std::make_pair(-5, 0));
+    tempTreedoublePosition.push_back(std::make_pair(0, 5));
+    tempTreedoublePosition.push_back(std::make_pair(0, -5));
+
+    tempTreedoublePosition.push_back(std::make_pair(7, 0));
+    tempTreedoublePosition.push_back(std::make_pair(-7, 0));
+    tempTreedoublePosition.push_back(std::make_pair(0, 7));
+    tempTreedoublePosition.push_back(std::make_pair(0, -7));*/
+  
+    tempTreedoublePosition.push_back(std::make_pair(10, 0));
+  /*  tempTreedoublePosition.push_back(std::make_pair(-10, 0));
+    tempTreedoublePosition.push_back(std::make_pair(0, 10));
+    tempTreedoublePosition.push_back(std::make_pair(0, -10));*/
 
     return tempTreedoublePosition;
 }
@@ -338,7 +353,8 @@ double OneNumberRangeError(float vNumber,int vControlFloatPosition,int vRange)
 			BaseNumber++;
 		}
 		return (pow(10,(BaseNumber-1 - vControlFloatPosition)))*vRange;
-	} 
+	}
+    return 0;
 }
 
 //计算范围从+0到360

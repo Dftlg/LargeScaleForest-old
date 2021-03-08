@@ -52,7 +52,7 @@ public:
   virtual ~ImplicitBackwardEulerSparse();
 
   virtual void WriteKRFextVMartixToFile(const std::string & vFilePath, int vFrameIndex);
-  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex, std::vector<int> & vForce);
+  virtual void WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<std::vector<int>> & vGroupElementIndex, std::vector<int> &vConnectElementIndex, std::vector<int> & vForce);
 
   // sets q, and (optionally) qvel 
   // returns 0 

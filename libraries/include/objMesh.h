@@ -154,6 +154,8 @@ public:
   inline const Vec3d & getNormal(int normalIndex) const { return normals[normalIndex]; }
   inline const Vec3d & getNormal(const Vertex & vertex) const { return normals[vertex.getNormalIndex()]; }
 
+  std::vector<int> &getVertexGroup() { return vertexGroups; };
+
   inline void setPosition(int vertexIndex, const Vec3d & position) { vertexPositions[vertexIndex] = position; }
   inline void setPosition(Vertex & vertex, const Vec3d & position) { vertexPositions[vertex.getPositionIndex()] = position; }
   inline void setTextureCoordinate(int textureCoordinateIndex, const Vec3d & textureCoordinate) { textureCoordinates[textureCoordinateIndex] = textureCoordinate; }
@@ -602,6 +604,8 @@ protected:
   std::vector< Vec3d > textureCoordinates;
   std::vector< Vec3d > normals;
   std::string filename;
+
+  std::vector<int> vertexGroups;
 
   double diameter;
   Vec3d bmin, bmax;

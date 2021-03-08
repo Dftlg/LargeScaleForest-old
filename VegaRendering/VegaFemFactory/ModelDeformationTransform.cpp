@@ -3,9 +3,9 @@
 
 CModelDeformationTransform::CModelDeformationTransform(const std::string & vFileName)
 {
-	//¶¨ÒåÒ»¸ö¸ÄÁ¼°æµÄmodel£¬¸Ãmodel¿ÉÒÔÖ±½Ó¶ÁÈ¡objÄ£ĞÍ
+	//å®šä¹‰ä¸€ä¸ªæ”¹è‰¯ç‰ˆçš„modelï¼Œè¯¥modelå¯ä»¥ç›´æ¥è¯»å–objæ¨¡å‹
 	SceneObjectDeformable *m_BaseFileStruct = new SceneObjectDeformable(vFileName.c_str());
-	//ÔÙ½«¶ÁÈ¡µÄmesh·µ»Øµ½Õâ¸ö±¾ÀàµÄmodelµÄmesh
+	//å†å°†è¯»å–çš„meshè¿”å›åˆ°è¿™ä¸ªæœ¬ç±»çš„modelçš„mesh
 	m_BaseFileMesh = m_BaseFileStruct->GetMesh();
 	__VertexFaceRelated();
 	//__VertexRepeat();
@@ -34,22 +34,22 @@ void CModelDeformationTransform::__VertexRepeat()
 	}
 }
 
-//¶Ôm_GroupsÖĞµÄÊı¾İ½øĞĞÌî³ä
+//å¯¹m_Groupsä¸­çš„æ•°æ®è¿›è¡Œå¡«å……
 void CModelDeformationTransform::__VertexFaceRelated()
 {
 	m_VerticesNumber = m_BaseFileMesh->getNumVertices();
-	//Ñ­»·objÄ£ĞÍÖĞµÄ×ÜgroupÊıÁ¿
+	//å¾ªç¯objæ¨¡å‹ä¸­çš„æ€»groupæ•°é‡
 	for (unsigned int i = 0; i < m_BaseFileMesh->getNumGroups(); i++)
 	{
 		m_Groups.push_back(BaseObjConstruct::SGroup(m_BaseFileMesh->getGroup(i).getName(), m_BaseFileMesh->getGroup(i).getNumFaces()));
 		std::vector<int> tempVertexIndex;
 		std::vector<int> tempGroupIndex;
-		//Ñ­»·Ã¿¸ögroupÖĞÃ¿¸öfaceµÄÊıÁ¿
+		//å¾ªç¯æ¯ä¸ªgroupä¸­æ¯ä¸ªfaceçš„æ•°é‡
 		for (unsigned int iFace = 0; iFace < m_BaseFileMesh->getGroup(i).getNumFaces(); iFace++)
 		{
 			ObjMesh::Face face = m_BaseFileMesh->getGroup(i).getFace(iFace);
 
-			//Ñ­»·Ã¿¸öfaceÖĞÃ¿¸ö¶¥µãµÄ¸öÊı£¬Ò»¸öfaceÈı¸ö¶¥µã
+			//å¾ªç¯æ¯ä¸ªfaceä¸­æ¯ä¸ªé¡¶ç‚¹çš„ä¸ªæ•°ï¼Œä¸€ä¸ªfaceä¸‰ä¸ªé¡¶ç‚¹
 			for (int j = 0; j < 3; j++)
 			{
 				tempVertexIndex.push_back(face.getVertex(j).getPositionIndex());
@@ -64,52 +64,72 @@ void CModelDeformationTransform::__VertexFaceRelated()
 	std::cout << "Finish Load Vega Vertex And Face Relationship" << std::endl;
 }
 
-//¸ù¾İÔ­Ê¼uÀ´Ìî³ä°´ÃæµÄË³ĞòÅÅĞòµÄ¶¥µãu
+//æ ¹æ®åŸå§‹uæ¥å¡«å……æŒ‰é¢çš„é¡ºåºæ’åºçš„é¡¶ç‚¹u
 void CModelDeformationTransform::ConvertVertex2mutileVerteices(Common::SFileData &vBaseFileDeformation)
 {
 	if (m_VerticesNumber != vBaseFileDeformation.BaseFileDeformations.size()) std::cout << "the DataSet not equal to baseFile" << std::endl;
 
-	//Ñ­»·group
+	//å¾ªç¯group
 	for (unsigned int i = 0; i < m_BaseFileMesh->getNumGroups(); i++)
 	{
 		Common::SFileDataGroup tempDataGroup(i);
-		//Ã¿¸ögroupÖĞµÄËùÓĞÃæ
+		//æ¯ä¸ªgroupä¸­çš„æ‰€æœ‰é¢
 		for (unsigned int faceid = 0; faceid < m_Groups[i].FaceSize; faceid++)
 		{
-			//Ã¿¸öÃæÖĞµÄËùÓĞ¶¥µã
+			//æ¯ä¸ªé¢ä¸­çš„æ‰€æœ‰é¡¶ç‚¹
 			for (unsigned int vertexindex = 0; vertexindex < 3; vertexindex++)
 			{
 				tempDataGroup.PositionsDeformation.push_back(vBaseFileDeformation.BaseFileDeformations[m_Groups[i].Faces[faceid].VertexIndex[vertexindex]]);
 			}
 		}
-		//½«Ò»Ö¡ÖĞËùÓĞgroup¶ÔÓ¦µÄ°´ÕÕÃæÅÅÁĞµÄu½øĞĞ´æ´¢
+		//å°†ä¸€å¸§ä¸­æ‰€æœ‰groupå¯¹åº”çš„æŒ‰ç…§é¢æ’åˆ—çš„uè¿›è¡Œå­˜å‚¨
 		vBaseFileDeformation.FileDeformation.push_back(tempDataGroup);
 	}
 }
 
-void CModelDeformationTransform::SaveDeformationVertexFromBaseModel(const double* u, const int vDeformationSize, std::string vSaveFileName, int vtimeStepCounter)
+void CModelDeformationTransform::SaveDeformationVertexFromBaseModel(const double* u, SceneObjectDeformable & tempObject, std::string vSaveFileName, int vtimeStepCounter)
 {
-	if (!vSaveFileName.empty())
-	{
-		char s[4096];
-		FILE * file = fopen(vSaveFileName.c_str(), "a");
-		if (!file)
-		{
-			printf("Can't open output file: %s.\n", s);
-		}
-		else
-		{
-			sprintf(s, "Position%d", vtimeStepCounter);
-			fprintf(file, "%s \n", s);
-			sprintf(s, "%d", vDeformationSize);
-			fprintf(file, "%s \n", s);
-			for (unsigned int i = 0; i < vDeformationSize; i++)
-			{
-				fprintf(file, "%.10lf %.10lf %.10lf ", u[3 * i + 0], u[3 * i + 1], u[3 * i + 2]);
-			}
-			//fprintf(file, "%.10lf %.10lf %.10lf ", u[3 * 32464 + 0], u[3 * 32464 + 1], u[3 * 32464 + 2]);
-			fprintf(file, "\n");
-		}
-		fclose(file);
-	}
+
+    const size_t last_slash_idx = vSaveFileName.rfind('.txt');
+    std::string FramesKVFFileName = vSaveFileName.substr(0, last_slash_idx - 3);
+    std::vector<FILE *> Files;
+
+    int vertexNumber = 0;
+    for (int i = 0; i < tempObject.GetVertexGroup().size(); i++)
+    {
+        std::string tempstring = "Group" + std::to_string(i);
+
+        std::string groupSaveFileName = FramesKVFFileName + tempstring;
+        groupSaveFileName += ".txt";
+       
+        std::cout << vertexNumber << std::endl;
+        if (!vSaveFileName.empty())
+        {
+            char s[4096];
+            FILE * file = fopen(groupSaveFileName.c_str(), "a");
+            if (!file)
+            {
+                printf("Can't open output file: %s.\n", s);
+            }
+            else
+            {
+                sprintf(s, "Position%d", vtimeStepCounter);
+                fprintf(file, "%s \n", s);
+                sprintf(s, "%d", tempObject.GetVertexGroup()[i]);
+                fprintf(file, "%s \n", s);
+                
+                for (unsigned int k = 0; k < tempObject.GetVertexGroup()[i]; k++)
+                {
+                    fprintf(file, "%.10lf %.10lf %.10lf ", u[3 * (k+ vertexNumber) + 0], u[3 * (k + vertexNumber) + 1], u[3 * (k + vertexNumber) + 2]);
+                }
+                //fprintf(file, "%.10lf %.10lf %.10lf ", u[3 * 32464 + 0], u[3 * 32464 + 1], u[3 * 32464 + 2]);
+                fprintf(file, "\n");
+                vertexNumber += tempObject.GetVertexGroup()[i];
+            }
+            fclose(file);
+
+        }
+    }
+       
+	
 }

@@ -274,6 +274,9 @@ int numFixedKVFNumber;
 int * fixedKVFVertices;
 std::vector<int> KVFVertices;
 
+std::vector<std::vector<int>> GroupKVFVertices;
+std::vector<int> ConnectKVFVertices;
+
 std::vector<int> StemExtraForces;
 std::vector<std::vector<int>> LeafExtraForces;
 std::vector<int> TempExtraForces;
@@ -761,7 +764,7 @@ void idleFunction(void)
 		TempExtraForces.push_back(StemExtraForces[subTimestepCounter]);
 		if ((subTimestepCounter+1) % Common::ForcesSampling == 0)
 		{
-			integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, KVFVertices, TempExtraForces);
+			integratorBase->WriteSpecificKRFextVMattixToFile(outputFilename, subTimestepCounter, GroupKVFVertices, ConnectKVFVertices, TempExtraForces);
 			TempExtraForces.clear();
 		}
 		//计算由力产生的结点位移形变
@@ -847,6 +850,7 @@ void idleFunction(void)
   {
     PerformanceCounter interpolationCounter;
 
+   
     VolumetricMesh::interpolate(u, uSecondary, secondaryDeformableObjectRenderingMesh->Getn(), secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices, secondaryDeformableObjectRenderingMesh_interpolation_vertices, secondaryDeformableObjectRenderingMesh_interpolation_weights);
 	//内部的三角形网格发生形变
     secondaryDeformableObjectRenderingMesh->SetVertexDeformations(uSecondary);
@@ -866,7 +870,7 @@ void idleFunction(void)
 		TempExtraForces.clear();
 	}*/
 	//存储deltaU的形变数据
-	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu, secondaryDeformableObjectRenderingMesh->GetNumVertices(), outputFilename, subTimestepCounter-1);
+	deformationsave.SaveDeformationVertexFromBaseModel(deltaSecondaryu,* secondaryDeformableObjectRenderingMesh, outputFilename, subTimestepCounter-1);
 
 
     //存储U的形变数据
@@ -1585,18 +1589,18 @@ void initSimulation()
     fixedVertices[0] = massSpringSystem->GetNumParticles();
   }
 
-  if (ListIO::load(fixedVerticesKVFFileName, &numFixedKVFNumber, &fixedKVFVertices) != 0)
+ /* if (ListIO::load(fixedVerticesKVFFileName, &numFixedKVFNumber, &fixedKVFVertices) != 0)
   {
 	  printf("Error reading fixed vertices.\n");
 	  exit(1);
-  }
-
-  for (auto i = 0; i < numFixedKVFNumber; i++)
+  }*/
+  ListIO::loadKVFFile(fixedVerticesKVFFileName,GroupKVFVertices,ConnectKVFVertices);
+ /* for (auto i = 0; i < numFixedKVFNumber; i++)
   {
 	  KVFVertices.push_back(fixedKVFVertices[i]);
-  }
+  }*/
   //存储判断体素形变顶点索引
-  volumetricMesh->SaveObjectVertexsintElement(KVFVertices, secondaryDeformableObjectRenderingMesh->Getn(), secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices, secondaryDeformableObjectRenderingMesh_interpolation_vertices, ObjectVertexIndexInElement);
+  //volumetricMesh->SaveObjectVertexsintElement(KVFVertices, secondaryDeformableObjectRenderingMesh->Getn(), secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices, secondaryDeformableObjectRenderingMesh_interpolation_vertices, ObjectVertexIndexInElement);
 
   printf("Loaded %d fixed vertices. They are:\n",numFixedVertices);
   ListIO::print(numFixedVertices,fixedVertices);
@@ -1677,7 +1681,7 @@ void initSimulation()
 	  std::vector<int> tempStemForces= GenerateSamplingForce(180, tempConfig[i][0], tempConfig[i][1], tempConfig[i][2], tempConfig[i][3], 6);	  
 	  for (int k = 0; k < tempStemForces.size(); k++)
 	  {
-          std::cout << tempConfig[i].size() << std::endl;
+          //std::cout << tempConfig[i].size() << std::endl;
           if (tempConfig[i].size() ==5 )
           {
               if (tempStemForces[k] < tempConfig[i][3])
@@ -1709,7 +1713,7 @@ void initSimulation()
           std::vector<int> tempLeafForces = GenerateSamplingForce(180, tempConfig[i][0], tempConfig[i][1] * tempFrequency[k], tempConfig[i][2]+ tempPhase[k], tempConfig[i][3], 6);
           for (int k = 0; k < tempLeafForces.size(); k++)
           {
-              std::cout << tempConfig[i].size() << std::endl;
+              //std::cout << tempConfig[i].size() << std::endl;
               if (tempConfig[i].size() == 5)
               {
                   if (tempLeafForces[k] < tempConfig[i][3])

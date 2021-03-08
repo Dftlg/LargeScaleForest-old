@@ -236,6 +236,8 @@ int ObjMesh::loadFromAscii(const string & filename, int verbose)
   int groupCloneIndex = 0;
   std::string groupSourceName;
 
+  bool judge = true;
+
   while(ifs)
   {
     lineNum++;
@@ -277,6 +279,7 @@ int ObjMesh::loadFromAscii(const string & filename, int verbose)
         throw ObjMeshException("Invalid vertex", filename, lineNum);
       }
       vertexPositions.push_back( pos );
+      judge = false;
     }
     else if (strncmp(line, "vn ", 3) == 0)
     {
@@ -302,6 +305,11 @@ int ObjMesh::loadFromAscii(const string & filename, int verbose)
     }
     else if (strncmp(line, "g ", 2) == 0)
     {
+        if (judge == false)
+        {
+            vertexGroups.push_back(vertexPositions.size());
+            judge = true;
+        }
       // remove last newline
       if (strlen(line) > 0)
       {
@@ -599,6 +607,18 @@ int ObjMesh::loadFromAscii(const string & filename, int verbose)
 
   // add the "default" material if it doesn't already exist
   addDefaultMaterial();
+
+  std::vector<int> tempvertexgroups(vertexGroups.size());
+  tempvertexgroups[0] = vertexGroups[0];
+  for (int i = 0; i < vertexGroups.size(); i++)
+  {
+      if (i !=0)
+          tempvertexgroups[i] = vertexGroups[i]-vertexGroups[i-1];
+  }
+  for (int i = 0; i < vertexGroups.size(); i++)
+  {
+      vertexGroups[i] = tempvertexgroups[i];
+  }
 
   return 0;
 }

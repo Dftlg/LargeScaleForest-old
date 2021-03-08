@@ -281,17 +281,17 @@ SparseMatrix::SparseMatrix(SparseMatrixOutline * sparseMatrixOutline)
 // construct matrix from the outline
 void SparseMatrix::InitFromOutline(SparseMatrixOutline * sparseMatrixOutline)
 {
-	//»ñÈ¡ĞĞÊıÎ¬¶È10884
+	//è·å–è¡Œæ•°ç»´åº¦10884
   numRows = sparseMatrixOutline->GetNumRows();
   Allocate();
 
   for(int i=0; i<numRows; i++)
   {
-	  //»ñÈ¡µ±Ç°Ä³¸ö¶¥µãµÄÄ³¸öÎ¬¶ÈËùÏà¹ØµÄÎ¬¶È³¤¶È ÀıÈç24£¬48£¬96µÈ
+	  //è·å–å½“å‰æŸä¸ªé¡¶ç‚¹çš„æŸä¸ªç»´åº¦æ‰€ç›¸å…³çš„ç»´åº¦é•¿åº¦ ä¾‹å¦‚24ï¼Œ48ï¼Œ96ç­‰
     rowLength[i] = (int)(sparseMatrixOutline->columnEntries[i].size());
-	//´´½¨µ±Ç°Ïà¹ØÎ¬¶ÈµÄÎ¬¶ÈË÷ÒıÖµ ×Ü¹²10884Î¬¶È
+	//åˆ›å»ºå½“å‰ç›¸å…³ç»´åº¦çš„ç»´åº¦ç´¢å¼•å€¼ æ€»å…±10884ç»´åº¦
     columnIndices[i] = (int*) malloc (sizeof(int) * rowLength[i]);
-	//´´½¨µ±Ç°Ïà¹ØÎ¬¶ÈµÄÊı¾İÖµ ×Ü¹²10884Î¬¶È
+	//åˆ›å»ºå½“å‰ç›¸å…³ç»´åº¦çš„æ•°æ®å€¼ æ€»å…±10884ç»´åº¦
     columnEntries[i] = (double*) malloc (sizeof(double) * rowLength[i]);
 
     map<int,double>::iterator pos;
@@ -299,16 +299,16 @@ void SparseMatrix::InitFromOutline(SparseMatrixOutline * sparseMatrixOutline)
     int prev = -1;
     for(pos = sparseMatrixOutline->columnEntries[i].begin(); pos != sparseMatrixOutline->columnEntries[i].end(); pos++)
     {
-		//ÎªÄ³Ò»Î¬¶È¸³ÖµÏà¹ØÎ¬¶ÈµÄË÷ÒıºÅ
+		//ä¸ºæŸä¸€ç»´åº¦èµ‹å€¼ç›¸å…³ç»´åº¦çš„ç´¢å¼•å·
       columnIndices[i][j] = pos->first;
       if (columnIndices[i][j] <= prev)
         printf("Warning: entries not sorted in a row in a sparse matrix.\n");
       prev = columnIndices[i][j];
-	  //ÎªÄ³Ò»Î¬¶È¸³ÖµÏà¹ØÎ¬¶ÈµÄÊı¾İ
+	  //ä¸ºæŸä¸€ç»´åº¦èµ‹å€¼ç›¸å…³ç»´åº¦çš„æ•°æ®
       columnEntries[i][j] = pos->second;
       j++;
     }
-	//columnIndices´óĞ¡ºÍcolumnEntries´óĞ¡ÏàÍ¬
+	//columnIndiceså¤§å°å’ŒcolumnEntrieså¤§å°ç›¸åŒ
   }
 }
 
@@ -798,7 +798,9 @@ void SparseMatrix::Print(int sparsePrint) const
 // if not found, returns -1
 int SparseMatrix::GetInverseIndex(int row, int jDense) const
 {
-	//´Ë´¦Êµ¼Ê¼ÆËãÊ±²¢Î´¿¼ÂÇµ½3¸öÎ¬¶È£¬Ö»¶ÔÒ»¸öÎ¬¶È½øĞĞÁË²éÕÒ
+    //columnIndiceså­˜å‚¨çš„æ¯ä¸ª[]ä¸­çš„24ï¼Œ96çš„æ•°ç»„ä¸­ï¼Œå› ä¸ºæ˜¯å°†æ¨¡å‹é¡¶ç‚¹è¿›è¡Œäº†é¡ºåºçš„æ’å¸ƒä¸vegçš„é¡ºåºä¸åŒ
+    //æœ€åè¿”å›ç»“æœä¸ºæ‰€åœ¨æ•°ç»„çš„ä½ç½®
+	//æ­¤å¤„å®é™…è®¡ç®—æ—¶å¹¶æœªè€ƒè™‘åˆ°3ä¸ªç»´åº¦ï¼Œåªå¯¹ä¸€ä¸ªç»´åº¦è¿›è¡Œäº†æŸ¥æ‰¾
   for(int j=0; j < rowLength[row]; j++)
     if (columnIndices[row][j] == jDense)
       return j;

@@ -65,7 +65,7 @@ int ImplicitBackwardEulerSparse::DoTimestep()
   double error0 = 0; // error after the first step
   double errorQuotient;
 
-  // store current amplitudesÕñ·ù and set initial guesses for qaccel, qvel¼ÓËÙ¶ÈºÍËÙ¶È qÊÇĞÎ±äÕñ·ù
+  // store current amplitudesæŒ¯å¹… and set initial guesses for qaccel, qvelåŠ é€Ÿåº¦å’Œé€Ÿåº¦ qæ˜¯å½¢å˜æŒ¯å¹…
   for(int i=0; i<r; i++)
   {
     qaccel_1[i] = qaccel[i] = 0; // acceleration is actually not used in this integrator
@@ -76,8 +76,8 @@ int ImplicitBackwardEulerSparse::DoTimestep()
   do
   {
     PerformanceCounter counterForceAssemblyTime;
-	//ÔÚÕâÀïÁÙÊ±ËãµÄinternalforceºÍtangentstiffness
-	//µ÷ÓÃµ½forcessModelAssember.cpp»ñÈ¡
+	//åœ¨è¿™é‡Œä¸´æ—¶ç®—çš„internalforceå’Œtangentstiffness
+	//è°ƒç”¨åˆ°forcessModelAssember.cppè·å–
     forceModel->GetForceAndMatrix(q, internalForces, tangentStiffnessMatrix);
     counterForceAssemblyTime.StopCounter();
     forceAssemblyTime = counterForceAssemblyTime.GetElapsedTime();
@@ -103,14 +103,14 @@ int ImplicitBackwardEulerSparse::DoTimestep()
     printf("\n");
 */
 
-    // scale stiffness matrix Ó¦¸ÃÊÇK¾ØÕó
+    // scale stiffness matrix åº”è¯¥æ˜¯KçŸ©é˜µ
     *tangentStiffnessMatrix *= internalForceScalingFactor;
 
     memset(qresidual, 0, sizeof(double) * r);
 
     if (useStaticSolver)
     {
-		//Õâ¸öqdeltaÊÇÊ²Ã´
+		//è¿™ä¸ªqdeltaæ˜¯ä»€ä¹ˆ
       // fint + K * qdelta = fext
 
       // add externalForces, internalForces
@@ -123,8 +123,8 @@ int ImplicitBackwardEulerSparse::DoTimestep()
     else
     {
       // compute D_Rayleigh = dampingStiffnessCoef * tangentStiffnessMatrix + dampingMassCoef * massMatrix
-		//¼ÆËãÈğÀû×èÄádampingMassCoefÈğÀû×èÄáaÖµ,dampingstiffnessCoefÈğÀû×èÄá¦ÂÖµ¡£
-		//tangentStiffnessMatrixÎªÇĞÏß¸Õ¶È¾ØÕóK
+		//è®¡ç®—ç‘åˆ©é˜»å°¼dampingMassCoefç‘åˆ©é˜»å°¼aå€¼,dampingstiffnessCoefç‘åˆ©é˜»å°¼Î²å€¼ã€‚
+		//tangentStiffnessMatrixä¸ºåˆ‡çº¿åˆšåº¦çŸ©é˜µK
       tangentStiffnessMatrix->ScalarMultiply(dampingStiffnessCoef, rayleighDampingMatrix);
       rayleighDampingMatrix->AddSubMatrix(dampingMassCoef, *massMatrix);
 
@@ -133,14 +133,14 @@ int ImplicitBackwardEulerSparse::DoTimestep()
 
       // build effective stiffness: 
       // Keff = M + h D + h^2 * K
-      // compute force residual, store it into aux variable qresidual ²Ğ²î
-	  //¡øt(fext-fint(ut)-(¡øt K+D)vt)
+      // compute force residual, store it into aux variable qresidual æ®‹å·®
+	  //â–²t(fext-fint(ut)-(â–²t K+D)vt)
       // qresidual = h * (-D qdot - fint + fext - h * K * qdot)) // this is semi-implicit Euler
       // qresidual = M (qvel_1 - qvel) + h * (-D qdot - fint + fext - K * (q_1 - q + h qdot) )) // for fully implicit Euler
 
       if (numIter != 0) // can skip on first iteration (zero contribution)
       {
-		 //K*¡øu
+		 //K*â–²u
         // add K * (q_1 - q) to qresidual (will multiply by -h later)
         for(int i=0; i<r; i++)
           buffer[i] = q_1[i] - q[i];
@@ -148,26 +148,26 @@ int ImplicitBackwardEulerSparse::DoTimestep()
       }
 
       //add mass matrix and damping matrix to tangentStiffnessMatrix
-	  //ÓÃÀ´¼ÆËãAÕâ¸öSystem Matrix¾ØÕó
+	  //ç”¨æ¥è®¡ç®—Aè¿™ä¸ªSystem MatrixçŸ©é˜µ
       *tangentStiffnessMatrix *= timestep; //K= t * K
       *tangentStiffnessMatrix += *rayleighDampingMatrix; //K=K+D_RayLeigh= t * K + D_Rayleigh
       tangentStiffnessMatrix->AddSubMatrix(1.0, *dampingMatrix, 1); // at this point, tangentStiffnessMatrix = t * K + (D_Rayleigh + D_exteral)
 
 	  // K=K+dampingMatrix=t*K+D_Rayleigh + D_dampMatrix=  t*k+C 
 
-	  //qresidual = K * v = (t*K + C)v  ´ËÊ±qresidualÎª(t*K+C)v
+	  //qresidual = K * v = (t*K + C)v  æ­¤æ—¶qresidualä¸º(t*K+C)v
       tangentStiffnessMatrix->MultiplyVectorAdd(qvel, qresidual);//(t*K+D)v  
 
 	  //K=t(t*K+C)
       *tangentStiffnessMatrix *= timestep; // h^2 * K + h * (D_Rayleigh + D_externnal)
-	  //K=t(t*K+C)+M=t^2K+tC+M  ´ËÊ±µÄtangentStiffnessMatrixÎªA¾ØÕó
+	  //K=t(t*K+C)+M=t^2K+tC+M  æ­¤æ—¶çš„tangentStiffnessMatrixä¸ºAçŸ©é˜µ
       tangentStiffnessMatrix->AddSubMatrix(1.0, *massMatrix); // h^2 * K + h * (D_Rayleigh + D_external) + M
 
 
 	  //tangentStiffnessMatrix->Save("D:\\GraduationProject\\LargeScaleForest\\models\\8.10\\test\\K3.txt");
       // add externalForces, internalForces
 	  // qresidual=qresidual + Fint-Fext= (t*K+C)v+Fint-Fext
-	  //qresidual=-t[(t*K+C)v+Fint-Fext]=t[-(t*K+C)v-Fint+Fext] ´ËÊ±ÓëÒşÊ½Å·À­residual²½ÖèÏàÍ¬
+	  //qresidual=-t[(t*K+C)v+Fint-Fext]=t[-(t*K+C)v-Fint+Fext] æ­¤æ—¶ä¸éšå¼æ¬§æ‹‰residualæ­¥éª¤ç›¸åŒ
       for(int i=0; i<r; i++)
       {
         qresidual[i] += internalForces[i] - externalForces[i];
@@ -350,19 +350,19 @@ void ImplicitBackwardEulerSparse::WriteKRFextVMartixToFile(const std::string & v
 		}*/
 
 
-		//Êä³öÖ¡ºÅ
+		//è¾“å‡ºå¸§å·
 		connectionFile << vFrameIndex << std::endl;
 		connectionFile << "u" << std::endl;
 		for (int i = 0; i < r; i++)
 			connectionFile << q[i] << " ";
 		connectionFile << std::endl;
-		//Êä³öÄÚÁ¦
+		//è¾“å‡ºå†…åŠ›
 		connectionFile << "internalForces" << std::endl;
 		for (int i = 0; i < r; i++)
 			connectionFile << internalForces[i] << " ";
 		connectionFile << std::endl;
 		connectionFile << "Kmatrix" << std::endl;
-		//Êä³ö¸Õ¶È¾ØÕó»òÕßÊä³öA¾ØÕó
+		//è¾“å‡ºåˆšåº¦çŸ©é˜µæˆ–è€…è¾“å‡ºAçŸ©é˜µ
 		int temRows = temptangentStiffnessMatrix->GetNumRows();
 
 		for (int i = 0; i < temptangentStiffnessMatrix->GetNumRows(); i++)
@@ -378,7 +378,7 @@ void ImplicitBackwardEulerSparse::WriteKRFextVMartixToFile(const std::string & v
 			connectionFile << "\n";
 		}
 			
-		//Êä³öËÙ¶È
+		//è¾“å‡ºé€Ÿåº¦
 		connectionFile << "velocity" << std::endl;
 		for (int i = 0; i < r; i++)
 			connectionFile << qvel[i] << " ";
@@ -388,7 +388,7 @@ void ImplicitBackwardEulerSparse::WriteKRFextVMartixToFile(const std::string & v
 
 }
 
-void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex, std::vector<int>& vElementIndex,std::vector<int> & vForce)
+void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::string &vFilePath, int vFrameIndex,std::vector<std::vector<int>> & vGroupElementIndex,std::vector<int> &vConnectElementIndex,  std::vector<int> & vForce)
 {
 	const size_t last_slash_idx = vFilePath.rfind('.txt');
 	std::string FramesBlockFileName = vFilePath.substr(0, last_slash_idx - 3);
@@ -401,10 +401,19 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 
 	if (connectionFile.is_open())
 	{
-		//Êä³öÌåËØ¸öÊı
+		//è¾“å‡ºä½“ç´ ä¸ªæ•°
 		connectionFile << "ElementSize" << std::endl;
-		connectionFile << vElementIndex.size() << std::endl;
-		//Êä³öÖ¡ºÅ
+        int tempAllGroupElement = 0;
+        for (int i = 0; i < vGroupElementIndex.size(); i++)
+            tempAllGroupElement += vGroupElementIndex[i].size();
+		connectionFile << tempAllGroupElement + vConnectElementIndex.size() << std::endl;
+
+        connectionFile << "EachGroupElement" << std::endl;
+        for (int i = 0; i < vGroupElementIndex.size(); i++)
+            connectionFile << vGroupElementIndex[i].size()<<",";
+        connectionFile << vConnectElementIndex.size();
+        connectionFile << std::endl;
+		//è¾“å‡ºå¸§å·
 
 		connectionFile << "FrameIndex" << std::endl;
 		connectionFile << vFrameIndex << std::endl;
@@ -418,59 +427,130 @@ void ImplicitBackwardEulerSparse::WriteSpecificKRFextVMattixToFile(const std::st
 		connectionFile << "Kmatrix" << std::endl;
 		std::map<int, std::vector<double>> vertexPos;
 		std::map<int, std::vector<double>> vertexVel;
-		for (int i = 0; i < vElementIndex.size(); i++)
-		{
-			const int *vIndices=forceModel->GetStencilForceModel()->GetStencilVertexIndices(0,vElementIndex[i]);
-			for (int v = 0; v < ElementNumber; v++)
-			{
-				//std::vector<int> RowLengthsInElement;
-				//´æ´¢µ±Ç°eleµÄÄ³¸ö¶¥µãÄÚÁ¦Öµ
-				if (vertexPos.count(vIndices[v]) == 0)
-				{
-					std::vector<double> tempForcesxyz;
-					tempForcesxyz.push_back(internalForces[vIndices[v] * 3]);
-					tempForcesxyz.push_back(internalForces[vIndices[v] * 3+1]);
-					tempForcesxyz.push_back(internalForces[vIndices[v] * 3+2]);
-					vertexPos.insert(std::make_pair(vIndices[v], tempForcesxyz));
-				}
+        std::vector<int> GroupPosSize;
+        //33ä¸ªä½“ç´ 
+        for (int GroupElement = 0; GroupElement < vGroupElementIndex.size(); GroupElement++)
+        {
+            connectionFile << "Group" << GroupElement << std::endl;
+            int Size = 0;
+            for (int i = 0; i < vGroupElementIndex[GroupElement].size(); i++)
+            {       
+                const int *vIndices = forceModel->GetStencilForceModel()->GetStencilVertexIndices(0, vGroupElementIndex[GroupElement][i]);
+                //8ä¸ªé¡¶ç‚¹
+                for (int v = 0; v < ElementNumber; v++)
+                {
+                    //std::vector<int> RowLengthsInElement;
+                    //å­˜å‚¨å½“å‰eleçš„æŸä¸ªé¡¶ç‚¹å†…åŠ›å€¼
+                    if (vertexPos.count(vIndices[v]) == 0)
+                    {
+                        std::vector<double> tempForcesxyz;
+                        tempForcesxyz.push_back(internalForces[vIndices[v] * 3]);
+                        tempForcesxyz.push_back(internalForces[vIndices[v] * 3 + 1]);
+                        tempForcesxyz.push_back(internalForces[vIndices[v] * 3 + 2]);
+                        vertexPos.insert(std::make_pair(vIndices[v], tempForcesxyz));
+                        Size++;
+                    }
 
-				if (vertexVel.count(vIndices[v]) == 0)
-				{
-					std::vector<double> tempVelsxyz;
-					tempVelsxyz.push_back(qvel[vIndices[v] * 3]);
-					tempVelsxyz.push_back(qvel[vIndices[v] * 3 + 1]);
-					tempVelsxyz.push_back(qvel[vIndices[v] * 3 + 2]);
-					vertexVel.insert(std::make_pair(vIndices[v], tempVelsxyz));
-				}
+                    if (vertexVel.count(vIndices[v]) == 0)
+                    {
+                        std::vector<double> tempVelsxyz;
+                        tempVelsxyz.push_back(qvel[vIndices[v] * 3]);
+                        tempVelsxyz.push_back(qvel[vIndices[v] * 3 + 1]);
+                        tempVelsxyz.push_back(qvel[vIndices[v] * 3 + 2]);
+                        vertexVel.insert(std::make_pair(vIndices[v], tempVelsxyz));
+                    }
 
-				//´æ´¢µ±Ç°eleµÄÄ³¸ö¶¥µãÏà¹ØµÄÄ³Ò»Î¬¶ÈÏà¹Ø¶¥µãÎ¬¶ÈµÄÊı¾İ
-				for (int j = 0; j < 3; j++)
-				{
-					int RowLength= temptangentStiffnessMatrix->GetRowLength(vIndices[v] * 3+j);
-					connectionFile << RowLength << " ";
-					for (int k = 0; k < RowLength; k++)
-					{
-						double entry = temptangentStiffnessMatrix->GetEntry(vIndices[v] * 3 + j, k);
-						connectionFile << entry << " ";
-					}
-					connectionFile << std::endl;
+                    //å­˜å‚¨å½“å‰eleçš„æŸä¸ªé¡¶ç‚¹ç›¸å…³çš„æŸä¸€ç»´åº¦ç›¸å…³é¡¶ç‚¹ç»´åº¦çš„æ•°æ®
+                    for (int j = 0; j < 3; j++)
+                    {
+                        int RowLength = temptangentStiffnessMatrix->GetRowLength(vIndices[v] * 3 + j);
+                        connectionFile << RowLength << " ";
+                        for (int k = 0; k < RowLength; k++)
+                        {
+                            double entry = temptangentStiffnessMatrix->GetEntry(vIndices[v] * 3 + j, k);
+                            connectionFile << entry << " ";
+                        }
+                        connectionFile << std::endl;
 
-				}
-			
-			}
-		}
+                    }
+
+                }
+            }
+            GroupPosSize.push_back(Size);
+        }
+
+        connectionFile << "Connect" << std::endl;
+        int Size = 0;
+         for (int i = 0; i < vConnectElementIndex.size(); i++)
+            {
+                
+                const int *vIndices = forceModel->GetStencilForceModel()->GetStencilVertexIndices(0, vConnectElementIndex[i]);
+                //8ä¸ªé¡¶ç‚¹
+                for (int v = 0; v < ElementNumber; v++)
+                {
+                    //std::vector<int> RowLengthsInElement;
+                    //å­˜å‚¨å½“å‰eleçš„æŸä¸ªé¡¶ç‚¹å†…åŠ›å€¼
+                    if (vertexPos.count(vIndices[v]) == 0)
+                    {
+                        std::vector<double> tempForcesxyz;
+                        tempForcesxyz.push_back(internalForces[vIndices[v] * 3]);
+                        tempForcesxyz.push_back(internalForces[vIndices[v] * 3 + 1]);
+                        tempForcesxyz.push_back(internalForces[vIndices[v] * 3 + 2]);
+                        vertexPos.insert(std::make_pair(vIndices[v], tempForcesxyz));
+                        Size++;
+                    }
+
+                    if (vertexVel.count(vIndices[v]) == 0)
+                    {
+                        std::vector<double> tempVelsxyz;
+                        tempVelsxyz.push_back(qvel[vIndices[v] * 3]);
+                        tempVelsxyz.push_back(qvel[vIndices[v] * 3 + 1]);
+                        tempVelsxyz.push_back(qvel[vIndices[v] * 3 + 2]);
+                        vertexVel.insert(std::make_pair(vIndices[v], tempVelsxyz));
+                    }
+
+                    //å­˜å‚¨å½“å‰eleçš„æŸä¸ªé¡¶ç‚¹ç›¸å…³çš„æŸä¸€ç»´åº¦ç›¸å…³é¡¶ç‚¹ç»´åº¦çš„æ•°æ®
+                    for (int j = 0; j < 3; j++)
+                    {
+                        int RowLength = temptangentStiffnessMatrix->GetRowLength(vIndices[v] * 3 + j);
+                        connectionFile << RowLength << " ";
+                        for (int k = 0; k < RowLength; k++)
+                        {
+                            double entry = temptangentStiffnessMatrix->GetEntry(vIndices[v] * 3 + j, k);
+                            connectionFile << entry << " ";
+                        }
+                        connectionFile << std::endl;
+
+                    }
+
+                }
+                
+            }
+         GroupPosSize.push_back(Size);
+		
 		connectionFile << "internalForces" << std::endl;
-		connectionFile << vertexPos.size() << std::endl;
+		connectionFile << vertexPos.size() << std::endl;   
+        for (int i = 0; i < GroupPosSize.size()-1; i++)
+        {
+            connectionFile << GroupPosSize[i] << ",";
+        }
+        connectionFile << GroupPosSize[GroupPosSize.size()]<< std::endl;
+
 		for (auto it = vertexPos.begin(); it != vertexPos.end(); ++it)
 		{
 			connectionFile << (it)->first << " ";
 			for (int i = 0; i < 3; i++)
 				connectionFile << it->second[i]<<" ";
-			connectionFile << "\n";
+			connectionFile << "\n";      
 		}
 
 		connectionFile << "velocity" << std::endl;
 		connectionFile << vertexVel.size() << std::endl;
+        for (int i = 0; i < GroupPosSize.size() - 1; i++)
+        {
+            connectionFile << GroupPosSize[i] << ",";
+        }
+        connectionFile << GroupPosSize[GroupPosSize.size()] << std::endl;
 		for (auto it = vertexVel.begin(); it != vertexVel.end(); ++it)
 		{
 			connectionFile << (it)->first << " ";
